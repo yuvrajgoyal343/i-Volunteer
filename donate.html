@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Donate food, clothes, books, medicines, and essentials to verified NGOs and charitable organisations through iVolunteer.">
+  <title>Donate — iVolunteer</title>
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="react/DonationTracker.css">
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="site-logo">
+        <div class="logo-icon">iV</div>
+        <span>iVolunteer</span>
+      </a>
+
+      <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="main-nav" id="main-nav">
+        <a href="index.html">Home</a>
+        <a href="donate.html">Donate</a>
+        <a href="volunteer.html">Volunteer</a>
+        <a href="organisations.html">Organisations</a>
+        <a href="about.html">About</a>
+        <div class="header-cta">
+          <a href="login.html" class="header-login-link">Sign In</a>
+          <a href="donate.html" class="btn btn-primary btn-sm">Donate Now</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+
+  <!-- Page Header -->
+  <section class="page-header">
+    <div class="container">
+      <h1>Make a Donation</h1>
+      <p>Fill in the details below and your items will be picked up and delivered to a verified organisation.</p>
+    </div>
+  </section>
+
+
+  <!-- Donation Form -->
+  <section class="page-content">
+    <div class="container">
+      <div class="form-page-layout">
+
+        <div class="form-wrapper">
+          <h2>Donation Details</h2>
+
+          <form id="donation-form" novalidate>
+            <div class="form-success" role="alert"></div>
+
+            <!-- Donation Type -->
+            <div class="form-group">
+              <label for="donation-type">Donation Type <span class="required">*</span></label>
+              <select id="donation-type" class="form-select" required>
+                <option value="">Select a category</option>
+                <option value="food">Food</option>
+                <option value="clothes">Clothes</option>
+                <option value="books">Books</option>
+                <option value="medicines">Medicines</option>
+                <option value="other">Other Essentials</option>
+              </select>
+              <span class="form-error">Please select a donation type.</span>
+            </div>
+
+            <!-- Item Description -->
+            <div class="form-group">
+              <label for="donation-desc">Item Description <span class="required">*</span></label>
+              <textarea id="donation-desc" class="form-textarea" rows="3"
+                placeholder="Describe the items you wish to donate (e.g. 10 kg rice, winter blankets, NCERT textbooks)"
+                required></textarea>
+              <span class="form-error">Please provide a description (at least 5 characters).</span>
+            </div>
+
+            <!-- Quantity -->
+            <div class="form-group">
+              <label for="donation-qty">Quantity <span class="required">*</span></label>
+              <input type="text" id="donation-qty" class="form-input" placeholder="e.g. 5 kg, 10 items, 20 books"
+                required>
+              <span class="form-error">Please enter the quantity.</span>
+            </div>
+
+            <!-- Pickup Address with Location -->
+            <div class="form-group">
+              <label for="donation-address">Pickup Address <span class="required">*</span></label>
+              <div class="input-with-btn">
+                <input type="text" id="donation-address" class="form-input" placeholder="Enter your pickup address"
+                  required>
+                <button type="button" id="use-location-btn" class="btn btn-ghost btn-sm">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  Use My Location
+                </button>
+              </div>
+              <span class="form-error">Please enter a valid pickup address.</span>
+              <div id="location-status" class="location-status"></div>
+            </div>
+
+            <!-- NGO Selection -->
+            <div class="form-group">
+              <label for="donation-ngo">Select Organisation <span class="required">*</span></label>
+              <select id="donation-ngo" class="form-select" required>
+                <option value="">Choose a nearby organisation</option>
+                <!-- Populated dynamically by donationForm.js -->
+              </select>
+              <span class="form-error">Please select an organisation.</span>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">Submit Donation Request</button>
+          </form>
+        </div>
+
+        <!-- Donation Tracking Dashboard (React) -->
+        <div class="form-wrapper">
+          <h2>Your Donations</h2>
+          <p style="margin-bottom: var(--space-6);">Track the status of your donations below.</p>
+          <div id="donation-tracker-root">
+            <!-- React DonationTracker component mounts here -->
+            <div class="empty-state">
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <line x1="3" y1="9" x2="21" y2="9" />
+                <line x1="9" y1="21" x2="9" y2="9" />
+              </svg>
+              <p>Loading donation tracker...</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="site-logo"
+            style="color: var(--color-white); margin-bottom: var(--space-2); display: inline-flex;">
+            <div class="logo-icon">iV</div>
+            <span>iVolunteer</span>
+          </a>
+          <p>Connecting generous donors with verified organisations to deliver food, clothing, books, medicines, and
+            essential items to those who need them most.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul>
+            <li><a href="donate.html">Donate Items</a></li>
+            <li><a href="volunteer.html">Volunteer</a></li>
+            <li><a href="organisations.html">Organisations</a></li>
+            <li><a href="about.html">About Us</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Categories</h4>
+          <ul>
+            <li><a href="donate.html">Food</a></li>
+            <li><a href="donate.html">Clothes</a></li>
+            <li><a href="donate.html">Books</a></li>
+            <li><a href="donate.html">Medicines</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <ul>
+            <li><a href="mailto:hello@ivolunteer.org">hello@ivolunteer.org</a></li>
+            <li><a href="about.html">Contact Form</a></li>
+            <li><a href="login.html">Sign In</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>2026 iVolunteer. All rights reserved.</p>
+        <p>Built with care for communities in need.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/geolocation.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/donationForm.js"></script>
+
+  <!-- React via CDN for donation tracker -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="text/babel" src="react/DonationTracker.jsx"></script>
+</body>
+
+</html>
