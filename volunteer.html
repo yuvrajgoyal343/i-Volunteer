@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sign up to volunteer with iVolunteer. Join food drives, teaching programmes, elder care visits, and community cleanup events.">
+  <title>Volunteer — iVolunteer</title>
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="site-logo">
+        <div class="logo-icon">iV</div>
+        <span>iVolunteer</span>
+      </a>
+
+      <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="main-nav" id="main-nav">
+        <a href="index.html">Home</a>
+        <a href="donate.html">Donate</a>
+        <a href="volunteer.html">Volunteer</a>
+        <a href="organisations.html">Organisations</a>
+        <a href="about.html">About</a>
+        <div class="header-cta">
+          <a href="login.html" class="header-login-link">Sign In</a>
+          <a href="donate.html" class="btn btn-primary btn-sm">Donate Now</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+
+  <!-- Page Header -->
+  <section class="page-header">
+    <div class="container">
+      <h1>Volunteer With Us</h1>
+      <p>Give your time to causes that matter. Sign up and join upcoming drives and activities in your area.</p>
+    </div>
+  </section>
+
+
+  <!-- Volunteer Content -->
+  <section class="page-content">
+    <div class="container">
+
+      <!-- Volunteer Sign-Up Form -->
+      <div class="form-page-layout" style="margin-bottom: var(--space-16);">
+        <div class="form-wrapper">
+          <h2>Sign Up as a Volunteer</h2>
+
+          <form id="volunteer-form" novalidate>
+            <div class="form-success" role="alert"></div>
+
+            <!-- Full Name -->
+            <div class="form-group">
+              <label for="vol-name">Full Name <span class="required">*</span></label>
+              <input type="text" id="vol-name" class="form-input" placeholder="Enter your full name" required>
+              <span class="form-error">Please enter your full name.</span>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+              <label for="vol-email">Email Address <span class="required">*</span></label>
+              <input type="email" id="vol-email" class="form-input" placeholder="you@example.com" required>
+              <span class="form-error">Please enter a valid email address.</span>
+            </div>
+
+            <!-- Phone -->
+            <div class="form-group">
+              <label for="vol-phone">Phone Number <span class="required">*</span></label>
+              <input type="tel" id="vol-phone" class="form-input" placeholder="+91 98765 43210" required>
+              <span class="form-error">Please enter a valid phone number.</span>
+            </div>
+
+            <!-- Areas of Interest -->
+            <div class="form-group">
+              <label>Areas of Interest <span class="required">*</span></label>
+              <div class="checkbox-group">
+                <label class="checkbox-item">
+                  <input type="checkbox" name="interests" value="foodDrive">
+                  Food Drives
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="interests" value="clothingDrive">
+                  Clothing Drives
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="interests" value="teaching">
+                  Teaching
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="interests" value="elderCare">
+                  Elder Care
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="interests" value="cleanup">
+                  Community Cleanup
+                </label>
+              </div>
+              <span class="form-error" id="interests-error" style="display: none;">Please select at least one area of interest.</span>
+            </div>
+
+            <!-- Availability -->
+            <div class="form-group">
+              <label for="vol-availability">Availability <span class="required">*</span></label>
+              <select id="vol-availability" class="form-select" required>
+                <option value="">Select your availability</option>
+                <option value="weekdays">Weekdays</option>
+                <option value="weekends">Weekends</option>
+                <option value="both">Both Weekdays and Weekends</option>
+                <option value="flexible">Flexible</option>
+              </select>
+              <span class="form-error">Please select your availability.</span>
+            </div>
+
+            <!-- Message (optional) -->
+            <div class="form-group">
+              <label for="vol-message">Additional Message</label>
+              <textarea id="vol-message" class="form-textarea" rows="3" placeholder="Tell us about any prior volunteering experience or other details (optional)"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">Sign Up to Volunteer</button>
+          </form>
+        </div>
+      </div>
+
+
+      <!-- Ongoing Activities Section -->
+      <div class="section-header">
+        <h2>Ongoing Activities and Drives</h2>
+        <p>Browse upcoming volunteer opportunities. Filter by activity type or location to find what suits you.</p>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-bar">
+        <div class="form-group" style="margin-bottom: 0; min-width: 180px;">
+          <select id="activity-type-filter" class="form-select">
+            <option value="all">All Activity Types</option>
+            <option value="foodDrive">Food Drives</option>
+            <option value="clothingDrive">Clothing Drives</option>
+            <option value="teaching">Teaching</option>
+            <option value="elderCare">Elder Care</option>
+            <option value="cleanup">Community Cleanup</option>
+          </select>
+        </div>
+        <div class="search-input-wrap" style="min-width: 200px;">
+          <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="activity-location-filter" class="form-input" placeholder="Filter by location...">
+        </div>
+      </div>
+
+      <!-- Activities Grid -->
+      <div id="activities-grid" class="grid-3">
+        <!-- Rendered dynamically by main.js -->
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="site-logo" style="color: var(--color-white); margin-bottom: var(--space-2); display: inline-flex;">
+            <div class="logo-icon">iV</div>
+            <span>iVolunteer</span>
+          </a>
+          <p>Connecting generous donors with verified organisations to deliver food, clothing, books, medicines, and essential items to those who need them most.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul>
+            <li><a href="donate.html">Donate Items</a></li>
+            <li><a href="volunteer.html">Volunteer</a></li>
+            <li><a href="organisations.html">Organisations</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="404.html">404 Help Page</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Categories</h4>
+          <ul>
+            <li><a href="donate.html">Food</a></li>
+            <li><a href="donate.html">Clothes</a></li>
+            <li><a href="donate.html">Books</a></li>
+            <li><a href="donate.html">Medicines</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <ul>
+            <li><a href="mailto:hello@ivolunteer.org">hello@ivolunteer.org</a></li>
+            <li><a href="about.html">Contact Form</a></li>
+            <li><a href="login.html">Sign In</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>2026 iVolunteer. All rights reserved.</p>
+        <p>Built with care for communities in need.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
