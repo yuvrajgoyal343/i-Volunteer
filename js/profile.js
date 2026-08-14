@@ -5,6 +5,16 @@
 (function () {
   "use strict";
 
+  /* Fallback: ensure escapeHtml is available even if main.js hasn't loaded */
+  if (typeof window.escapeHtml !== "function") {
+    window.escapeHtml = function (str) {
+      var div = document.createElement("div");
+      div.textContent = str;
+      return div.innerHTML;
+    };
+  }
+  var escapeHtml = window.escapeHtml;
+
   var currentUser = null;
   var activeDonationStatus = "all";
 

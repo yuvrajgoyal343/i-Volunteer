@@ -24,13 +24,21 @@ var AppData = (function () {
 
       // Not logged in and trying to access a protected page → go to login
       if (!userLoggedIn && !isPublicPage) {
-        window.location.href = "login.html";
+        window.location.replace("login.html");
+        return; // Stop further execution
       }
       // Logged in but on login/signup → go to home
       else if (userLoggedIn && isAuthPage) {
-        window.location.href = "index.html";
+        window.location.replace("index.html");
+        return; // Stop further execution
       }
-    } catch (e) {}
+
+      // Auth check passed — reveal the page body
+      document.documentElement.style.visibility = "visible";
+    } catch (e) {
+      // On error, still show the page to avoid blank screens
+      document.documentElement.style.visibility = "visible";
+    }
   })();
 
   /* ----- NGOs / Organisations ----- */
