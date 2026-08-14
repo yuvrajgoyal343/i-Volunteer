@@ -5,11 +5,35 @@
 (function () {
   "use strict";
 
+  /* ----- Self-contained validation helpers -----
+     main.js (which defines window.validateField) is NOT loaded on login/signup pages,
+     so we need our own validation functions here. */
+
+  function showFieldError(input, errorMsg) {
+    var group = input.closest(".form-group");
+    if (!group) return;
+    group.classList.add("has-error");
+    var errorEl = group.querySelector(".form-error");
+    if (errorEl && errorMsg) {
+      errorEl.textContent = errorMsg;
+    }
+  }
+
+  function clearFieldError(input) {
+    var group = input.closest(".form-group");
+    if (group) {
+      group.classList.remove("has-error");
+    }
+  }
+
+
   /* ----- LOGIN FORM ----- */
   var loginForm = document.getElementById("login-form");
   if (loginForm) {
     var nameInput = document.getElementById("login-name");
     var emailInput = document.getElementById("login-email");
+    var phoneInput = document.getElementById("login-phone");
+    var cityInput = document.getElementById("login-city");
     var passwordInput = document.getElementById("login-password");
     var toggleBtn = document.getElementById("toggle-password");
     var successMsg = loginForm.querySelector(".form-success");
@@ -38,26 +62,37 @@
 
       var nameVal = nameInput ? nameInput.value.trim() : "";
       var emailVal = emailInput ? emailInput.value.trim() : "";
+      var phoneVal = phoneInput ? phoneInput.value.trim() : "";
+      var cityVal = cityInput ? cityInput.value.trim() : "";
       var passVal = passwordInput ? passwordInput.value : "";
 
+      // Validate Name
       if (nameInput && !nameVal) {
-        if (typeof validateField === "function") {
-          validateField(nameInput, function () { return false; }, "Please enter your full name.");
-        }
+        showFieldError(nameInput, "Please enter your full name.");
         valid = false;
       }
 
+      // Validate Email
       if (!emailVal || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
-        if (typeof validateField === "function") {
-          validateField(emailInput, function () { return false; }, "Please enter a valid email address.");
-        }
+        showFieldError(emailInput, "Please enter a valid email address.");
         valid = false;
       }
 
+      // Validate Phone
+      if (phoneInput && !phoneVal) {
+        showFieldError(phoneInput, "Please enter your phone number.");
+        valid = false;
+      }
+
+      // Validate City
+      if (cityInput && !cityVal) {
+        showFieldError(cityInput, "Please enter your city.");
+        valid = false;
+      }
+
+      // Validate Password
       if (!passVal || passVal.length < 6) {
-        if (typeof validateField === "function") {
-          validateField(passwordInput, function () { return false; }, "Password must be at least 6 characters.");
-        }
+        showFieldError(passwordInput, "Password must be at least 6 characters.");
         valid = false;
       }
 
@@ -72,8 +107,8 @@
         var user = {
           name: nameVal || (existingUser && existingUser.name) || emailVal.split("@")[0],
           email: emailVal,
-          phone: (existingUser && existingUser.phone) || "+91 98765 43210",
-          city: (existingUser && existingUser.city) || "New Delhi",
+          phone: phoneVal || (existingUser && existingUser.phone) || "",
+          city: cityVal || (existingUser && existingUser.city) || "",
           joinedDate: (existingUser && existingUser.joinedDate) || "August 2026",
           bio: (existingUser && existingUser.bio) || "Enthusiastic community member.",
           loggedIn: true,
@@ -95,12 +130,11 @@
       }
     });
 
-    // Clear error on input
-    [nameInput, emailInput, passwordInput].forEach(function (input) {
+    // Clear error on input for all fields
+    [nameInput, emailInput, phoneInput, cityInput, passwordInput].forEach(function (input) {
       if (!input) return;
       input.addEventListener("input", function () {
-        var group = this.closest(".form-group");
-        if (group) group.classList.remove("has-error");
+        clearFieldError(this);
       });
     });
   }
@@ -129,15 +163,15 @@
       var isVol = sVolCheck ? sVolCheck.checked : false;
 
       if (!nameVal) {
-        if (typeof validateField === "function") validateField(sName, function () { return false; }, "Please enter your full name.");
+        showFieldError(sName, "Please enter your full name.");
         valid = false;
       }
       if (!emailVal || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
-        if (typeof validateField === "function") validateField(sEmail, function () { return false; }, "Please enter a valid email address.");
+        showFieldError(sEmail, "Please enter a valid email address.");
         valid = false;
       }
       if (!passVal || passVal.length < 6) {
-        if (typeof validateField === "function") validateField(sPass, function () { return false; }, "Password must be at least 6 characters.");
+        showFieldError(sPass, "Password must be at least 6 characters.");
         valid = false;
       }
 
@@ -145,8 +179,8 @@
         var newUser = {
           name: nameVal,
           email: emailVal,
-          phone: phoneVal || "+91 98765 43210",
-          city: cityVal || "New Delhi",
+          phone: phoneVal || "",
+          city: cityVal || "",
           joinedDate: "August 2026",
           bio: "Enthusiastic community member dedicated to making a difference through giving and volunteering.",
           loggedIn: true,
@@ -180,11 +214,10 @@
       }
     });
 
-    [sName, sEmail, sPass].forEach(function (input) {
+    [sName, sEmail, sPass, sPhone, sCity].forEach(function (input) {
       if (!input) return;
       input.addEventListener("input", function () {
-        var group = this.closest(".form-group");
-        if (group) group.classList.remove("has-error");
+        clearFieldError(this);
       });
     });
   }
@@ -201,12 +234,19 @@
         if (gName === null) return;
       }
 
+      var gPhone = prompt("Please enter your Phone Number (e.g. +91 98765 43210):");
+      if (gPhone === null) gPhone = "";
+
+      var gCity = prompt("Please enter your City (e.g. Mumbai, New Delhi):");
+      if (gCity === null) gCity = "";
+
       var googleUser = {
         name: gName.trim(),
         email: gName.trim().toLowerCase().replace(/\s+/g, ".") + "@gmail.com",
-        phone: "+91 98112 33445",
-        city: "Mumbai",
+        phone: gPhone.trim() || "",
+        city: gCity.trim() || "",
         joinedDate: "August 2026",
+        bio: "Signed in via Google.",
         loggedIn: true,
         isVolunteer: true
       };
