@@ -30,10 +30,7 @@
   /* ----- LOGIN FORM ----- */
   var loginForm = document.getElementById("login-form");
   if (loginForm) {
-    var nameInput = document.getElementById("login-name");
     var emailInput = document.getElementById("login-email");
-    var phoneInput = document.getElementById("login-phone");
-    var cityInput = document.getElementById("login-city");
     var passwordInput = document.getElementById("login-password");
     var toggleBtn = document.getElementById("toggle-password");
     var successMsg = loginForm.querySelector(".form-success");
@@ -60,33 +57,12 @@
       e.preventDefault();
       var valid = true;
 
-      var nameVal = nameInput ? nameInput.value.trim() : "";
       var emailVal = emailInput ? emailInput.value.trim() : "";
-      var phoneVal = phoneInput ? phoneInput.value.trim() : "";
-      var cityVal = cityInput ? cityInput.value.trim() : "";
       var passVal = passwordInput ? passwordInput.value : "";
-
-      // Validate Name
-      if (nameInput && !nameVal) {
-        showFieldError(nameInput, "Please enter your full name.");
-        valid = false;
-      }
 
       // Validate Email
       if (!emailVal || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
         showFieldError(emailInput, "Please enter a valid email address.");
-        valid = false;
-      }
-
-      // Validate Phone
-      if (phoneInput && !phoneVal) {
-        showFieldError(phoneInput, "Please enter your phone number.");
-        valid = false;
-      }
-
-      // Validate City
-      if (cityInput && !cityVal) {
-        showFieldError(cityInput, "Please enter your city.");
         valid = false;
       }
 
@@ -97,18 +73,21 @@
       }
 
       if (valid) {
-        // If user was previously saved under this email, keep existing profile info if available
+        // If user was previously saved, keep existing profile info if available
         var existingUser = null;
         try {
           var stored = localStorage.getItem("ivolunteer_user");
           if (stored) existingUser = JSON.parse(stored);
         } catch (err) {}
 
+        var fallbackName = emailVal.split("@")[0];
+        fallbackName = fallbackName.charAt(0).toUpperCase() + fallbackName.slice(1);
+
         var user = {
-          name: nameVal || (existingUser && existingUser.name) || emailVal.split("@")[0],
+          name: (existingUser && existingUser.name) ? existingUser.name : fallbackName,
           email: emailVal,
-          phone: phoneVal || (existingUser && existingUser.phone) || "",
-          city: cityVal || (existingUser && existingUser.city) || "",
+          phone: (existingUser && existingUser.phone) || "",
+          city: (existingUser && existingUser.city) || "",
           joinedDate: (existingUser && existingUser.joinedDate) || "August 2026",
           bio: (existingUser && existingUser.bio) || "Enthusiastic community member.",
           loggedIn: true,
@@ -131,7 +110,7 @@
     });
 
     // Clear error on input for all fields
-    [nameInput, emailInput, phoneInput, cityInput, passwordInput].forEach(function (input) {
+    [emailInput, passwordInput].forEach(function (input) {
       if (!input) return;
       input.addEventListener("input", function () {
         clearFieldError(this);

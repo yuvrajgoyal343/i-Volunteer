@@ -10,10 +10,51 @@
   var userCoords = null;
 
 
+  /* ----- Generate Unique Donation ID ----- */
+  function generateDonationId() {
+    var maxId = 1000;
+
+    // Check AppData mock donations
+    if (typeof AppData !== "undefined" && Array.isArray(AppData.donations)) {
+      AppData.donations.forEach(function (d) {
+        if (d && d.id) {
+          var match = String(d.id).match(/DON-(\d+)/);
+          if (match) {
+            var num = parseInt(match[1], 10);
+            if (num > maxId) maxId = num;
+          }
+        }
+      });
+    }
+
+    // Check localStorage donations
+    try {
+      var raw = localStorage.getItem("ivolunteer_donations");
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          parsed.forEach(function (d) {
+            if (d && d.id) {
+              var match = String(d.id).match(/DON-(\d+)/);
+              if (match) {
+                var num = parseInt(match[1], 10);
+                if (num > maxId) maxId = num;
+              }
+            }
+          });
+        }
+      }
+    } catch (e) {}
+
+    return "DON-" + (maxId + 1);
+  }
+
+
   /* ----- Populate NGO Dropdown ----- */
   function populateNgoDropdown(sortByDistance) {
     if (!ngoSelect || typeof AppData === "undefined") return;
 
+    var selectedVal = ngoSelect.value;
     var ngos = AppData.ngos.slice();
 
     // Sort by distance if user location is available
@@ -41,6 +82,10 @@
       option.textContent = label;
       ngoSelect.appendChild(option);
     });
+
+    if (selectedVal) {
+      ngoSelect.value = selectedVal;
+    }
   }
 
 
@@ -86,14 +131,14 @@
     if (!valid) return;
 
     // Build donation record
-    var selectedNgo = AppData.ngos.find(function (n) { return n.id === parseInt(ngoField.value); });
+    var selectedNgo = AppData.ngos.find(function (n) { return n.id === parseInt(ngoField.value, 10); });
     var donation = {
-      id: "DON-" + (Date.now() % 100000),
+      id: generateDonationId(),
       type: typeField.value,
       description: descField.value.trim(),
       quantity: qtyField.value.trim(),
       pickupAddress: addrField.value.trim(),
-      ngoId: parseInt(ngoField.value),
+      ngoId: parseInt(ngoField.value, 10),
       ngoName: selectedNgo ? selectedNgo.name : "Unknown",
       status: "requested",
       date: new Date().toISOString().split("T")[0],
@@ -119,8 +164,8 @@
 
     form.reset();
 
-    // Refresh the React tracker if it exists
-    if (window.refreshDonationTracker) {
+    // Refresh the tracker if it exists
+    if (typeof window.refreshDonationTracker === "function") {
       window.refreshDonationTracker();
     }
 
@@ -150,6 +195,13 @@
     // Populate NGO dropdown
     populateNgoDropdown(false);
 
+    // Read NGO pre-selection from URL query parameter (?ngo=<id> or ?id=<id>)
+    var params = new URLSearchParams(window.location.search);
+    var preselectedNgo = params.get("ngo") || params.get("id");
+    if (preselectedNgo && ngoSelect) {
+      ngoSelect.value = preselectedNgo;
+    }
+
     // Location button
     if (locationBtn) {
       locationBtn.addEventListener("click", handleLocationClick);
@@ -178,3 +230,4 @@
   document.addEventListener("DOMContentLoaded", init);
 
 })();
+

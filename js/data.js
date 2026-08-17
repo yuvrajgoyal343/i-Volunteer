@@ -7,9 +7,9 @@ var AppData = (function () {
       var filename = path.split("/").pop() || "index.html";
       if (!filename || filename === "") filename = "index.html";
 
-      // Pages that don't require login
-      var publicPages = ["login.html", "signup.html", "404.html"];
-      var isPublicPage = publicPages.indexOf(filename) !== -1;
+      // Pages that require login
+      var protectedPages = ["profile.html"];
+      var isProtectedPage = protectedPages.indexOf(filename) !== -1;
       // Pages where logged-in users should be redirected away
       var isAuthPage = (filename === "login.html" || filename === "signup.html");
 
@@ -23,7 +23,7 @@ var AppData = (function () {
       }
 
       // Not logged in and trying to access a protected page → go to login
-      if (!userLoggedIn && !isPublicPage) {
+      if (!userLoggedIn && isProtectedPage) {
         window.location.replace("login.html");
         return; // Stop further execution
       }
