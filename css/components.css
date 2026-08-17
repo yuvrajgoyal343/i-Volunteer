@@ -1123,3 +1123,239 @@
   color: var(--color-text-main);
 }
 
+
+/* ========================================
+   Interactive NGO Card & Subprofile Prompt
+   ======================================== */
+.ngo-interactive-card {
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.ngo-interactive-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.subprofile-prompt-card {
+  border: 2px dashed var(--color-border);
+  background-color: var(--color-bg-secondary);
+  text-align: center;
+}
+
+.vol-prompt-icon {
+  margin-bottom: var(--space-4);
+}
+
+
+/* ========================================
+   Donation Tracker (Vanilla JS Component)
+   ======================================== */
+.tracker-tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-1);
+}
+
+.tracker-tab {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+  margin-bottom: -1px;
+}
+
+.tracker-tab:hover {
+  color: var(--color-primary);
+}
+
+.tracker-tab.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.tracker-tab .tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  margin-left: var(--space-2);
+  font-size: 11px;
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-full);
+  background-color: var(--color-border-light);
+  color: var(--color-text-secondary);
+}
+
+.tracker-tab.active .tab-count {
+  background-color: rgba(27, 107, 74, 0.1);
+  color: var(--color-primary);
+}
+
+
+/* ----- Tracker Donation List ----- */
+.donation-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.donation-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.donation-item:hover {
+  border-color: var(--color-primary);
+  background-color: rgba(27, 107, 74, 0.02);
+}
+
+.donation-type-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
+  flex-shrink: 0;
+}
+
+.donation-type-icon.food { background-color: #E67E22; }
+.donation-type-icon.clothes { background-color: #8E44AD; }
+.donation-type-icon.books { background-color: #2980B9; }
+.donation-type-icon.medicines { background-color: #C0392B; }
+.donation-type-icon.other { background-color: #7F8C8D; }
+
+.donation-info h4 {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 2px;
+}
+
+.donation-info p {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.donation-info .donation-ngo {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+.donation-status-col {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.donation-status-col .donation-date {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+}
+
+
+/* ----- Tracker Status Badges ----- */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-full);
+  line-height: 1.4;
+}
+
+.status-badge.requested {
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
+}
+
+.status-badge.pickedUp {
+  background-color: var(--color-warning-bg);
+  color: #8D6E00;
+}
+
+.status-badge.delivered {
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.requested { background-color: var(--color-info); }
+.status-dot.pickedUp { background-color: var(--color-warning); }
+.status-dot.delivered { background-color: var(--color-success); }
+
+
+/* ----- Tracker Empty State ----- */
+.tracker-empty {
+  text-align: center;
+  padding: var(--space-10) var(--space-4);
+  color: var(--color-text-secondary);
+}
+
+.tracker-empty p {
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+.tracker-empty .empty-icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto var(--space-3);
+  stroke: var(--color-border);
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+
+/* ----- Responsive Tracker ----- */
+@media (max-width: 480px) {
+  .donation-item {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+
+  .donation-type-icon {
+    display: none;
+  }
+
+  .donation-status-col {
+    text-align: left;
+  }
+
+  .tracker-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+

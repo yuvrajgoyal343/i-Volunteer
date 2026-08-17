@@ -331,7 +331,7 @@
               '</div>' +
               '<div>' +
                 '<strong style="display: block; font-size: var(--font-size-xs); color: var(--color-text-secondary); text-transform: uppercase; margin-bottom: var(--space-1);">Availability</strong>' +
-                '<span style="font-weight: var(--font-weight-medium); capitalize">' + escapeHtml(volSub.availability || 'Weekends') + '</span>' +
+                '<span style="font-weight: var(--font-weight-medium); text-transform: capitalize;">' + escapeHtml(volSub.availability || 'Weekends') + '</span>' +
               '</div>' +
             '</div>' +
           '</div>' +

@@ -15,7 +15,6 @@
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/responsive.css">
-  <link rel="stylesheet" href="react/DonationTracker.css">
   <style>html { visibility: hidden; }</style>
   <script src="js/data.js"></script>
 </head>
@@ -134,12 +133,12 @@
           </form>
         </div>
 
-        <!-- Donation Tracking Dashboard (React) -->
+        <!-- Donation Tracking Dashboard -->
         <div class="form-wrapper">
           <h2>Your Donations</h2>
           <p style="margin-bottom: var(--space-6);">Track the status of your donations below.</p>
           <div id="donation-tracker-root">
-            <!-- React DonationTracker component mounts here -->
+            <!-- Donation tracker component mounts here -->
             <div class="empty-state">
               <svg viewBox="0 0 24 24">
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
@@ -206,12 +205,7 @@
   <script src="js/geolocation.js"></script>
   <script src="js/main.js"></script>
   <script src="js/donationForm.js"></script>
-
-  <!-- React via CDN for donation tracker -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script type="text/babel" src="react/DonationTracker.jsx"></script>
+  <script src="js/donationTracker.js"></script>
 </body>
 
 </html>
