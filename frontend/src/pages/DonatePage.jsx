@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { ngos, donationTypeLabels, statusLabels } from '../appData';
+import { ngos, statusLabels } from '../appData';
 import { useAuth } from '../context/AuthContext';
 import api from '../api';
 
@@ -11,35 +11,63 @@ const DONATION_TYPES = [
   {
     id: 'food',
     label: 'Food & Rations',
-    icon: '🍲',
+    icon: (
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+        <line x1="6" y1="1" x2="6" y2="4"></line>
+        <line x1="10" y1="1" x2="10" y2="4"></line>
+        <line x1="14" y1="1" x2="14" y2="4"></line>
+      </svg>
+    ),
     desc: 'Atta, rice, pulses, fresh fruit, packaged dry ration kits',
     examples: 'Wheat flour, pulses, cooking oil'
   },
   {
     id: 'clothes',
     label: 'Clothes & Woollens',
-    icon: '🧥',
+    icon: (
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path>
+      </svg>
+    ),
     desc: 'Winter jackets, warm sweaters, blankets, shoes, children wear',
     examples: 'Clean sweaters, coats, blankets'
   },
   {
     id: 'books',
     label: 'Books & Stationery',
-    icon: '📚',
+    icon: (
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+      </svg>
+    ),
     desc: 'School textbooks (CBSE/PSEB), notebooks, stationery kits',
     examples: 'Class 1-12 books, school supplies'
   },
   {
     id: 'medicines',
     label: 'Medicines & First Aid',
-    icon: '💊',
+    icon: (
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"></path>
+        <path d="m8.5 8.5 7 7"></path>
+      </svg>
+    ),
     desc: 'Unopened prescription medicines, surgical supplies, bandages',
     examples: 'First aid kits, antiseptic, wheelchairs'
   },
   {
     id: 'other',
     label: 'Other Essentials',
-    icon: '📦',
+    icon: (
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+        <polyline points="3.29 7 12 12.03 20.71 7"></polyline>
+        <line x1="12" y1="22.5" x2="12" y2="12"></line>
+      </svg>
+    ),
     desc: 'Utensils, bedding, sports gear, hygiene kits, baby care',
     examples: 'Stainless steel utensils, hygiene sets'
   }
@@ -212,15 +240,12 @@ export default function DonatePage() {
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-6)', flexWrap: 'wrap' }}>
             <div className="hero-feature-chip">
-              <span>🚚</span>
               <span><strong>100% Free</strong> Doorstep Pickup</span>
             </div>
             <div className="hero-feature-chip">
-              <span>🛡️</span>
               <span><strong>Verified</strong> Non-Profits Only</span>
             </div>
             <div className="hero-feature-chip">
-              <span>📱</span>
               <span><strong>Real-Time</strong> Status Tracking</span>
             </div>
           </div>
@@ -251,7 +276,7 @@ export default function DonatePage() {
               {success && (
                 <div className="form-success visible" role="alert" style={{ marginBottom: 'var(--space-6)', animation: 'fadeIn 0.3s ease' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: '1.5rem' }}>✅</span>
+                    <span style={{ fontSize: '1.25rem', color: 'var(--color-primary)', fontWeight: 'bold' }}>&#x2713;</span>
                     <div>
                       <strong>Pickup Booked!</strong>
                       <p style={{ fontSize: 'var(--font-size-xs)', margin: '4px 0 0' }}>{success}</p>
@@ -301,7 +326,9 @@ export default function DonatePage() {
                             boxShadow: isSelected ? '0 4px 12px rgba(5, 150, 105, 0.15)' : 'none'
                           }}
                         >
-                          <span style={{ fontSize: '1.8rem', marginBottom: 4 }}>{cat.icon}</span>
+                          <span style={{ color: isSelected ? 'var(--color-primary)' : 'var(--color-text-secondary)', marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {cat.icon}
+                          </span>
                           <span style={{
                             fontSize: 'var(--font-size-xs)',
                             fontWeight: isSelected ? 700 : 500,
@@ -380,9 +407,8 @@ export default function DonatePage() {
                       className="btn btn-ghost btn-sm"
                       onClick={handleDetectLocation}
                       disabled={isDetectingLoc}
-                      style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6 }}
+                      style={{ whiteSpace: 'nowrap' }}
                     >
-                      <span style={{ fontSize: '1.1rem' }}>📍</span>
                       <span>{isDetectingLoc ? 'Detecting...' : 'Auto-Detect'}</span>
                     </button>
                   </div>
@@ -438,7 +464,6 @@ export default function DonatePage() {
                       gap: 8,
                       alignItems: 'flex-start'
                     }}>
-                      <span style={{ fontSize: '1.2rem' }}>🏛️</span>
                       <div>
                         <strong>{selectedNgoDetails.name}</strong> • {selectedNgoDetails.city}
                         <div style={{ color: 'var(--color-text-secondary)', marginTop: 2 }}>
@@ -480,7 +505,6 @@ export default function DonatePage() {
 
               {!user ? (
                 <div className="empty-state" style={{ padding: 'var(--space-8) var(--space-4)', textAlign: 'center' }}>
-                  <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-2)' }}>🔐</div>
                   <h4>Sign In to View Your Donations</h4>
                   <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
                     Track previous donation deliveries and live volunteer pickups in real time.
@@ -496,7 +520,6 @@ export default function DonatePage() {
                 </div>
               ) : donations.length === 0 ? (
                 <div className="empty-state" style={{ padding: 'var(--space-8) var(--space-4)', textAlign: 'center' }}>
-                  <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-2)' }}>📦</div>
                   <h4>No Donations Logged Yet</h4>
                   <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
                     Fill out the form on the left to schedule your first doorstep pickup in Chandigarh Tricity.
@@ -505,9 +528,8 @@ export default function DonatePage() {
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
                   {donations.map(d => {
-                    const typeObj = DONATION_TYPES.find(t => t.id === d.type) || { icon: '📦', label: d.type };
+                    const typeObj = DONATION_TYPES.find(t => t.id === d.type) || { icon: null, label: d.type };
                     const isDelivered = d.status === 'delivered';
-                    const isPickedUp = d.status === 'pickedUp';
 
                     return (
                       <div
@@ -523,7 +545,11 @@ export default function DonatePage() {
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ fontSize: '1.4rem' }}>{typeObj.icon}</span>
+                            {typeObj.icon && (
+                              <span style={{ color: 'var(--color-primary)', display: 'flex', alignItems: 'center' }}>
+                                {typeObj.icon}
+                              </span>
+                            )}
                             <div>
                               <strong style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text)' }}>
                                 {d.description}
@@ -578,9 +604,9 @@ export default function DonatePage() {
                           flexWrap: 'wrap',
                           gap: 4
                         }}>
-                          <span>🏛️ {d.ngoName || 'Verified Partner'}</span>
-                          <span>📦 {d.quantity}</span>
-                          <span>📅 {d.date}</span>
+                          <span>{d.ngoName || 'Verified Partner'}</span>
+                          <span>Qty: {d.quantity}</span>
+                          <span>Date: {d.date}</span>
                         </div>
                       </div>
                     );

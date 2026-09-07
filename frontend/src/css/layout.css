@@ -209,41 +209,10 @@
 .hero {
   padding-top: var(--space-20);
   padding-bottom: var(--space-24);
-  background:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(16, 185, 129, 0.14) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 40% at 90% 20%, rgba(245, 158, 11, 0.1) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 30% at 10% 80%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
-    linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
   border-bottom: 1px solid var(--color-border);
   position: relative;
   overflow: hidden;
-}
-
-/* Animated glowing blobs */
-.hero::before {
-  content: '';
-  position: absolute;
-  top: -200px;
-  right: -100px;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
-  filter: blur(60px);
-  pointer-events: none;
-  animation: blobFloat 15s ease-in-out infinite;
-}
-
-.hero::after {
-  content: '';
-  position: absolute;
-  bottom: -150px;
-  left: -100px;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, transparent 70%);
-  filter: blur(60px);
-  pointer-events: none;
-  animation: blobFloat 18s ease-in-out infinite reverse;
 }
 
 .hero-content {
@@ -252,7 +221,6 @@
   text-align: center;
   position: relative;
   z-index: 1;
-  animation: slideInUp 0.7s ease-out both;
 }
 
 .hero-content h1 {
@@ -271,18 +239,6 @@
   display: inline-block;
 }
 
-.hero-content h1 span::after {
-  content: '';
-  position: absolute;
-  bottom: 4px;
-  left: 0;
-  right: 0;
-  height: 8px;
-  background: linear-gradient(90deg, rgba(16, 185, 129, 0.25) 0%, rgba(245, 158, 11, 0.2) 100%);
-  border-radius: 4px;
-  z-index: -1;
-}
-
 .hero-content p {
   font-size: var(--font-size-lg);
   margin-bottom: var(--space-10);
@@ -291,7 +247,6 @@
   margin-left: auto;
   margin-right: auto;
   line-height: var(--line-height-relaxed);
-  animation: slideInUp 0.7s ease-out 0.15s both;
 }
 
 .hero-actions {
@@ -299,7 +254,6 @@
   gap: var(--space-4);
   justify-content: center;
   flex-wrap: wrap;
-  animation: slideInUp 0.7s ease-out 0.25s both;
 }
 
 /* Hero trust badges */
@@ -310,7 +264,6 @@
   justify-content: center;
   gap: var(--space-4);
   flex-wrap: wrap;
-  animation: slideInUp 0.7s ease-out 0.35s both;
 }
 
 .hero-trust-item {
@@ -352,28 +305,11 @@
 .page-header {
   padding-top: var(--space-12);
   padding-bottom: var(--space-12);
-  background:
-    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(16, 185, 129, 0.1) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 40% at 80% 100%, rgba(99, 102, 241, 0.04) 0%, transparent 50%),
-    linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
   border-bottom: 1px solid var(--color-border);
   text-align: center;
   position: relative;
   overflow: hidden;
-}
-
-.page-header::before {
-  content: '';
-  position: absolute;
-  top: -100px;
-  right: -50px;
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
-  border-radius: 50%;
-  filter: blur(40px);
-  pointer-events: none;
-  animation: floatGentle 10s ease-in-out infinite;
 }
 
 .page-header h1 {
@@ -381,7 +317,6 @@
   font-size: clamp(2rem, 4vw, 2.8rem);
   font-weight: var(--font-weight-extrabold);
   letter-spacing: -0.025em;
-  animation: slideInUp 0.5s ease-out both;
 }
 
 .page-header p {
@@ -390,7 +325,6 @@
   font-size: var(--font-size-md);
   color: var(--color-text-secondary);
   line-height: var(--line-height-relaxed);
-  animation: slideInUp 0.5s ease-out 0.1s both;
 }
 
 
@@ -602,29 +536,12 @@
 
 /* ─── Impact / Trust Section ─── */
 .impact-section {
-  background:
-    radial-gradient(ellipse 50% 70% at 10% 20%, rgba(16, 185, 129, 0.25) 0%, transparent 50%),
-    radial-gradient(ellipse 40% 50% at 90% 80%, rgba(245, 158, 11, 0.18) 0%, transparent 40%),
-    radial-gradient(ellipse 30% 30% at 50% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
-    linear-gradient(135deg, #064E3B 0%, #0F172A 100%);
+  background: linear-gradient(135deg, #064E3B 0%, #0F172A 100%);
   color: var(--color-white);
   position: relative;
   overflow: hidden;
   border-top: 1px solid rgba(16, 185, 129, 0.2);
   border-bottom: 1px solid rgba(16, 185, 129, 0.2);
-}
-
-.impact-section::before {
-  content: '';
-  position: absolute;
-  width: 400px;
-  height: 400px;
-  top: -200px;
-  right: -100px;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%);
-  border-radius: 50%;
-  animation: blobFloat 12s ease-in-out infinite;
-  pointer-events: none;
 }
 
 .impact-section .section-header h2 {
@@ -768,17 +685,7 @@
   background: linear-gradient(90deg, transparent 0%, #10B981 30%, #F59E0B 70%, transparent 100%);
 }
 
-.site-footer::after {
-  content: '';
-  position: absolute;
-  top: -200px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 600px;
-  height: 400px;
-  background: radial-gradient(ellipse, rgba(16, 185, 129, 0.06) 0%, transparent 70%);
-  pointer-events: none;
-}
+
 
 .footer-grid {
   display: grid;

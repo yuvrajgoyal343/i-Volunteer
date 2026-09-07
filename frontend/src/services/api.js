@@ -31,9 +31,9 @@ const INITIAL_USERS = [
       interests: ['foodDrive', 'clothingDrive', 'teaching'],
       skills: ['Community Outreach', 'Logistics Coordination', 'First Aid'],
       badges: [
-        { name: 'First Drive', icon: '🌱', desc: 'Attended first community drive' },
-        { name: 'Community Star', icon: '⭐', desc: 'Completed over 25 volunteer hours' },
-        { name: 'Tricity Champion', icon: '❤️', desc: 'Active volunteer in Chandigarh & Punjab region' }
+        { name: 'First Drive', icon: '', desc: 'Attended first community drive' },
+        { name: 'Community Star', icon: '', desc: 'Completed over 25 volunteer hours' },
+        { name: 'Tricity Champion', icon: '', desc: 'Active volunteer in Chandigarh & Punjab region' }
       ],
       upcomingDrives: [
         { id: 2, title: 'Weekend Langar & Rations Drive at PGI', date: '2026-09-12', role: 'Distribution Coordinator' }
@@ -270,7 +270,7 @@ const api = {
           interests: ['foodDrive', 'clothingDrive'],
           skills: ['Community Outreach'],
           badges: [
-            { name: 'New Volunteer', icon: '🌱', desc: 'Joined iVolunteer active volunteer network' }
+            { name: 'New Volunteer', icon: '', desc: 'Joined iVolunteer active volunteer network' }
           ],
           upcomingDrives: []
         };
@@ -400,8 +400,8 @@ const api = {
         interests: user.volunteerSubProfile?.interests || ['foodDrive', 'clothingDrive'],
         skills: user.volunteerSubProfile?.skills || ['Community Support'],
         badges: user.volunteerSubProfile?.badges || [
-          { name: 'First Drive', icon: '🌱', desc: 'Joined iVolunteer active volunteer network' },
-          { name: 'Kind Heart', icon: '❤️', desc: 'Activated volunteer subprofile' }
+          { name: 'First Drive', icon: '', desc: 'Joined iVolunteer active volunteer network' },
+          { name: 'Kind Heart', icon: '', desc: 'Activated volunteer subprofile' }
         ],
         upcomingDrives: user.volunteerSubProfile?.upcomingDrives || []
       };
@@ -447,8 +447,8 @@ const api = {
           interests: user.volunteerSubProfile?.interests || ['foodDrive', 'clothingDrive'],
           skills: user.volunteerSubProfile?.skills || ['Community Support'],
           badges: user.volunteerSubProfile?.badges || [
-            { name: 'First Drive', icon: '🌱', desc: 'Joined iVolunteer active volunteer network' },
-            { name: 'Kind Heart', icon: '❤️', desc: 'Activated volunteer subprofile' }
+            { name: 'First Drive', icon: '', desc: 'Joined iVolunteer active volunteer network' },
+            { name: 'Kind Heart', icon: '', desc: 'Activated volunteer subprofile' }
           ],
           upcomingDrives: []
         };
@@ -524,7 +524,7 @@ const api = {
           interests: ['foodDrive', 'clothingDrive'],
           skills: ['Community Support'],
           badges: [
-            { name: 'Active Volunteer', icon: '🌱', desc: 'Joined iVolunteer active volunteer network' }
+            { name: 'Active Volunteer', icon: '', desc: 'Joined iVolunteer active volunteer network' }
           ],
           upcomingDrives: []
         };
@@ -572,7 +572,7 @@ const api = {
           availability,
           interests,
           skills,
-          badges: [{ name: 'New Volunteer', icon: '🌱', desc: 'Joined active volunteer network' }],
+          badges: [{ name: 'New Volunteer', icon: '', desc: 'Joined active volunteer network' }],
           upcomingDrives: []
         };
       } else {
