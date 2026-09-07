@@ -1,17 +1,18 @@
 // App.jsx — Main router and application entry
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
-
-import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage';
-import ProfilePage from './pages/ProfilePage';
-import DonatePage from './pages/DonatePage';
-import VolunteerPage from './pages/VolunteerPage';
-import OrganisationsPage from './pages/OrganisationsPage';
-import AboutPage from './pages/AboutPage';
-import NotFoundPage from './pages/NotFoundPage';
+import { AuthProvider, useAuth } from './context';
+import { ProtectedRoute } from './components';
+import {
+  HomePage,
+  LoginPage,
+  SignupPage,
+  ProfilePage,
+  DonatePage,
+  VolunteerPage,
+  OrganisationsPage,
+  AboutPage,
+  NotFoundPage
+} from './pages';
 
 // Redirect logged-in users away from Login and Signup pages to home
 function PublicOnlyRoute({ children }) {

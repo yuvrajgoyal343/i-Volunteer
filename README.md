@@ -12,32 +12,35 @@ donation-project/
 │   ├── public/           # Static assets & images (served at root)
 │   │   └── images/       # Site hero & card images, favicon
 │   ├── src/
-│   │   ├── components/   # Header, Footer, ProtectedRoute
-│   │   ├── context/      # AuthContext (React Context + JWT/LocalStorage)
-│   │   ├── css/          # Base, layout, components, responsive styles
-│   │   ├── pages/        # HomePage, DonatePage, VolunteerPage, OrganisationsPage, etc.
-│   │   ├── api.js        # API service layer (Backend API with LocalStorage fallback)
-│   │   ├── appData.js    # Seed data & initial mock state
-│   │   ├── App.jsx       # Client router (react-router-dom)
+│   │   ├── components/   # Reusable UI components (Header, Footer, ProtectedRoute)
+│   │   ├── context/      # Global state & hooks (AuthContext)
+│   │   ├── css/          # Modular stylesheet architecture (base, layout, components, responsive)
+│   │   ├── data/         # Tricity seed data & taxonomy (appData.js)
+│   │   ├── pages/        # Page views (Home, Donate, Volunteer, Organisations, Profile, Auth)
+│   │   ├── services/     # Zero-database LocalStorage mock REST client (api.js)
+│   │   ├── api.js        # Re-export pointing to services/api.js
+│   │   ├── appData.js    # Re-export pointing to data/appData.js
+│   │   ├── App.jsx       # Application router with clean barrel imports
 │   │   └── main.jsx      # React entry point
 │   ├── index.html        # Vite HTML entry template
 │   └── package.json      # Frontend scripts and dependencies
 │
-├── backend/              # Node.js + Express REST API
-│   ├── db.js             # MySQL connection pool configuration
-│   ├── server.js         # Express REST API endpoints & JWT authentication
-│   ├── test_api.js       # Backend integration test script
-│   └── package.json      # Backend scripts and dependencies
-│
-├── package.json          # Root orchestration scripts
-└── .gitignore            # Git ignore rules for node_modules, build outputs, & secrets
+├── package.json          # Root convenience scripts
+└── .gitignore            # Git ignore rules for node_modules & build outputs
 ```
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Run the Frontend (React App)
+This is a **100% frontend-only** web application. All authentication, donation submissions, and volunteer drive RSVPs are persisted entirely in browser `localStorage` using the mock client in `src/api.js` (no database or external backend server required).
+
+### 1. Install Dependencies
+```bash
+cd frontend && npm install
+```
+
+### 2. Run the Development Server
 ```bash
 npm run dev
 # or from frontend folder:
@@ -45,17 +48,9 @@ cd frontend && npm run dev
 ```
 The React development server runs at `http://localhost:5173`.
 
-### 2. Build for Production
+### 3. Build for Production
 ```bash
 npm run build
-# or:
+# or from frontend folder:
 cd frontend && npm run build
 ```
-
-### 3. Run the Backend API (Optional)
-```bash
-npm run server
-# or:
-cd backend && npm start
-```
-The Express backend server runs at `http://localhost:3001`.
