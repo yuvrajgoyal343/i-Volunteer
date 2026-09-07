@@ -13,12 +13,31 @@ import OrganisationsPage from './pages/OrganisationsPage';
 import AboutPage from './pages/AboutPage';
 import NotFoundPage from './pages/NotFoundPage';
 
-// Redirect logged-in users away from Login and Signup pages
+// Redirect logged-in users away from Login and Signup pages to home
 function PublicOnlyRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) return null;
-  if (user) return <Navigate to="/profile" replace />;
+  if (user) return <Navigate to="/" replace />;
   return children;
+}
+
+// When opening the website, start from sign-in page if not authenticated
+function RootRoute() {
+  const { user, loading } = useAuth();
+  if (loading) {
+    return (
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        minHeight: '100vh', fontSize: '1rem', color: 'var(--color-text-secondary)'
+      }}>
+        Loading…
+      </div>
+    );
+  }
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  return <HomePage />;
 }
 
 export default function App() {
@@ -26,7 +45,8 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<RootRoute />} />
+          <Route path="/home" element={<HomePage />} />
           <Route path="/index.html" element={<Navigate to="/" replace />} />
 
           {/* Auth pages */}

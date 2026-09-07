@@ -1,5 +1,6 @@
-// AboutPage.jsx — Mission, verification process, values, and contact form
+// AboutPage.jsx — Premium About Page with Verification Pipeline, Core Values & Direct Helpdesk
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
@@ -19,9 +20,9 @@ export default function AboutPage() {
     if (!contactForm.name.trim()) errs.name = 'Please enter your name.';
     if (!contactForm.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactForm.email))
       errs.email = 'Please enter a valid email address.';
-    if (!contactForm.subject.trim()) errs.subject = 'Please enter a subject.';
+    if (!contactForm.subject.trim()) errs.subject = 'Please specify the subject.';
     if (!contactForm.message.trim() || contactForm.message.trim().length < 10)
-      errs.message = 'Message must be at least 10 characters.';
+      errs.message = 'Message must contain at least 10 characters.';
     return errs;
   };
 
@@ -31,123 +32,295 @@ export default function AboutPage() {
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
 
-    setSuccess('Thank you for reaching out. We will get back to you shortly.');
+    setSuccess('Thank you for reaching out! Our Chandigarh support team will reply within 24 hours.');
     setContactForm({ name: '', email: '', subject: '', message: '' });
-    setTimeout(() => setSuccess(''), 5000);
+    setTimeout(() => setSuccess(''), 6000);
   };
 
   return (
     <>
       <Header />
 
-      <section className="page-header">
-        <div className="container">
-          <h1>About iVolunteer</h1>
-          <p>Our mission, values, and commitment to transparent, impactful giving.</p>
+      {/* Hero Header */}
+      <section className="page-header" style={{ position: 'relative', overflow: 'hidden' }}>
+        <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+          <div className="live-region-badge" style={{ margin: '0 auto var(--space-4)' }}>
+            <span className="live-dot pulse"></span>
+            <span>Our Mission &amp; Transparent Verification • Chandigarh Tricity &amp; Punjab</span>
+          </div>
+
+          <h1>
+            Connecting Compassion with <span className="hero-gradient-text">Verified Need</span>
+          </h1>
+          <p style={{ maxWidth: 720, margin: '0 auto var(--space-6)' }}>
+            iVolunteer was founded to eliminate opacity in charity. We ensure every warm sweater, book, and meal reaches genuine orphanages, elderly shelters, and community langars across Chandigarh, Mohali, Panchkula, and Punjab.
+          </p>
+
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-6)', flexWrap: 'wrap' }}>
+            <div className="hero-feature-chip">
+              <span>🛡️</span>
+              <span>100% 3-Stage NGO Audit</span>
+            </div>
+            <div className="hero-feature-chip">
+              <span>🚫</span>
+              <span>No Cash Handouts • Items Only</span>
+            </div>
+            <div className="hero-feature-chip">
+              <span>📍</span>
+              <span>Hyper-Local Ground Verification</span>
+            </div>
+          </div>
         </div>
       </section>
 
       <section className="page-content">
         <div className="container">
 
-          {/* Mission Section */}
-          <div className="form-page-layout" style={{ maxWidth: 800, margin: '0 auto var(--space-16)' }}>
+          {/* Mission & Key Philosophy Split */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: 'var(--space-8)',
+            alignItems: 'center',
+            marginBottom: 'var(--space-16)'
+          }}>
             <div>
-              <h2 style={{ marginBottom: 'var(--space-4)' }}>Our Mission</h2>
-              <p style={{ fontSize: 'var(--font-size-md)', marginBottom: 'var(--space-6)' }}>
-                iVolunteer was built on a simple belief: everyone has something to give, and every contribution — no matter how small — can change a life. We bridge the gap between willing donors and verified organisations that serve the most vulnerable members of our communities.
+              <span className="badge badge-verified" style={{ marginBottom: 'var(--space-3)' }}>The Philosophy</span>
+              <h2 style={{ fontSize: 'var(--font-size-2xl)', lineHeight: 1.2, marginBottom: 'var(--space-4)' }}>
+                Why Physical Giving Changes Everything
+              </h2>
+              <p style={{ fontSize: 'var(--font-size-md)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
+                Too often, monetary donations get diluted by administrative overhead and uncertainty. iVolunteer completely shifts the paradigm: we deal exclusively in <strong>tangible essentials</strong> — food grains, textbooks, prescription medicines, warm winter clothing, and volunteer care hours.
               </p>
-              <p style={{ marginBottom: 'var(--space-6)' }}>
-                Whether it is a bag of rice for a family struggling with food insecurity, warm blankets for an orphanage in winter, or textbooks for a child who cannot afford them, iVolunteer makes it easy to give what you can and know exactly where it goes.
+              <p style={{ fontSize: 'var(--font-size-sm)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-6)' }}>
+                Every donation submitted through our platform is routed to verified partners such as Tammana, Bal Niketan Panchkula, Tera Hi Tera mission, or Lions Club Old Age Home, where it is put directly into the hands of someone who needs it today.
               </p>
-              <p>
-                We are not just a donation platform. We are a community of people who believe in showing up for each other — through donations, volunteering, and simply paying attention to the needs around us.
-              </p>
+              <div style={{ display: 'flex', gap: 'var(--space-4)' }}>
+                <Link to="/organisations" className="btn btn-primary btn-sm">
+                  View Verified Organisations →
+                </Link>
+                <Link to="/donate" className="btn btn-secondary btn-sm">
+                  Donate Essentials
+                </Link>
+              </div>
+            </div>
+
+            {/* Visual Stats Box */}
+            <div style={{
+              background: 'linear-gradient(135deg, #059669 0%, #10B981 100%)',
+              borderRadius: 'var(--radius-2xl)',
+              padding: 'var(--space-8)',
+              color: 'var(--color-white)',
+              boxShadow: '0 20px 40px -10px rgba(5, 150, 105, 0.35)',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              <div style={{ position: 'relative', zIndex: 2 }}>
+                <h3 style={{ color: 'var(--color-white)', fontSize: '1.4rem', marginBottom: 'var(--space-6)' }}>
+                  Our Tricity Impact Snapshot
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-6)' }}>
+                  <div>
+                    <div style={{ fontSize: '2.5rem', fontWeight: 800, lineHeight: 1 }}>8+</div>
+                    <div style={{ fontSize: 'var(--font-size-xs)', opacity: 0.9, marginTop: 4 }}>
+                      Verified Partner Homes &amp; Missions
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '2.5rem', fontWeight: 800, lineHeight: 1 }}>12k+</div>
+                    <div style={{ fontSize: 'var(--font-size-xs)', opacity: 0.9, marginTop: 4 }}>
+                      Children, Elders &amp; Families Supported
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '2.5rem', fontWeight: 800, lineHeight: 1 }}>₹0</div>
+                    <div style={{ fontSize: 'var(--font-size-xs)', opacity: 0.9, marginTop: 4 }}>
+                      Platform Fees (100% Free Doorstep Pickup)
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '2.5rem', fontWeight: 800, lineHeight: 1 }}>1,200+</div>
+                    <div style={{ fontSize: 'var(--font-size-xs)', opacity: 0.9, marginTop: 4 }}>
+                      Active Community Volunteers Enrolled
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style={{
+                position: 'absolute',
+                bottom: -50,
+                right: -50,
+                width: 200,
+                height: 200,
+                borderRadius: '50%',
+                background: 'rgba(255,255,255,0.1)'
+              }}></div>
             </div>
           </div>
 
-          {/* How Verification Works */}
-          <div style={{ maxWidth: 800, margin: '0 auto var(--space-16)' }}>
-            <h2 style={{ marginBottom: 'var(--space-6)', textAlign: 'center' }}>How We Verify Organisations</h2>
-
-            <div className="steps-flow" style={{ marginBottom: 'var(--space-8)' }}>
-              <div className="step-item">
-                <div className="step-number">1</div>
-                <h3>Application Review</h3>
-                <p>Organisations submit their registration documents, tax exemption certificates, and operational details for review.</p>
-              </div>
-              <div className="step-item">
-                <div className="step-number">2</div>
-                <h3>On-Ground Check</h3>
-                <p>Our team conducts physical visits to verify the organisation's operations, infrastructure, and community impact.</p>
-              </div>
-              <div className="step-item">
-                <div className="step-number">3</div>
-                <h3>Ongoing Monitoring</h3>
-                <p>Verified organisations provide periodic reports. We track donation deliveries and collect feedback from beneficiaries.</p>
-              </div>
+          {/* 3-Stage Verification Pipeline */}
+          <div style={{ marginBottom: 'var(--space-16)' }}>
+            <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
+              <span className="badge badge-verified" style={{ marginBottom: 'var(--space-2)' }}>The Trust Standard</span>
+              <h2>How We Verify Every Organisation</h2>
+              <p style={{ color: 'var(--color-text-secondary)', maxWidth: 600, margin: '0 auto' }}>
+                Every listed home undergoes a strict 3-tier audit before appearing in the directory.
+              </p>
             </div>
 
-            <div className="alert alert-info">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-              <span>Every organisation listed on iVolunteer carries a Verified badge, meaning it has passed all three stages of our verification process. We re-verify annually.</span>
+            <div className="steps-flow" style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: 'var(--space-6)'
+            }}>
+              <div className="card" style={{ padding: 'var(--space-6)', borderRadius: 'var(--radius-xl)', borderTop: '4px solid #059669' }}>
+                <div style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: '50%',
+                  background: 'var(--color-primary-bg)',
+                  color: 'var(--color-primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 800,
+                  fontSize: '1.2rem',
+                  marginBottom: 'var(--space-4)'
+                }}>
+                  1
+                </div>
+                <h3 style={{ fontSize: '1.15rem', marginBottom: 'var(--space-2)' }}>Legal &amp; Tax Audit</h3>
+                <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
+                  Verification of 12A/80G tax exemption certificates, state society registration under the Societies Act, and CWC (Child Welfare Committee) approvals.
+                </p>
+              </div>
+
+              <div className="card" style={{ padding: 'var(--space-6)', borderRadius: 'var(--radius-xl)', borderTop: '4px solid #F59E0B' }}>
+                <div style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: '50%',
+                  background: 'var(--color-accent-bg)',
+                  color: 'var(--color-accent-dark)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 800,
+                  fontSize: '1.2rem',
+                  marginBottom: 'var(--space-4)'
+                }}>
+                  2
+                </div>
+                <h3 style={{ fontSize: '1.15rem', marginBottom: 'var(--space-2)' }}>On-Ground Inspection</h3>
+                <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
+                  Our field coordinators conduct physical visits to inspect facility hygiene, resident welfare, storage conditions, and direct community utilization.
+                </p>
+              </div>
+
+              <div className="card" style={{ padding: 'var(--space-6)', borderRadius: 'var(--radius-xl)', borderTop: '4px solid #6366F1' }}>
+                <div style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: '50%',
+                  background: '#EEF2FF',
+                  color: '#4F46E5',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 800,
+                  fontSize: '1.2rem',
+                  marginBottom: 'var(--space-4)'
+                }}>
+                  3
+                </div>
+                <h3 style={{ fontSize: '1.15rem', marginBottom: 'var(--space-2)' }}>Continuous Delivery Receipts</h3>
+                <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
+                  Donation deliveries are documented with date-stamped pickup proofs and annual re-verification to maintain list status.
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Values Section */}
-          <div style={{ maxWidth: 800, margin: '0 auto var(--space-16)' }}>
-            <h2 style={{ marginBottom: 'var(--space-8)', textAlign: 'center' }}>Our Values</h2>
+          {/* Core Values Section */}
+          <div style={{ marginBottom: 'var(--space-16)' }}>
+            <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
+              <span className="badge badge-category" style={{ marginBottom: 'var(--space-2)' }}>Guiding Principles</span>
+              <h2>Our Core Values</h2>
+            </div>
 
-            <div className="grid-3">
-              <div className="card">
-                <div className="card-body">
-                  <div className="card-icon-header">
-                    <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  </div>
-                  <h3>Transparency</h3>
-                  <p>Every donation is tracked from pickup to delivery. Donors can see exactly where their contributions go.</p>
-                </div>
+            <div className="grid-4" style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: 'var(--space-6)'
+            }}>
+              <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center', borderRadius: 'var(--radius-xl)' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-3)' }}>🔍</div>
+                <h4 style={{ fontSize: 'var(--font-size-md)', marginBottom: 'var(--space-2)' }}>Radical Transparency</h4>
+                <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
+                  Every donor receives a unique pickup code and delivery confirmation. You always know where your items go.
+                </p>
               </div>
 
-              <div className="card">
-                <div className="card-body">
-                  <div className="card-icon-header">
-                    <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                  </div>
-                  <h3>Trust</h3>
-                  <p>We only work with verified organisations. Our multi-step verification process ensures every partner is legitimate.</p>
-                </div>
+              <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center', borderRadius: 'var(--radius-xl)' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-3)' }}>🤝</div>
+                <h4 style={{ fontSize: 'var(--font-size-md)', marginBottom: 'var(--space-2)' }}>Dignity First</h4>
+                <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
+                  We believe giving is a shared human connection, not charity from above. Items must be clean, wearable, and high quality.
+                </p>
               </div>
 
-              <div className="card">
-                <div className="card-body">
-                  <div className="card-icon-header">
-                    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                  </div>
-                  <h3>Community</h3>
-                  <p>We bring together donors, volunteers, and organisations to build a network of mutual support and shared purpose.</p>
-                </div>
+              <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center', borderRadius: 'var(--radius-xl)' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-3)' }}>🌍</div>
+                <h4 style={{ fontSize: 'var(--font-size-md)', marginBottom: 'var(--space-2)' }}>Hyper-Local Focus</h4>
+                <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
+                  Solving local challenges in Chandigarh, Mohali, and Panchkula strengthens our own immediate neighborhood.
+                </p>
+              </div>
+
+              <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center', borderRadius: 'var(--radius-xl)' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-3)' }}>⚡</div>
+                <h4 style={{ fontSize: 'var(--font-size-md)', marginBottom: 'var(--space-2)' }}>Zero Waste Culture</h4>
+                <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
+                  Reallocating excess good clothing, extra textbooks, and surplus wedding food directly reduces environmental waste.
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Contact Section */}
-          <div className="two-col" style={{ maxWidth: 900, margin: '0 auto' }}>
-
+          {/* Contact & Inquiries */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: 'var(--space-8)',
+            alignItems: 'start'
+          }}>
             {/* Contact Form */}
-            <div className="form-wrapper">
-              <h2>Get in Touch</h2>
+            <div className="form-wrapper" style={{
+              background: 'var(--color-white)',
+              borderRadius: 'var(--radius-xl)',
+              border: '1px solid var(--color-border)',
+              boxShadow: 'var(--shadow-md)',
+              padding: 'var(--space-8)'
+            }}>
+              <h3 style={{ fontSize: 'var(--font-size-xl)', marginBottom: 'var(--space-2)' }}>Get in Touch</h3>
+              <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-6)' }}>
+                Have questions or need assistance with a large donation pickup? Send us a message.
+              </p>
 
-              {success && <div className="form-success visible" role="alert">{success}</div>}
+              {success && (
+                <div className="form-success visible" role="alert" style={{ marginBottom: 'var(--space-4)', animation: 'fadeIn 0.3s ease' }}>
+                  ✓ {success}
+                </div>
+              )}
 
               <form id="contact-form" noValidate onSubmit={handleSubmit}>
                 <div className={`form-group${errors.name ? ' has-error' : ''}`}>
-                  <label htmlFor="contact-name">Your Name <span className="required">*</span></label>
+                  <label htmlFor="contact-name">Full Name <span className="required">*</span></label>
                   <input
                     type="text"
                     id="contact-name"
                     className="form-input"
-                    placeholder="Full name"
+                    placeholder="Your name"
                     value={contactForm.name}
                     onChange={e => {
                       setContactForm(prev => ({ ...prev, name: e.target.value }));
@@ -181,7 +354,7 @@ export default function AboutPage() {
                     type="text"
                     id="contact-subject"
                     className="form-input"
-                    placeholder="What is this about?"
+                    placeholder="e.g. Bulk Winter Cloth Drive / NGO Listing"
                     value={contactForm.subject}
                     onChange={e => {
                       setContactForm(prev => ({ ...prev, subject: e.target.value }));
@@ -197,8 +370,8 @@ export default function AboutPage() {
                   <textarea
                     id="contact-message"
                     className="form-textarea"
-                    rows="5"
-                    placeholder="Write your message here (minimum 10 characters)"
+                    rows="4"
+                    placeholder="Tell us how we can help..."
                     value={contactForm.message}
                     onChange={e => {
                       setContactForm(prev => ({ ...prev, message: e.target.value }));
@@ -209,34 +382,48 @@ export default function AboutPage() {
                   {errors.message && <span className="form-error">{errors.message}</span>}
                 </div>
 
-                <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%' }}>
-                  Send Message
+                <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%', justifyContent: 'center' }}>
+                  Send Message →
                 </button>
               </form>
             </div>
 
-            {/* Contact Info */}
-            <div>
-              <h2 style={{ marginBottom: 'var(--space-6)' }}>Contact Information</h2>
-
-              <div style={{ marginBottom: 'var(--space-8)' }}>
-                <h4 style={{ marginBottom: 'var(--space-2)' }}>Email</h4>
-                <p><a href="mailto:hello@ivolunteer.org" style={{ color: 'var(--color-primary)' }}>hello@ivolunteer.org</a></p>
+            {/* Helpdesk Contacts */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              <div className="card" style={{ padding: 'var(--space-6)', borderRadius: 'var(--radius-xl)' }}>
+                <div style={{ fontSize: '1.5rem', marginBottom: 'var(--space-2)' }}>📬</div>
+                <h4 style={{ fontSize: 'var(--font-size-md)', marginBottom: 4 }}>General Inquiries</h4>
+                <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 8 }}>
+                  For questions about doorstep pickup coverage or drive volunteer guidelines.
+                </p>
+                <a href="mailto:support@ivolunteer-tricity.org" style={{ color: 'var(--color-primary)', fontWeight: 600, fontSize: 'var(--font-size-sm)' }}>
+                  support@ivolunteer-tricity.org
+                </a>
               </div>
 
-              <div style={{ marginBottom: 'var(--space-8)' }}>
-                <h4 style={{ marginBottom: 'var(--space-2)' }}>For Organisations</h4>
-                <p>If you run an NGO, orphanage, or old-age home and would like to be listed on iVolunteer, write to us at <a href="mailto:partners@ivolunteer.org" style={{ color: 'var(--color-primary)' }}>partners@ivolunteer.org</a> with your registration details.</p>
+              <div className="card" style={{ padding: 'var(--space-6)', borderRadius: 'var(--radius-xl)' }}>
+                <div style={{ fontSize: '1.5rem', marginBottom: 'var(--space-2)' }}>🏛️</div>
+                <h4 style={{ fontSize: 'var(--font-size-md)', marginBottom: 4 }}>NGO Listing &amp; Verification</h4>
+                <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 8 }}>
+                  Run an orphanage, senior home, or charitable dispensary in Chandigarh Tricity or Punjab? Get audited and verified for listings.
+                </p>
+                <a href="mailto:partners@ivolunteer-tricity.org" style={{ color: 'var(--color-primary)', fontWeight: 600, fontSize: 'var(--font-size-sm)' }}>
+                  partners@ivolunteer-tricity.org
+                </a>
               </div>
 
-              <div style={{ marginBottom: 'var(--space-8)' }}>
-                <h4 style={{ marginBottom: 'var(--space-2)' }}>For Volunteers</h4>
-                <p>Have questions about volunteering opportunities? Visit our <a href="/volunteer" style={{ color: 'var(--color-primary)' }}>Volunteer page</a> or email <a href="mailto:volunteer@ivolunteer.org" style={{ color: 'var(--color-primary)' }}>volunteer@ivolunteer.org</a>.</p>
-              </div>
-
-              <div className="alert alert-warning">
-                <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                <span>iVolunteer does not accept monetary donations. We only facilitate the donation of physical items (food, clothes, books, medicines, and essentials).</span>
+              <div style={{
+                background: 'var(--color-warning-bg)',
+                border: '1px solid rgba(245, 158, 11, 0.3)',
+                borderRadius: 'var(--radius-lg)',
+                padding: 'var(--space-4)',
+                fontSize: 'var(--font-size-xs)',
+                color: 'var(--color-text)'
+              }}>
+                <div style={{ fontWeight: 700, color: 'var(--color-accent-dark)', marginBottom: 4 }}>
+                  ⚠️ Important Donor Advisory
+                </div>
+                iVolunteer coordinates material goods (clothes, food grains, books, medicines) and volunteer service hours only. We do not solicit or process direct cash transfers or money wires.
               </div>
             </div>
 

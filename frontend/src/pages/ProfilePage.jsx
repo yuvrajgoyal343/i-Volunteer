@@ -22,9 +22,16 @@ export default function ProfilePage() {
   const [donationsLoading,setDonationsLoading]= useState(true);
   const [donationFilter,  setDonationFilter]  = useState('all');
 
-  // Edit profile modal
+  // Edit profile modal & tab
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editForm, setEditForm]           = useState({ name: '', phone: '', city: '', bio: '' });
+  const [editForm, setEditForm]           = useState({
+    name: '',
+    phone: '',
+    city: '',
+    bio: '',
+    isVolunteer: false,
+    availability: 'weekends'
+  });
   const [editLoading, setEditLoading]     = useState(false);
   const [editError, setEditError]         = useState('');
   const [editSuccess, setEditSuccess]     = useState('');
@@ -49,10 +56,32 @@ export default function ProfilePage() {
 
   /* ── Open edit modal ── */
   const openEdit = () => {
-    setEditForm({ name: user.name || '', phone: user.phone || '', city: user.city || '', bio: user.bio || '' });
+    setEditForm({
+      name: user.name || '',
+      phone: user.phone || '',
+      city: user.city || '',
+      bio: user.bio || '',
+      isVolunteer: !!user.isVolunteer,
+      availability: user.volunteerSubProfile?.availability || 'weekends'
+    });
     setEditError('');
     setEditSuccess('');
     setShowEditModal(true);
+  };
+
+  /* ── Open edit tab ── */
+  const openEditTab = () => {
+    setEditForm({
+      name: user.name || '',
+      phone: user.phone || '',
+      city: user.city || '',
+      bio: user.bio || '',
+      isVolunteer: !!user.isVolunteer,
+      availability: user.volunteerSubProfile?.availability || 'weekends'
+    });
+    setEditError('');
+    setEditSuccess('');
+    setActiveTab('edit');
   };
 
   /* ── Save profile edit ── */
@@ -64,10 +93,15 @@ export default function ProfilePage() {
     try {
       await api.put('/profile', editForm);
       await refreshProfile();
-      setEditSuccess('Profile updated!');
-      setTimeout(() => setShowEditModal(false), 800);
+      setEditSuccess('Profile updated successfully!');
+      setTimeout(() => {
+        setShowEditModal(false);
+        if (activeTab === 'edit') {
+          setActiveTab('overview');
+        }
+      }, 900);
     } catch (err) {
-      setEditError(err.response?.data?.error || 'Update failed.');
+      setEditError(err.response?.data?.error || 'Update failed. Please try again.');
     } finally {
       setEditLoading(false);
     }
@@ -131,6 +165,22 @@ export default function ProfilePage() {
                   </span>
                 </div>
               </div>
+
+              {/* Edit Profile Action Button */}
+              <div className="profile-hero-actions">
+                <button
+                  type="button"
+                  className="btn btn-edit-profile"
+                  onClick={openEdit}
+                  title="Edit Profile"
+                >
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                  Edit Profile
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -154,6 +204,10 @@ export default function ProfilePage() {
               <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
               Volunteer Subprofile <span className={`tab-badge${user.isVolunteer ? ' badge-vol' : ''}`}>{user.isVolunteer ? 'Active' : 'Off'}</span>
             </button>
+            <button className={`profile-tab-btn${activeTab === 'edit' ? ' active' : ''}`} onClick={openEditTab}>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Edit Profile
+            </button>
           </div>
 
           {/* ─── TAB: OVERVIEW ─── */}
@@ -165,7 +219,10 @@ export default function ProfilePage() {
                   <div className="card-body">
                     <h3 style={{ marginBottom: 'var(--space-4)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <span>Personal Information</span>
-                      <button type="button" className="btn btn-ghost btn-sm" onClick={openEdit}>Edit</button>
+                      <button type="button" className="btn btn-outline btn-sm" onClick={openEdit} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        Edit Profile
+                      </button>
                     </h3>
                     <div className="profile-info-list">
                       {[
@@ -400,6 +457,146 @@ export default function ProfilePage() {
             </div>
           )}
 
+          {/* ─── TAB: EDIT PROFILE ─── */}
+          {activeTab === 'edit' && (
+            <div className="profile-tab-content active">
+              <div className="card" style={{ maxWidth: '780px', margin: '0 auto' }}>
+                <div className="card-body">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-6)', borderBottom: '1px solid var(--color-border)', paddingBottom: 'var(--space-4)' }}>
+                    <div>
+                      <h2 style={{ margin: 0, fontSize: 'var(--font-size-xl)' }}>Edit Profile Details</h2>
+                      <p style={{ color: 'var(--color-text-secondary)', margin: '4px 0 0 0', fontSize: 'var(--font-size-sm)' }}>
+                        Update your personal information, volunteer status, and contact preferences.
+                      </p>
+                    </div>
+                    <button type="button" className="btn btn-ghost btn-sm" onClick={() => setActiveTab('overview')}>
+                      Cancel
+                    </button>
+                  </div>
+
+                  {editError   && (
+                    <div style={{ marginBottom: 'var(--space-4)', padding: '10px 14px', borderRadius: 'var(--radius-md)', background: '#fee2e2', color: '#991b1b', fontSize: 'var(--font-size-sm)' }}>
+                      {editError}
+                    </div>
+                  )}
+                  {editSuccess && (
+                    <div style={{ marginBottom: 'var(--space-4)', padding: '10px 14px', borderRadius: 'var(--radius-md)', background: '#dcfce7', color: '#166534', fontSize: 'var(--font-size-sm)', fontWeight: 600 }}>
+                      ✓ {editSuccess}
+                    </div>
+                  )}
+
+                  <form onSubmit={handleEditSubmit}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-4)' }}>
+                      <div className="form-group">
+                        <label htmlFor="edit-tab-name">Full Name *</label>
+                        <input
+                          type="text"
+                          id="edit-tab-name"
+                          className="form-input"
+                          required
+                          value={editForm.name}
+                          onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="edit-tab-email">Email Address</label>
+                        <input
+                          type="email"
+                          id="edit-tab-email"
+                          className="form-input"
+                          disabled
+                          value={user.email}
+                          style={{ backgroundColor: 'var(--color-bg-secondary)', cursor: 'not-allowed', opacity: 0.85 }}
+                        />
+                        <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '3px', display: 'block' }}>Email cannot be changed directly</span>
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="edit-tab-phone">Phone Number</label>
+                        <input
+                          type="tel"
+                          id="edit-tab-phone"
+                          className="form-input"
+                          placeholder="+91 98765 43210"
+                          value={editForm.phone}
+                          onChange={e => setEditForm(f => ({ ...f, phone: e.target.value }))}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="edit-tab-city">City / Location</label>
+                        <input
+                          type="text"
+                          id="edit-tab-city"
+                          className="form-input"
+                          placeholder="e.g. Chandigarh, Mohali, Panchkula, Ludhiana"
+                          value={editForm.city}
+                          onChange={e => setEditForm(f => ({ ...f, city: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group" style={{ marginTop: 'var(--space-4)' }}>
+                      <label htmlFor="edit-tab-bio">Bio / About You</label>
+                      <textarea
+                        id="edit-tab-bio"
+                        className="form-textarea"
+                        rows="3"
+                        placeholder="Tell the community about yourself and what causes you care about..."
+                        value={editForm.bio}
+                        onChange={e => setEditForm(f => ({ ...f, bio: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={{ background: 'var(--color-bg-secondary)', padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)', marginTop: 'var(--space-4)', border: '1px solid var(--color-border)' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', cursor: 'pointer', fontWeight: 600, margin: 0 }}>
+                        <input
+                          type="checkbox"
+                          checked={editForm.isVolunteer}
+                          onChange={e => setEditForm(f => ({ ...f, isVolunteer: e.target.checked }))}
+                          style={{ width: '18px', height: '18px', accentColor: 'var(--color-primary)' }}
+                        />
+                        <span>Active Volunteer Network Member</span>
+                      </label>
+                      <p style={{ margin: '4px 0 0 28px', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
+                        Enable this to receive alerts about local community food &amp; clothing distribution drives.
+                      </p>
+
+                      {editForm.isVolunteer && (
+                        <div style={{ marginTop: 'var(--space-3)', marginLeft: '28px' }}>
+                          <label htmlFor="edit-tab-avail" style={{ fontSize: 'var(--font-size-xs)', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                            Volunteer Availability:
+                          </label>
+                          <select
+                            id="edit-tab-avail"
+                            className="form-input"
+                            style={{ maxWidth: '260px', padding: '6px 10px', fontSize: 'var(--font-size-sm)' }}
+                            value={editForm.availability}
+                            onChange={e => setEditForm(f => ({ ...f, availability: e.target.value }))}
+                          >
+                            <option value="weekends">Weekends Only</option>
+                            <option value="weekdays">Weekdays</option>
+                            <option value="flexible">Flexible / Any Time</option>
+                          </select>
+                        </div>
+                      )}
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)', marginTop: 'var(--space-6)' }}>
+                      <button type="button" className="btn btn-secondary" onClick={() => setActiveTab('overview')}>
+                        Cancel
+                      </button>
+                      <button type="submit" className="btn btn-primary" disabled={editLoading}>
+                        {editLoading ? 'Saving Changes…' : 'Save Changes'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
       </section>
 
@@ -411,28 +608,115 @@ export default function ProfilePage() {
               <h3>Edit Profile Details</h3>
               <button type="button" className="modal-close" onClick={() => setShowEditModal(false)}>&times;</button>
             </div>
-            {editError   && <p style={{ color: 'var(--color-error, #dc2626)', marginBottom: 8 }}>{editError}</p>}
-            {editSuccess && <p style={{ color: 'var(--color-success, #16a34a)', marginBottom: 8 }}>{editSuccess}</p>}
+            {editError   && (
+              <div style={{ marginBottom: 'var(--space-3)', padding: '8px 12px', borderRadius: 'var(--radius-md)', background: '#fee2e2', color: '#991b1b', fontSize: 'var(--font-size-sm)' }}>
+                {editError}
+              </div>
+            )}
+            {editSuccess && (
+              <div style={{ marginBottom: 'var(--space-3)', padding: '8px 12px', borderRadius: 'var(--radius-md)', background: '#dcfce7', color: '#166534', fontSize: 'var(--font-size-sm)', fontWeight: 600 }}>
+                ✓ {editSuccess}
+              </div>
+            )}
             <form onSubmit={handleEditSubmit}>
               <div className="form-group">
-                <label htmlFor="edit-name">Full Name</label>
-                <input type="text" id="edit-name" className="form-input" required value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} />
+                <label htmlFor="edit-modal-name">Full Name *</label>
+                <input
+                  type="text"
+                  id="edit-modal-name"
+                  className="form-input"
+                  required
+                  value={editForm.name}
+                  onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
+                />
               </div>
+
               <div className="form-group">
-                <label htmlFor="edit-phone">Phone Number</label>
-                <input type="tel" id="edit-phone" className="form-input" value={editForm.phone} onChange={e => setEditForm(f => ({ ...f, phone: e.target.value }))} />
+                <label htmlFor="edit-modal-email">Email Address</label>
+                <input
+                  type="email"
+                  id="edit-modal-email"
+                  className="form-input"
+                  disabled
+                  value={user.email}
+                  style={{ backgroundColor: 'var(--color-bg-secondary)', cursor: 'not-allowed', opacity: 0.85 }}
+                />
               </div>
+
               <div className="form-group">
-                <label htmlFor="edit-city">City</label>
-                <input type="text" id="edit-city" className="form-input" value={editForm.city} onChange={e => setEditForm(f => ({ ...f, city: e.target.value }))} />
+                <label htmlFor="edit-modal-phone">Phone Number</label>
+                <input
+                  type="tel"
+                  id="edit-modal-phone"
+                  className="form-input"
+                  placeholder="+91 98765 43210"
+                  value={editForm.phone}
+                  onChange={e => setEditForm(f => ({ ...f, phone: e.target.value }))}
+                />
               </div>
+
               <div className="form-group">
-                <label htmlFor="edit-bio">Short Bio</label>
-                <textarea id="edit-bio" className="form-textarea" rows="3" value={editForm.bio} onChange={e => setEditForm(f => ({ ...f, bio: e.target.value }))} />
+                <label htmlFor="edit-modal-city">City / Location</label>
+                <input
+                  type="text"
+                  id="edit-modal-city"
+                  className="form-input"
+                  placeholder="e.g. Chandigarh, Mohali, Panchkula, Ludhiana"
+                  value={editForm.city}
+                  onChange={e => setEditForm(f => ({ ...f, city: e.target.value }))}
+                />
               </div>
+
+              <div className="form-group">
+                <label htmlFor="edit-modal-bio">Short Bio</label>
+                <textarea
+                  id="edit-modal-bio"
+                  className="form-textarea"
+                  rows="3"
+                  placeholder="Tell the community about yourself..."
+                  value={editForm.bio}
+                  onChange={e => setEditForm(f => ({ ...f, bio: e.target.value }))}
+                />
+              </div>
+
+              <div style={{ background: 'var(--color-bg-secondary)', padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-4)', border: '1px solid var(--color-border)' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', cursor: 'pointer', fontWeight: 600, margin: 0, fontSize: 'var(--font-size-sm)' }}>
+                  <input
+                    type="checkbox"
+                    checked={editForm.isVolunteer}
+                    onChange={e => setEditForm(f => ({ ...f, isVolunteer: e.target.checked }))}
+                    style={{ accentColor: 'var(--color-primary)' }}
+                  />
+                  <span>Active Volunteer Network Member</span>
+                </label>
+
+                {editForm.isVolunteer && (
+                  <div style={{ marginTop: 'var(--space-2)', marginLeft: '24px' }}>
+                    <label htmlFor="edit-modal-avail" style={{ fontSize: '11px', fontWeight: 600, display: 'block', marginBottom: '2px' }}>
+                      Availability:
+                    </label>
+                    <select
+                      id="edit-modal-avail"
+                      className="form-input"
+                      style={{ padding: '4px 8px', fontSize: 'var(--font-size-xs)' }}
+                      value={editForm.availability}
+                      onChange={e => setEditForm(f => ({ ...f, availability: e.target.value }))}
+                    >
+                      <option value="weekends">Weekends Only</option>
+                      <option value="weekdays">Weekdays</option>
+                      <option value="flexible">Flexible / Any Time</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)', marginTop: 'var(--space-6)' }}>
-                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowEditModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary btn-sm" disabled={editLoading}>{editLoading ? 'Saving…' : 'Save Changes'}</button>
+                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowEditModal(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary btn-sm" disabled={editLoading}>
+                  {editLoading ? 'Saving…' : 'Save Changes'}
+                </button>
               </div>
             </form>
           </div>

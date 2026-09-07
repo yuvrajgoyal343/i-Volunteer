@@ -35,8 +35,8 @@ export default function LoginPage() {
     try {
       const res = await api.post('/auth/login', { email: form.email, password: form.password });
       login(res.data.token, res.data.user);
-      setSuccess('Signed in successfully. Redirecting to your profile…');
-      setTimeout(() => navigate('/profile'), 1000);
+      setSuccess('Signed in successfully! Entering website…');
+      setTimeout(() => navigate('/'), 700);
     } catch (err) {
       setApiError(err.response?.data?.error || 'Login failed. Please try again.');
     } finally {
@@ -54,16 +54,16 @@ export default function LoginPage() {
             <span>iVolunteer</span>
           </Link>
           <h1 className="login-brand-heading">Every act of giving creates a ripple of change.</h1>
-          <p className="login-brand-subtext">Join thousands of donors and volunteers who are making a real difference in communities across India.</p>
+          <p className="login-brand-subtext">Join donors and volunteers making a real difference in communities across Chandigarh Tricity & Punjab.</p>
           <div className="login-brand-stats">
-            {[['2,400+', 'Donations Delivered'], ['85+', 'Verified Organisations'], ['1,200+', 'Active Volunteers']].map(([n, l]) => (
+            {[['2,800+', 'Donations Delivered'], ['12', 'Verified Organisations'], ['1,400+', 'Active Volunteers']].map(([n, l]) => (
               <div className="login-stat" key={l}>
                 <span className="login-stat-number">{n}</span>
                 <span className="login-stat-label">{l}</span>
               </div>
             ))}
           </div>
-          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginTop: 'var(--space-4)' }}>* Platform-wide network impact metrics across India</p>
+          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginTop: 'var(--space-4)' }}>* Impact metrics across Chandigarh, Mohali, Panchkula & Punjab</p>
         </div>
         <div className="login-brand-decor">
           <div className="decor-circle decor-circle-1"></div>

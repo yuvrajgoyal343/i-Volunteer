@@ -1,4 +1,4 @@
-// SignupPage.jsx — Register new user, all profile data from form
+// SignupPage.jsx — Register new user with Chandigarh Tricity & Punjab region branding
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -9,9 +9,14 @@ export default function SignupPage() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    name: '', email: '', phone: '', city: '', password: '', isVolunteer: true
+    name: '',
+    email: '',
+    phone: '',
+    city: 'Chandigarh',
+    password: '',
+    isVolunteer: true
   });
-  const [errors, setErrors]   = useState({});
+  const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,12 +41,12 @@ export default function SignupPage() {
     setLoading(true);
     try {
       const res = await api.post('/auth/register', {
-        name:        form.name.trim(),
-        email:       form.email.trim(),
-        password:    form.password,
-        phone:       form.phone.trim(),
-        city:        form.city.trim(),
-        isVolunteer: form.isVolunteer,
+        name: form.name.trim(),
+        email: form.email.trim(),
+        password: form.password,
+        phone: form.phone.trim(),
+        city: form.city.trim(),
+        isVolunteer: form.isVolunteer
       });
       login(res.data.token, res.data.user);
       setSuccess('Account created successfully! Redirecting to your profile…');
@@ -69,16 +74,18 @@ export default function SignupPage() {
             <span>iVolunteer</span>
           </Link>
           <h1 className="login-brand-heading">Join our community of givers &amp; change-makers.</h1>
-          <p className="login-brand-subtext">Create your iVolunteer account to track donations, connect with top verified NGOs, and manage your volunteer journey.</p>
+          <p className="login-brand-subtext">Create your iVolunteer account to track doorstep donations, connect with top verified Tricity non-profits, and log your volunteer hours.</p>
           <div className="login-brand-stats">
-            {[['2,400+', 'Donations Delivered'], ['85+', 'Verified Organisations'], ['1,200+', 'Active Volunteers']].map(([n, l]) => (
+            {[['2,800+', 'Donations Delivered'], ['12', 'Verified Organisations'], ['1,400+', 'Active Volunteers']].map(([n, l]) => (
               <div className="login-stat" key={l}>
                 <span className="login-stat-number">{n}</span>
                 <span className="login-stat-label">{l}</span>
               </div>
             ))}
           </div>
-          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginTop: 'var(--space-4)' }}>* Platform-wide network impact metrics across India</p>
+          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginTop: 'var(--space-4)' }}>
+            * Verified impact metrics across Chandigarh, Mohali, Panchkula &amp; Punjab
+          </p>
         </div>
         <div className="login-brand-decor">
           <div className="decor-circle decor-circle-1"></div>
@@ -99,7 +106,7 @@ export default function SignupPage() {
 
           <div className="login-form-header">
             <h2>Create an account</h2>
-            <p>Start your journey of giving back and making an impact today.</p>
+            <p>Start your journey of giving back and making a local impact today.</p>
           </div>
 
           {success && <div className="form-success visible" role="alert">{success}</div>}
@@ -115,7 +122,7 @@ export default function SignupPage() {
               <label htmlFor="signup-name">Full Name <span className="required">*</span></label>
               <div className="input-icon-wrap">
                 <svg className="input-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <input type="text" id="signup-name" className="form-input form-input-icon" placeholder="Enter your full name" value={form.name} onChange={setField('name')} autoComplete="name" />
+                <input type="text" id="signup-name" className="form-input form-input-icon" placeholder="e.g. Amanpreet Singh" value={form.name} onChange={setField('name')} autoComplete="name" />
               </div>
               {errors.name && <span className="form-error">{errors.name}</span>}
             </div>
@@ -133,12 +140,12 @@ export default function SignupPage() {
             {/* Phone & City */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
               <div className="form-group">
-                <label htmlFor="signup-phone">Phone Number</label>
-                <input type="tel" id="signup-phone" className="form-input" placeholder="+91 98765 43210" value={form.phone} onChange={setField('phone')} />
+                <label htmlFor="signup-phone">Phone / WhatsApp</label>
+                <input type="tel" id="signup-phone" className="form-input" placeholder="+91 98140 76543" value={form.phone} onChange={setField('phone')} />
               </div>
               <div className="form-group">
-                <label htmlFor="signup-city">City</label>
-                <input type="text" id="signup-city" className="form-input" placeholder="e.g. New Delhi" value={form.city} onChange={setField('city')} />
+                <label htmlFor="signup-city">City / Region</label>
+                <input type="text" id="signup-city" className="form-input" placeholder="Chandigarh, Mohali..." value={form.city} onChange={setField('city')} />
               </div>
             </div>
 
@@ -153,18 +160,18 @@ export default function SignupPage() {
             </div>
 
             {/* Volunteer checkbox */}
-            <div className="form-group" style={{ backgroundColor: 'var(--color-bg-secondary)', padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
-              <label className="checkbox-item" style={{ fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-main)' }}>
+            <div className="form-group" style={{ backgroundColor: 'var(--color-primary-bg)', padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--radius-md)', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
+              <label className="checkbox-item" style={{ fontWeight: 'var(--font-weight-semibold)', color: 'var(--color-primary-dark)' }}>
                 <input type="checkbox" id="signup-is-volunteer" checked={form.isVolunteer} onChange={setField('isVolunteer')} />
-                Register as a Volunteer as well (creates a Volunteer Subprofile)
+                Enroll as Active Volunteer (Unlocks Badges &amp; Drive RSVP)
               </label>
               <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: 4, marginLeft: 24 }}>
-                Enables volunteer badges, drives tracking, and hours logger in your profile.
+                Enables volunteer badges, drive hours tracking, and certificates in your profile.
               </p>
             </div>
 
             <button type="submit" className="btn btn-primary btn-lg login-submit-btn" disabled={loading}>
-              {loading ? 'Creating account…' : 'Create My Account'}
+              {loading ? 'Creating account…' : 'Create My Free Account →'}
             </button>
           </form>
 

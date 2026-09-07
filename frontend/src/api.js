@@ -3,49 +3,49 @@
 
 'use strict';
 
-const STORAGE_USERS_KEY     = 'ivolunteer_mock_users';
-const STORAGE_DONATIONS_KEY = 'ivolunteer_mock_donations';
+const STORAGE_USERS_KEY     = 'ivolunteer_mock_users_v2';
+const STORAGE_DONATIONS_KEY = 'ivolunteer_mock_donations_v2';
 const TOKEN_KEY             = 'iv_token';
 
-/* ─── Seed Data ─── */
+/* ─── Seed Data (Real Chandigarh Tricity & Punjab) ─── */
 const INITIAL_USERS = [
   {
     id: 1,
-    name: 'Priya Sharma',
+    name: 'Amanpreet Singh',
     email: 'demo@ivolunteer.org',
     password: 'password123',
-    phone: '+91 98765 43210',
-    city: 'Mumbai',
-    bio: 'Passionate community volunteer supporting food rescue and animal welfare initiatives.',
+    phone: '+91 98140 76543',
+    city: 'Chandigarh',
+    bio: 'Dedicated community volunteer supporting food drives, child education, and winter warmth campaigns across Chandigarh Tricity.',
     isVolunteer: true,
     joinedDate: 'March 2026',
     volunteerSubProfile: {
       volunteerId: 'VOL-2026-1042',
       status: 'Active Volunteer',
       joinedDate: '2026-03-15',
-      hoursContributed: 24.5,
-      drivesAttended: 5,
+      hoursContributed: 26.5,
+      drivesAttended: 6,
       availability: 'weekends',
       interests: ['foodDrive', 'clothingDrive', 'teaching'],
-      skills: ['Community Outreach', 'Event Coordination', 'Logistics'],
+      skills: ['Community Outreach', 'Logistics Coordination', 'First Aid'],
       badges: [
         { name: 'First Drive', icon: '🌱', desc: 'Attended first community drive' },
-        { name: 'Community Star', icon: '⭐', desc: 'Completed over 20 volunteer hours' },
-        { name: 'Kind Heart', icon: '❤️', desc: 'Recognised for dedicated community support' }
+        { name: 'Community Star', icon: '⭐', desc: 'Completed over 25 volunteer hours' },
+        { name: 'Tricity Champion', icon: '❤️', desc: 'Active volunteer in Chandigarh & Punjab region' }
       ],
       upcomingDrives: [
-        { id: 1, title: 'Weekend Food Distribution Drive', date: '2026-09-12', role: 'Distribution Lead' }
+        { id: 2, title: 'Weekend Langar & Rations Drive at PGI', date: '2026-09-12', role: 'Distribution Coordinator' }
       ]
     }
   },
   {
     id: 2,
-    name: 'Rahul Verma',
-    email: 'rahul@example.com',
+    name: 'Harleen Kaur',
+    email: 'harleen@example.com',
     password: 'password123',
-    phone: '+91 91234 56789',
-    city: 'New Delhi',
-    bio: 'Active donor contributing seasonal clothing, blankets, and school books.',
+    phone: '+91 98722 11234',
+    city: 'Mohali',
+    bio: 'Active donor contributing seasonal clothing, medical supplies, and school textbooks for underprivileged students in Tricity.',
     isVolunteer: false,
     joinedDate: 'April 2026',
     volunteerSubProfile: null
@@ -58,11 +58,11 @@ const INITIAL_DONATIONS = [
     userId: 1,
     donationRef: 'DON-20260815-402',
     type: 'clothes',
-    description: 'Winter jackets, warm blankets and woollen sweaters for children',
-    quantity: '3 boxes (approx 25 items)',
-    pickupAddress: 'Flat 402, Sea Green Apts, Worli, Mumbai',
+    description: 'Warm woollen sweaters, winter jackets and thermal blankets for children',
+    quantity: '2 boxes (approx 20 items)',
+    pickupAddress: 'House No. 1420, Sector 35-C, Chandigarh',
     ngoId: 2,
-    ngoName: 'Sunshine Orphanage',
+    ngoName: 'Bal Niketan Children Home',
     status: 'delivered',
     date: '2026-08-15',
     lastUpdated: '2026-08-18'
@@ -72,11 +72,11 @@ const INITIAL_DONATIONS = [
     userId: 1,
     donationRef: 'DON-20260828-819',
     type: 'food',
-    description: 'Packets of rice, lentils, wheat flour and cooking oil',
-    quantity: '15 kg grocery kit',
-    pickupAddress: 'Flat 402, Sea Green Apts, Worli, Mumbai',
-    ngoId: 1,
-    ngoName: 'Helping Hands Foundation',
+    description: 'Bags of wheat flour (Atta), Basmati rice, pulses, and mustard oil',
+    quantity: '25 kg grocery kit',
+    pickupAddress: 'Flat 502, Ivory Towers, Sector 70, Mohali',
+    ngoId: 3,
+    ngoName: 'Sri Guru Granth Sahib Sewa Society (Tera Hi Tera)',
     status: 'pickedUp',
     date: '2026-08-28',
     lastUpdated: '2026-08-30'
@@ -86,11 +86,11 @@ const INITIAL_DONATIONS = [
     userId: 1,
     donationRef: 'DON-20260902-154',
     type: 'books',
-    description: 'School textbooks (Classes 6-10) and general knowledge storybooks',
-    quantity: '20 books',
-    pickupAddress: 'Flat 402, Sea Green Apts, Worli, Mumbai',
-    ngoId: 7,
-    ngoName: 'Vidya Daan Foundation',
+    description: 'CBSE Class 8-10 Science & Math textbooks and blank notebooks',
+    quantity: '20 textbooks & stationery kit',
+    pickupAddress: 'House No. 312, Sector 15, Panchkula',
+    ngoId: 1,
+    ngoName: 'Tammana NGO',
     status: 'requested',
     date: '2026-09-02',
     lastUpdated: '2026-09-02'
@@ -100,6 +100,8 @@ const INITIAL_DONATIONS = [
 /* ─── LocalStorage Helpers ─── */
 function getStoredUsers() {
   try {
+    // Clear legacy mock data if present
+    localStorage.removeItem('ivolunteer_mock_users');
     const raw = localStorage.getItem(STORAGE_USERS_KEY);
     if (!raw) {
       localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(INITIAL_USERS));
@@ -121,6 +123,8 @@ function saveStoredUsers(users) {
 
 function getStoredDonations() {
   try {
+    // Clear legacy mock data if present
+    localStorage.removeItem('ivolunteer_mock_donations');
     const raw = localStorage.getItem(STORAGE_DONATIONS_KEY);
     if (!raw) {
       localStorage.setItem(STORAGE_DONATIONS_KEY, JSON.stringify(INITIAL_DONATIONS));
@@ -423,7 +427,7 @@ const api = {
       const userId = getCurrentUserId();
       if (!userId) throw createError('No token provided.', 401);
 
-      const { name, phone = '', city = '', bio = '' } = body;
+      const { name, phone = '', city = '', bio = '', isVolunteer, availability } = body;
       if (!name || !name.trim()) {
         throw createError('Name is required.', 400);
       }
@@ -432,12 +436,40 @@ const api = {
       const userIndex = users.findIndex((u) => u.id === userId);
       if (userIndex === -1) throw createError('User not found.', 404);
 
+      const existingUser = users[userIndex];
+      const updatedIsVol = typeof isVolunteer === 'boolean' ? isVolunteer : existingUser.isVolunteer;
+      
+      let updatedSubProfile = existingUser.volunteerSubProfile;
+      if (updatedIsVol && !updatedSubProfile) {
+        updatedSubProfile = {
+          volunteerId: generateVolunteerId(),
+          status: 'Active Volunteer',
+          joinedDate: todayStr(),
+          hoursContributed: 0,
+          drivesAttended: 0,
+          availability: availability || 'weekends',
+          interests: ['foodDrive', 'clothingDrive'],
+          skills: ['Community Support'],
+          badges: [
+            { name: 'Active Volunteer', icon: '🌱', desc: 'Joined iVolunteer active volunteer network' }
+          ],
+          upcomingDrives: []
+        };
+      } else if (updatedSubProfile && availability) {
+        updatedSubProfile = {
+          ...updatedSubProfile,
+          availability
+        };
+      }
+
       users[userIndex] = {
-        ...users[userIndex],
+        ...existingUser,
         name: name.trim(),
         phone: phone.trim(),
         city: city.trim(),
-        bio: bio.trim()
+        bio: bio.trim(),
+        isVolunteer: updatedIsVol,
+        volunteerSubProfile: updatedSubProfile
       };
 
       saveStoredUsers(users);
