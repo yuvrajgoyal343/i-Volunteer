@@ -150,7 +150,13 @@ export default function LoginPage() {
             <div className={`form-group${errors.password ? ' has-error' : ''}`}>
               <div className="label-row">
                 <label htmlFor="login-password">Password <span className="required">*</span></label>
-                <a href="#" className="forgot-link">Forgot password?</a>
+                <a
+                  href="mailto:support@ivolunteer.org?subject=Password%20Reset%20Assistance"
+                  className="forgot-link"
+                  title="Password reset is not available in demo mode. Click to contact support."
+                >
+                  Forgot password?
+                </a>
               </div>
               <div className="input-icon-wrap">
                 <svg className="input-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>

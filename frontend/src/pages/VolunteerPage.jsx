@@ -1,9 +1,9 @@
 // VolunteerPage.jsx — Premium Volunteer Hub for Chandigarh Tricity & Punjab
 import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { volunteerActivities, activityTypeLabels } from '../appData';
+import { volunteerActivities } from '../appData';
 import { useAuth } from '../context/AuthContext';
 import api from '../api';
 
@@ -47,6 +47,7 @@ const TYPE_CONFIG = {
 
 export default function VolunteerPage() {
   const { user, refreshProfile } = useAuth();
+  const navigate = useNavigate();
 
   const [form, setForm] = useState({
     name: user?.name || '',
@@ -68,6 +69,15 @@ export default function VolunteerPage() {
   // Drive RSVP modal
   const [selectedDrive, setSelectedDrive] = useState(null);
   const [rsvpSuccess, setRsvpSuccess] = useState(false);
+  const [rsvpSubmitting, setRsvpSubmitting] = useState(false);
+  const [rsvpError, setRsvpError] = useState('');
+
+  const isDriveRegistered = (drive) => {
+    if (!user || !user.volunteerSubProfile?.upcomingDrives || !drive) return false;
+    return user.volunteerSubProfile.upcomingDrives.some(
+      d => (drive.id && d.id === drive.id) || (drive.title && d.title === drive.title)
+    );
+  };
 
   const toggleInterest = (val) => {
     setForm(prev => {
@@ -125,14 +135,38 @@ export default function VolunteerPage() {
   const handleJoinDrive = (activity) => {
     setSelectedDrive(activity);
     setRsvpSuccess(false);
+    setRsvpError('');
   };
 
-  const confirmRsvp = () => {
-    setRsvpSuccess(true);
-    setTimeout(() => {
-      setSelectedDrive(null);
-      setRsvpSuccess(false);
-    }, 2200);
+  const confirmRsvp = async () => {
+    if (!user) {
+      alert('Please sign in or create an account to RSVP for volunteer drives!');
+      navigate('/login');
+      return;
+    }
+
+    if (isDriveRegistered(selectedDrive)) {
+      setRsvpError('You have already confirmed attendance for this drive. You can view it in your profile.');
+      return;
+    }
+
+    setRsvpSubmitting(true);
+    setRsvpError('');
+
+    try {
+      await api.post('/volunteer/rsvp', { drive: selectedDrive });
+      await refreshProfile();
+      setRsvpSuccess(true);
+      setTimeout(() => {
+        setSelectedDrive(null);
+        setRsvpSuccess(false);
+        setRsvpError('');
+      }, 2200);
+    } catch (err) {
+      setRsvpError(err.response?.data?.error || 'Failed to confirm RSVP. Please try again.');
+    } finally {
+      setRsvpSubmitting(false);
+    }
   };
 
   // Filtered activities
@@ -588,11 +622,11 @@ export default function VolunteerPage() {
                       {/* Action Button */}
                       <button
                         type="button"
-                        className="btn btn-primary btn-sm"
+                        className={`btn btn-sm ${isDriveRegistered(activity) ? 'btn-ghost' : 'btn-primary'}`}
                         style={{ width: '100%', justifyContent: 'center' }}
                         onClick={() => handleJoinDrive(activity)}
                       >
-                        Join This Drive →
+                        {isDriveRegistered(activity) ? '✓ Registered' : 'Join This Drive →'}
                       </button>
                     </div>
                   </div>
@@ -695,12 +729,27 @@ export default function VolunteerPage() {
                   <div>👥 <strong>Capacity:</strong> {selectedDrive.spotsAvailable} spots remaining</div>
                 </div>
 
+                {rsvpError && (
+                  <div style={{
+                    marginBottom: 'var(--space-4)',
+                    padding: '0.75rem 1rem',
+                    background: '#FEF2F2',
+                    border: '1px solid #FECACA',
+                    borderRadius: 'var(--radius-md)',
+                    color: '#DC2626',
+                    fontSize: 'var(--font-size-sm)'
+                  }}>
+                    {rsvpError}
+                  </div>
+                )}
+
                 <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
                   <button
                     type="button"
                     className="btn btn-ghost"
                     style={{ flex: 1 }}
                     onClick={() => setSelectedDrive(null)}
+                    disabled={rsvpSubmitting}
                   >
                     Cancel
                   </button>
@@ -709,8 +758,13 @@ export default function VolunteerPage() {
                     className="btn btn-primary"
                     style={{ flex: 2, justifyContent: 'center' }}
                     onClick={confirmRsvp}
+                    disabled={rsvpSubmitting || isDriveRegistered(selectedDrive)}
                   >
-                    Confirm My Attendance ✓
+                    {rsvpSubmitting
+                      ? 'Confirming RSVP...'
+                      : isDriveRegistered(selectedDrive)
+                      ? 'Already Registered ✓'
+                      : 'Confirm My Attendance ✓'}
                   </button>
                 </div>
               </>
