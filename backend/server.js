@@ -188,14 +188,21 @@ app.get('/api/profile', authMiddleware, async (req, res) => {
 ══════════════════════════════════════ */
 app.put('/api/profile', authMiddleware, async (req, res) => {
   try {
-    const { name, phone, city, bio } = req.body;
+    const { name, phone, city, bio, isVolunteer } = req.body;
     if (!name || !name.trim())
       return res.status(400).json({ error: 'Name is required.' });
 
-    await db.run(
-      'UPDATE users SET name = ?, phone = ?, city = ?, bio = ? WHERE id = ?',
-      [name.trim(), (phone || '').trim(), (city || '').trim(), (bio || '').trim(), req.userId]
-    );
+    if (typeof isVolunteer === 'boolean') {
+      await db.run(
+        'UPDATE users SET name = ?, phone = ?, city = ?, bio = ?, is_volunteer = ? WHERE id = ?',
+        [name.trim(), (phone || '').trim(), (city || '').trim(), (bio || '').trim(), isVolunteer ? 1 : 0, req.userId]
+      );
+    } else {
+      await db.run(
+        'UPDATE users SET name = ?, phone = ?, city = ?, bio = ? WHERE id = ?',
+        [name.trim(), (phone || '').trim(), (city || '').trim(), (bio || '').trim(), req.userId]
+      );
+    }
     return res.json({ message: 'Profile updated successfully.' });
   } catch (err) {
     console.error('Profile PUT error:', err);

@@ -266,6 +266,22 @@
     padding: var(--space-4);
     border-radius: var(--radius-md);
   }
+
+  /* Form page layout stack */
+  .form-page-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .live-region-badge {
+    font-size: 11px;
+    padding: 4px 12px;
+    text-align: center;
+  }
+
+  .hero-feature-chip {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
 }
 
 
