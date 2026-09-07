@@ -1,0 +1,12 @@
+{
+  "name": "ivolunteer-app",
+  "version": "1.0.0",
+  "description": "iVolunteer - Donation and Volunteering Platform (Zero-Database LocalStorage Architecture)",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "start": "npm --prefix frontend run dev",
+    "client": "npm --prefix frontend run dev",
+    "server": "npm --prefix backend start",
+    "build": "npm --prefix frontend run build"
+  }
+}
