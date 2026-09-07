@@ -14,10 +14,6 @@ function getCategoryColor(category) {
   return colors[category] || ['#059669', '#10B981'];
 }
 
-function getCategoryEmoji(category) {
-  const emojis = { ngo: '🌿', orphanage: '🏠', oldAgeHome: '🤝' };
-  return emojis[category] || '🌿';
-}
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371;
@@ -109,7 +105,7 @@ export default function OrganisationsPage() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-3)', marginBottom: 'var(--space-4)', padding: 'var(--space-3) var(--space-5)', background: 'var(--color-white)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-xs)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
               <span style={{ fontSize: 'var(--font-size-xs)', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-secondary)', marginRight: 4 }}>
-                📍 Region:
+                Region:
               </span>
               {[
                 { key: 'all', label: 'All Regions' },
@@ -150,9 +146,9 @@ export default function OrganisationsPage() {
             <div className="filter-pills" id="ngo-filters">
               {[
                 { key: 'all', label: 'All Types' },
-                { key: 'ngo', label: '🌿 NGOs' },
-                { key: 'orphanage', label: '🏠 Orphanages' },
-                { key: 'oldAgeHome', label: '🤝 Old Age Homes' }
+                { key: 'ngo', label: 'NGOs' },
+                { key: 'orphanage', label: 'Orphanages' },
+                { key: 'oldAgeHome', label: 'Old Age Homes' }
               ].map(({ key, label }) => (
                 <button key={key} className={`filter-pill${activeCategory === key ? ' active' : ''}`}
                   onClick={() => setActiveCategory(key)}>{label}</button>
@@ -167,7 +163,7 @@ export default function OrganisationsPage() {
               <svg viewBox="0 0 24 24" width="16" height="16">
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
               </svg>
-              {distanceLoading ? 'Locating...' : userCoords ? '📍 Nearest First' : '📍 Sort by Distance'}
+              {distanceLoading ? 'Locating...' : userCoords ? 'Nearest First' : 'Sort by Distance'}
             </button>
           </div>
 
@@ -292,10 +288,10 @@ export default function OrganisationsPage() {
                 </div>
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 6, flexWrap: 'wrap' }}>
                   <span className="badge badge-category">
-                    {getCategoryEmoji(selectedNgo.category)} {categoryLabels[selectedNgo.category] || selectedNgo.category}
+                    {categoryLabels[selectedNgo.category] || selectedNgo.category}
                   </span>
                   <span className="badge" style={{ background: 'linear-gradient(135deg, #E0F2FE, #BAE6FD)', color: '#0369A1', border: '1px solid rgba(3,105,161,0.12)' }}>
-                    📍 {selectedNgo.city}, {selectedNgo.state}
+                    {selectedNgo.city}, {selectedNgo.state}
                   </span>
                 </div>
               </div>

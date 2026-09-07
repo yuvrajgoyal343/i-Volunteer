@@ -97,7 +97,7 @@ export default function LoginPage() {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
               <div>
-                <strong style={{ color: 'var(--color-primary-800, #1e40af)' }}>💡 Demo Account:</strong>
+                <strong style={{ color: 'var(--color-primary-800, #1e40af)' }}>Demo Account:</strong>
                 <div style={{ color: 'var(--color-neutral-600, #4b5563)', fontSize: '0.8rem', marginTop: '2px' }}>
                   <code>demo@ivolunteer.org</code> / <code>password123</code>
                 </div>

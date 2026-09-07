@@ -109,25 +109,53 @@ export default function NotFoundPage() {
               {[
                 {
                   to: '/',
-                  icon: '🏠',
+                  icon: (
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                      <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                  ),
                   title: 'Home',
                   sub: 'Return to main page'
                 },
                 {
                   to: '/donate',
-                  icon: '📦',
+                  icon: (
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                      <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                      <line x1="12" y1="22.08" x2="12" y2="12"/>
+                    </svg>
+                  ),
                   title: 'Schedule Pickup',
                   sub: 'Food, clothes, books'
                 },
                 {
                   to: '/volunteer',
-                  icon: '🤝',
+                  icon: (
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                      <circle cx="9" cy="7" r="4"/>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                  ),
                   title: 'Volunteer Hub',
                   sub: 'Upcoming community drives'
                 },
                 {
                   to: '/organisations',
-                  icon: '🏛️',
+                  icon: (
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/>
+                      <line x1="9" y1="6" x2="9" y2="6.01"/>
+                      <line x1="15" y1="6" x2="15" y2="6.01"/>
+                      <line x1="9" y1="10" x2="9" y2="10.01"/>
+                      <line x1="15" y1="10" x2="15" y2="10.01"/>
+                      <line x1="9" y1="14" x2="9" y2="14.01"/>
+                      <line x1="15" y1="14" x2="15" y2="14.01"/>
+                    </svg>
+                  ),
                   title: 'Verified NGOs',
                   sub: 'Tricity & Punjab homes'
                 }
@@ -148,7 +176,7 @@ export default function NotFoundPage() {
                     boxShadow: 'var(--shadow-xs)'
                   }}
                 >
-                  <div style={{ fontSize: '2rem', marginBottom: 'var(--space-2)' }}>
+                  <div style={{ color: 'var(--color-primary)', marginBottom: 'var(--space-2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {icon}
                   </div>
                   <div style={{ fontWeight: 700, fontSize: 'var(--font-size-sm)', marginBottom: 2 }}>

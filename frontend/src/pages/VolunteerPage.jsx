@@ -10,35 +10,30 @@ import api from '../api';
 const TYPE_CONFIG = {
   foodDrive: {
     label: 'Food Drive',
-    icon: '🍲',
     badgeClass: 'badge-warning',
     color: '#F59E0B',
     lightBg: '#FFFBEB'
   },
   clothingDrive: {
     label: 'Clothing Drive',
-    icon: '🧥',
     badgeClass: 'badge-category',
     color: '#059669',
     lightBg: '#ECFDF5'
   },
   teaching: {
     label: 'Teaching & Mentorship',
-    icon: '📚',
     badgeClass: 'badge-verified',
     color: '#6366F1',
     lightBg: '#EEF2FF'
   },
   elderCare: {
     label: 'Elder Care',
-    icon: '❤️',
     badgeClass: 'badge-rose',
     color: '#F43F5E',
     lightBg: '#FFF1F2'
   },
   cleanup: {
     label: 'Eco Cleanup & Animal Care',
-    icon: '🌿',
     badgeClass: 'badge-teal',
     color: '#0D9488',
     lightBg: '#F0FDFA'
@@ -204,19 +199,15 @@ export default function VolunteerPage() {
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-6)', flexWrap: 'wrap' }}>
             <div className="hero-feature-chip">
-              <span style={{ fontSize: '1.2rem' }}>🌟</span>
               <span><strong>8+</strong> Weekly Drives</span>
             </div>
             <div className="hero-feature-chip">
-              <span style={{ fontSize: '1.2rem' }}>🤝</span>
               <span><strong>1,200+</strong> Volunteers Joined</span>
             </div>
             <div className="hero-feature-chip">
-              <span style={{ fontSize: '1.2rem' }}>📜</span>
               <span>Volunteer Hour Certificates</span>
             </div>
             <div className="hero-feature-chip">
-              <span style={{ fontSize: '1.2rem' }}>📍</span>
               <span>Verified Local NGOs Only</span>
             </div>
           </div>
@@ -229,7 +220,6 @@ export default function VolunteerPage() {
           {/* Value Props Row */}
           <div className="grid-3" style={{ marginBottom: 'var(--space-12)' }}>
             <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center', borderTop: '4px solid var(--color-primary)' }}>
-              <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-3)' }}>🎯</div>
               <h3 style={{ fontSize: 'var(--font-size-md)', marginBottom: 'var(--space-2)' }}>Direct Grassroots Impact</h3>
               <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
                 Work directly alongside verified homes like Bal Niketan, Tammana, and Tera Hi Tera mission right here in the Tricity.
@@ -237,7 +227,6 @@ export default function VolunteerPage() {
             </div>
 
             <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center', borderTop: '4px solid var(--color-accent)' }}>
-              <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-3)' }}>⏱️</div>
               <h3 style={{ fontSize: 'var(--font-size-md)', marginBottom: 'var(--space-2)' }}>Flexible Time Commitments</h3>
               <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
                 Whether you have 2 hours on Sunday morning or can coordinate weekday drives, there is a role designed for your schedule.
@@ -245,7 +234,6 @@ export default function VolunteerPage() {
             </div>
 
             <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center', borderTop: '4px solid var(--color-secondary-indigo)' }}>
-              <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-3)' }}>🏅</div>
               <h3 style={{ fontSize: 'var(--font-size-md)', marginBottom: 'var(--space-2)' }}>Recognition &amp; Badges</h3>
               <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
                 Track your hours, earn community milestone badges, and receive verified volunteering certificates for college and career portfolios.
@@ -272,19 +260,18 @@ export default function VolunteerPage() {
               {success && (
                 <div className="form-success visible" role="alert" style={{ marginBottom: 'var(--space-6)', animation: 'fadeIn 0.4s ease' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center' }}>
-                    <span style={{ fontSize: '1.4rem' }}>🎉</span>
                     <span>{success}</span>
                   </div>
                   {user ? (
                     <div style={{ textAlign: 'center', marginTop: 'var(--space-3)' }}>
                       <Link to="/profile" className="btn btn-primary btn-sm">
-                        View Volunteer Profile &amp; Badges →
+                        View Volunteer Profile &amp; Badges
                       </Link>
                     </div>
                   ) : (
                     <div style={{ textAlign: 'center', marginTop: 'var(--space-3)' }}>
                       <Link to="/signup" className="btn btn-primary btn-sm">
-                        Create Free Account to Save Hours →
+                        Create Free Account to Save Hours
                       </Link>
                     </div>
                   )}
@@ -378,12 +365,12 @@ export default function VolunteerPage() {
                   </label>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))', gap: 'var(--space-2)' }}>
                     {[
-                      { val: 'foodDrive', label: 'Food Drives', icon: '🍲' },
-                      { val: 'clothingDrive', label: 'Winter Clothes', icon: '🧥' },
-                      { val: 'teaching', label: 'Teaching Children', icon: '📚' },
-                      { val: 'elderCare', label: 'Elder Care', icon: '❤️' },
-                      { val: 'cleanup', label: 'Eco & Animal Care', icon: '🌿' }
-                    ].map(({ val, label, icon }) => {
+                      { val: 'foodDrive', label: 'Food Drives' },
+                      { val: 'clothingDrive', label: 'Winter Clothes' },
+                      { val: 'teaching', label: 'Teaching Children' },
+                      { val: 'elderCare', label: 'Elder Care' },
+                      { val: 'cleanup', label: 'Eco & Animal Care' }
+                    ].map(({ val, label }) => {
                       const selected = form.interests.includes(val);
                       return (
                         <button
@@ -405,10 +392,9 @@ export default function VolunteerPage() {
                             textAlign: 'left'
                           }}
                         >
-                          <span style={{ fontSize: '1.1rem' }}>{icon}</span>
                           <span style={{ fontSize: 'var(--font-size-sm)' }}>{label}</span>
                           {selected && (
-                            <span style={{ marginLeft: 'auto', color: 'var(--color-primary)', fontWeight: 'bold' }}>✓</span>
+                            <span style={{ marginLeft: 'auto', color: 'var(--color-primary)', fontWeight: 'bold' }}>&#x2713;</span>
                           )}
                         </button>
                       );
@@ -436,8 +422,7 @@ export default function VolunteerPage() {
                   style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
                   disabled={submitting}
                 >
-                  <span>{submitting ? 'Registering...' : 'Register as Tricity Volunteer'}</span>
-                  <span>→</span>
+                  {submitting ? 'Registering...' : 'Register as Tricity Volunteer'}
                 </button>
               </form>
             </div>
@@ -472,12 +457,12 @@ export default function VolunteerPage() {
             {/* Category Pills */}
             <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
               {[
-                { id: 'all', label: 'All Drives', icon: '✨' },
-                { id: 'foodDrive', label: 'Food Drives', icon: '🍲' },
-                { id: 'clothingDrive', label: 'Clothes', icon: '🧥' },
-                { id: 'teaching', label: 'Teaching', icon: '📚' },
-                { id: 'elderCare', label: 'Elder Care', icon: '❤️' },
-                { id: 'cleanup', label: 'Eco & Animal', icon: '🌿' }
+                { id: 'all', label: 'All Drives' },
+                { id: 'foodDrive', label: 'Food Drives' },
+                { id: 'clothingDrive', label: 'Clothes' },
+                { id: 'teaching', label: 'Teaching' },
+                { id: 'elderCare', label: 'Elder Care' },
+                { id: 'cleanup', label: 'Eco & Animal' }
               ].map(cat => (
                 <button
                   key={cat.id}
@@ -495,12 +480,10 @@ export default function VolunteerPage() {
                     fontWeight: activeCategory === cat.id ? 600 : 500,
                     fontSize: 'var(--font-size-xs)',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    boxShadow: activeCategory === cat.id ? '0 2px 8px rgba(5, 150, 105, 0.3)' : 'none'
+                    transition: 'all 0.2s ease'
                   }}
                 >
-                  <span>{cat.icon}</span>
-                  <span>{cat.label}</span>
+                  {cat.label}
                 </button>
               ))}
             </div>
@@ -525,7 +508,6 @@ export default function VolunteerPage() {
           <div id="activities-grid" className="grid-3">
             {filteredActivities.length === 0 ? (
               <div className="empty-state" style={{ gridColumn: '1 / -1', padding: 'var(--space-12)' }}>
-                <div style={{ fontSize: '3rem', marginBottom: 'var(--space-2)' }}>🔍</div>
                 <h3>No drives found matching your criteria</h3>
                 <p>Try clearing your search query or selecting "All Drives" to see all scheduled events.</p>
                 <button
@@ -541,7 +523,7 @@ export default function VolunteerPage() {
               filteredActivities.map((activity, idx) => {
                 const conf = TYPE_CONFIG[activity.type] || {
                   label: activity.type,
-                  icon: '🤝',
+                  icon: '',
                   badgeClass: 'badge-category',
                   color: 'var(--color-primary)',
                   lightBg: 'var(--color-primary-bg)'
@@ -576,7 +558,6 @@ export default function VolunteerPage() {
                             color: conf.color
                           }}
                         >
-                          <span>{conf.icon}</span>
                           <span>{conf.label}</span>
                         </span>
 
@@ -606,15 +587,12 @@ export default function VolunteerPage() {
                         gap: 6
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-text)' }}>
-                          <span style={{ color: 'var(--color-primary)' }}>📍</span>
                           <span><strong>Venue:</strong> {activity.location}</span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-text)' }}>
-                          <span style={{ color: 'var(--color-accent)' }}>📅</span>
                           <span><strong>Schedule:</strong> {activity.date}</span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-text-secondary)' }}>
-                          <span>🏛️</span>
                           <span><strong>Host:</strong> {activity.organiser}</span>
                         </div>
                       </div>
@@ -626,7 +604,7 @@ export default function VolunteerPage() {
                         style={{ width: '100%', justifyContent: 'center' }}
                         onClick={() => handleJoinDrive(activity)}
                       >
-                        {isDriveRegistered(activity) ? '✓ Registered' : 'Join This Drive →'}
+                        {isDriveRegistered(activity) ? 'Registered' : 'Join This Drive'}
                       </button>
                     </div>
                   </div>
@@ -689,24 +667,18 @@ export default function VolunteerPage() {
 
             {rsvpSuccess ? (
               <div style={{ textAlign: 'center', padding: 'var(--space-6) 0' }}>
-                <div style={{ fontSize: '3.5rem', marginBottom: 'var(--space-2)' }}>🎉</div>
-                <h3 style={{ fontSize: 'var(--font-size-xl)', color: 'var(--color-primary)' }}>You're Confirmed!</h3>
+                <h3 style={{ fontSize: 'var(--font-size-xl)', color: 'var(--color-primary)' }}>You&apos;re Confirmed!</h3>
                 <p style={{ color: 'var(--color-text-secondary)', marginTop: 'var(--space-2)' }}>
                   A confirmation SMS &amp; drive briefing have been dispatched. See you at <strong>{selectedDrive.title}</strong>!
                 </p>
               </div>
             ) : (
               <>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 'var(--space-3)' }}>
-                  <span style={{ fontSize: '1.8rem' }}>
-                    {TYPE_CONFIG[selectedDrive.type]?.icon || '🤝'}
+                <div style={{ marginBottom: 'var(--space-3)' }}>
+                  <span className="badge badge-category" style={{ fontSize: 11 }}>
+                    {TYPE_CONFIG[selectedDrive.type]?.label || selectedDrive.type}
                   </span>
-                  <div>
-                    <span className="badge badge-category" style={{ fontSize: 11 }}>
-                      {TYPE_CONFIG[selectedDrive.type]?.label || selectedDrive.type}
-                    </span>
-                    <h3 style={{ fontSize: '1.25rem', margin: '4px 0 0' }}>{selectedDrive.title}</h3>
-                  </div>
+                  <h3 style={{ fontSize: '1.25rem', margin: '4px 0 0' }}>{selectedDrive.title}</h3>
                 </div>
 
                 <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
@@ -723,10 +695,10 @@ export default function VolunteerPage() {
                   flexDirection: 'column',
                   gap: 8
                 }}>
-                  <div>📍 <strong>Location:</strong> {selectedDrive.location}</div>
-                  <div>📅 <strong>Timing:</strong> {selectedDrive.date}</div>
-                  <div>🏛️ <strong>Lead Organiser:</strong> {selectedDrive.organiser}</div>
-                  <div>👥 <strong>Capacity:</strong> {selectedDrive.spotsAvailable} spots remaining</div>
+                  <div><strong>Location:</strong> {selectedDrive.location}</div>
+                  <div><strong>Timing:</strong> {selectedDrive.date}</div>
+                  <div><strong>Lead Organiser:</strong> {selectedDrive.organiser}</div>
+                  <div><strong>Capacity:</strong> {selectedDrive.spotsAvailable} spots remaining</div>
                 </div>
 
                 {rsvpError && (
@@ -763,8 +735,8 @@ export default function VolunteerPage() {
                     {rsvpSubmitting
                       ? 'Confirming RSVP...'
                       : isDriveRegistered(selectedDrive)
-                      ? 'Already Registered ✓'
-                      : 'Confirm My Attendance ✓'}
+                      ? 'Already Registered'
+                      : 'Confirm My Attendance'}
                   </button>
                 </div>
               </>

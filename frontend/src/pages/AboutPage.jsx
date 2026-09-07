@@ -58,15 +58,12 @@ export default function AboutPage() {
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-6)', flexWrap: 'wrap' }}>
             <div className="hero-feature-chip">
-              <span>🛡️</span>
               <span>100% 3-Stage NGO Audit</span>
             </div>
             <div className="hero-feature-chip">
-              <span>🚫</span>
               <span>No Cash Handouts • Items Only</span>
             </div>
             <div className="hero-feature-chip">
-              <span>📍</span>
               <span>Hyper-Local Ground Verification</span>
             </div>
           </div>
@@ -254,7 +251,9 @@ export default function AboutPage() {
               gap: 'var(--space-6)'
             }}>
               <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center', borderRadius: 'var(--radius-xl)' }}>
-                <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-3)' }}>🔍</div>
+                <div style={{ color: 'var(--color-primary)', marginBottom: 'var(--space-3)', display: 'flex', justifyContent: 'center' }}>
+                  <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </div>
                 <h4 style={{ fontSize: 'var(--font-size-md)', marginBottom: 'var(--space-2)' }}>Radical Transparency</h4>
                 <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
                   Every donor receives a unique pickup code and delivery confirmation. You always know where your items go.
@@ -262,7 +261,9 @@ export default function AboutPage() {
               </div>
 
               <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center', borderRadius: 'var(--radius-xl)' }}>
-                <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-3)' }}>🤝</div>
+                <div style={{ color: 'var(--color-primary)', marginBottom: 'var(--space-3)', display: 'flex', justifyContent: 'center' }}>
+                  <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
                 <h4 style={{ fontSize: 'var(--font-size-md)', marginBottom: 'var(--space-2)' }}>Dignity First</h4>
                 <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
                   We believe giving is a shared human connection, not charity from above. Items must be clean, wearable, and high quality.
@@ -270,7 +271,9 @@ export default function AboutPage() {
               </div>
 
               <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center', borderRadius: 'var(--radius-xl)' }}>
-                <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-3)' }}>🌍</div>
+                <div style={{ color: 'var(--color-primary)', marginBottom: 'var(--space-3)', display: 'flex', justifyContent: 'center' }}>
+                  <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                </div>
                 <h4 style={{ fontSize: 'var(--font-size-md)', marginBottom: 'var(--space-2)' }}>Hyper-Local Focus</h4>
                 <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
                   Solving local challenges in Chandigarh, Mohali, and Panchkula strengthens our own immediate neighborhood.
@@ -278,7 +281,9 @@ export default function AboutPage() {
               </div>
 
               <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center', borderRadius: 'var(--radius-xl)' }}>
-                <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-3)' }}>⚡</div>
+                <div style={{ color: 'var(--color-primary)', marginBottom: 'var(--space-3)', display: 'flex', justifyContent: 'center' }}>
+                  <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </div>
                 <h4 style={{ fontSize: 'var(--font-size-md)', marginBottom: 'var(--space-2)' }}>Zero Waste Culture</h4>
                 <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
                   Reallocating excess good clothing, extra textbooks, and surplus wedding food directly reduces environmental waste.
@@ -391,7 +396,6 @@ export default function AboutPage() {
             {/* Helpdesk Contacts */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
               <div className="card" style={{ padding: 'var(--space-6)', borderRadius: 'var(--radius-xl)' }}>
-                <div style={{ fontSize: '1.5rem', marginBottom: 'var(--space-2)' }}>📬</div>
                 <h4 style={{ fontSize: 'var(--font-size-md)', marginBottom: 4 }}>General Inquiries</h4>
                 <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 8 }}>
                   For questions about doorstep pickup coverage or drive volunteer guidelines.
@@ -402,7 +406,6 @@ export default function AboutPage() {
               </div>
 
               <div className="card" style={{ padding: 'var(--space-6)', borderRadius: 'var(--radius-xl)' }}>
-                <div style={{ fontSize: '1.5rem', marginBottom: 'var(--space-2)' }}>🏛️</div>
                 <h4 style={{ fontSize: 'var(--font-size-md)', marginBottom: 4 }}>NGO Listing &amp; Verification</h4>
                 <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 8 }}>
                   Run an orphanage, senior home, or charitable dispensary in Chandigarh Tricity or Punjab? Get audited and verified for listings.
@@ -421,7 +424,7 @@ export default function AboutPage() {
                 color: 'var(--color-text)'
               }}>
                 <div style={{ fontWeight: 700, color: 'var(--color-accent-dark)', marginBottom: 4 }}>
-                  ⚠️ Important Donor Advisory
+                  Important Donor Advisory
                 </div>
                 iVolunteer coordinates material goods (clothes, food grains, books, medicines) and volunteer service hours only. We do not solicit or process direct cash transfers or money wires.
               </div>
