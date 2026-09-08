@@ -4,7 +4,7 @@ A modern web platform connecting surplus food, clothing, and essential donors wi
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 donation-project/
