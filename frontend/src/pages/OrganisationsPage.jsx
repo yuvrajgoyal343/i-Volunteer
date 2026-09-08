@@ -14,6 +14,14 @@ function getCategoryColor(category) {
   return colors[category] || ['#059669', '#10B981'];
 }
 
+function getCategoryEmoji(category) {
+  const emojis = {
+    ngo: '🤝',
+    orphanage: '🧒',
+    oldAgeHome: '👴'
+  };
+  return emojis[category] || '🏢';
+}
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371;
@@ -288,7 +296,7 @@ export default function OrganisationsPage() {
                 </div>
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 6, flexWrap: 'wrap' }}>
                   <span className="badge badge-category">
-                    {categoryLabels[selectedNgo.category] || selectedNgo.category}
+                    {getCategoryEmoji(selectedNgo.category)} {categoryLabels[selectedNgo.category] || selectedNgo.category}
                   </span>
                   <span className="badge" style={{ background: 'linear-gradient(135deg, #E0F2FE, #BAE6FD)', color: '#0369A1', border: '1px solid rgba(3,105,161,0.12)' }}>
                     {selectedNgo.city}, {selectedNgo.state}
@@ -356,7 +364,7 @@ export default function OrganisationsPage() {
               <div style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-4)' }}>
                 <Link to={`/donate?ngo=${selectedNgo.id}`} className="btn btn-primary btn-lg"
                   style={{ flex: 1, textAlign: 'center' }} onClick={() => setSelectedNgo(null)}>
-                  Donate to {selectedNgo.name.split(' ')[0]}
+                  Donate to {selectedNgo.name ? selectedNgo.name.split(' ')[0] : 'Organisation'}
                 </Link>
                 <button type="button" className="btn btn-ghost btn-lg" onClick={() => setSelectedNgo(null)}>
                   Close
