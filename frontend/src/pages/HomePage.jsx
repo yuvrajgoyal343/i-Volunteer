@@ -1,39 +1,7 @@
-// HomePage.jsx — Premium landing page with animations and rich visuals
-import { useState, useEffect, useRef } from 'react';
+// HomePage.jsx — Landing page with clean, formal styling
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-
-function AnimatedCounter({ target, suffix = '', duration = 2000 }) {
-  const [count, setCount] = useState(0);
-  const [started, setStarted] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting && !started) setStarted(true); },
-      { threshold: 0.3 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [started]);
-
-  useEffect(() => {
-    if (!started) return;
-    const num = parseInt(target.replace(/[^0-9]/g, ''));
-    if (isNaN(num)) { setCount(target); return; }
-    let start = 0;
-    const step = Math.max(1, Math.floor(num / (duration / 30)));
-    const timer = setInterval(() => {
-      start += step;
-      if (start >= num) { start = num; clearInterval(timer); }
-      setCount(start.toLocaleString());
-    }, 30);
-    return () => clearInterval(timer);
-  }, [started, target, duration]);
-
-  return <span ref={ref}>{typeof count === 'number' ? count : count}{suffix}</span>;
-}
 
 export default function HomePage() {
   return (
@@ -46,7 +14,7 @@ export default function HomePage() {
           <div className="hero-content">
             <div className="region-badge">
               <span className="live-dot"></span>
-              <span>Live Verified Directory • Chandigarh Tricity & Punjab</span>
+              <span>Verified Directory • Chandigarh Tricity & Punjab</span>
             </div>
             <h1>Give What You Can. <span>Change a Life.</span></h1>
             <p>iVolunteer connects generous donors with verified NGOs, orphanages, and old-age homes across Chandigarh, Mohali, Panchkula & Punjab. Donate essentials, volunteer your time, and see the impact you make.</p>
@@ -139,15 +107,13 @@ export default function HomePage() {
           </div>
           <div className="impact-stats">
             {[
-              { num: '2800', suffix: '+', label: 'Donations Delivered' },
-              { num: '12',   suffix: '',  label: 'Verified Organisations' },
-              { num: '1400', suffix: '+', label: 'Active Volunteers' },
-              { num: null,   text: 'Tricity & Punjab', label: 'Region Covered' },
-            ].map(({ num, suffix, text, label }) => (
+              { val: '2,800+', label: 'Donations Delivered' },
+              { val: '12',     label: 'Verified Organisations' },
+              { val: '1,400+', label: 'Active Volunteers' },
+              { val: 'Tricity & Punjab', label: 'Region Covered' },
+            ].map(({ val, label }) => (
               <div className="stat-item" key={label}>
-                <div className="stat-number">
-                  {num ? <AnimatedCounter target={num} suffix={suffix} /> : text}
-                </div>
+                <div className="stat-number">{val}</div>
                 <div className="stat-label">{label}</div>
               </div>
             ))}

@@ -185,13 +185,13 @@ export default function VolunteerPage() {
       {/* Hero Section */}
       <section className="page-header" style={{ position: 'relative', overflow: 'hidden' }}>
         <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-          <div className="live-region-badge" style={{ margin: '0 auto var(--space-4)' }}>
-            <span className="live-dot pulse"></span>
+          <div className="region-badge" style={{ margin: '0 auto var(--space-4)' }}>
+            <span className="live-dot"></span>
             <span>Tricity Volunteer Network • Chandigarh, Mohali, Panchkula &amp; Punjab</span>
           </div>
 
           <h1>
-            Give Your Time, <span className="hero-gradient-text">Spark Real Change</span>
+            Give Your Time, <span className="gradient-text">Spark Real Change</span>
           </h1>
           <p style={{ maxWidth: 700, margin: '0 auto var(--space-8)' }}>
             Join hundreds of dedicated Tricity volunteers distributing hot langar meals, teaching children, warming families in winter, and preserving local ecology.
@@ -243,12 +243,7 @@ export default function VolunteerPage() {
 
           {/* Volunteer Sign-Up Form Card */}
           <div className="form-page-layout" style={{ marginBottom: 'var(--space-16)', maxWidth: 840, margin: '0 auto var(--space-16)' }}>
-            <div className="form-wrapper" style={{
-              background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
-              border: '1px solid rgba(16, 185, 129, 0.2)',
-              boxShadow: '0 20px 40px -15px rgba(5, 150, 105, 0.08), 0 0 0 1px rgba(16, 185, 129, 0.08)',
-              borderRadius: 'var(--radius-xl)'
-            }}>
+            <div className="form-wrapper">
               <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
                 <span className="badge badge-verified" style={{ marginBottom: 'var(--space-2)' }}>Quick Enrollment</span>
                 <h2 style={{ fontSize: 'var(--font-size-xl)' }}>Become an Active Volunteer</h2>
@@ -258,7 +253,7 @@ export default function VolunteerPage() {
               </div>
 
               {success && (
-                <div className="form-success visible" role="alert" style={{ marginBottom: 'var(--space-6)', animation: 'fadeIn 0.4s ease' }}>
+                <div className="form-success visible" role="alert" style={{ marginBottom: 'var(--space-6)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center' }}>
                     <span>{success}</span>
                   </div>
@@ -475,12 +470,12 @@ export default function VolunteerPage() {
                     padding: '6px 14px',
                     borderRadius: 'var(--radius-full)',
                     border: activeCategory === cat.id ? '1.5px solid var(--color-primary)' : '1px solid var(--color-border)',
-                    background: activeCategory === cat.id ? 'var(--color-primary-gradient)' : 'var(--color-white)',
+                    background: activeCategory === cat.id ? 'var(--color-primary)' : 'var(--color-white)',
                     color: activeCategory === cat.id ? 'var(--color-white)' : 'var(--color-text-secondary)',
                     fontWeight: activeCategory === cat.id ? 600 : 500,
                     fontSize: 'var(--font-size-xs)',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease'
+                    transition: 'border-color 0.2s ease'
                   }}
                 >
                   {cat.label}
@@ -537,9 +532,7 @@ export default function VolunteerPage() {
                       display: 'flex',
                       flexDirection: 'column',
                       borderRadius: 'var(--radius-xl)',
-                      borderTop: `4px solid ${conf.color}`,
-                      transition: 'transform 0.25s ease, box-shadow 0.25s ease',
-                      animation: `fadeInUp 0.35s ease ${idx * 0.05}s both`
+                      borderTop: `4px solid ${conf.color}`
                     }}
                   >
                     <div className="card-body" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -642,8 +635,7 @@ export default function VolunteerPage() {
               width: '100%',
               padding: 'var(--space-8)',
               position: 'relative',
-              boxShadow: 'var(--shadow-xl)',
-              animation: 'modalPop 0.3s ease'
+              boxShadow: 'var(--shadow-xl)'
             }}
             onClick={e => e.stopPropagation()}
           >

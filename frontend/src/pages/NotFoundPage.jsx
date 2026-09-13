@@ -21,12 +21,11 @@ export default function NotFoundPage() {
       <section className="error-hero" style={{
         padding: 'var(--space-20) 0',
         textAlign: 'center',
-        background: 'radial-gradient(ellipse at top, rgba(16, 185, 129, 0.08) 0%, var(--color-bg) 60%)',
-        position: 'relative',
-        overflow: 'hidden'
+        background: 'var(--color-bg)',
+        position: 'relative'
       }}>
         <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-          {/* Animated 404 Tag */}
+          {/* 404 Tag */}
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -49,9 +48,7 @@ export default function NotFoundPage() {
             fontSize: 'clamp(5rem, 14vw, 9rem)',
             fontWeight: 900,
             lineHeight: 1,
-            background: 'linear-gradient(135deg, #059669 0%, #10B981 50%, #F59E0B 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
+            color: 'var(--color-primary)',
             letterSpacing: '-0.04em',
             marginBottom: 'var(--space-2)'
           }}>

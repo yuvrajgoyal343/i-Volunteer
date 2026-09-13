@@ -1,9 +1,9 @@
-// DonatePage.jsx — Premium Donation Flow with Visual Category Picker & Multi-Stage Tracker
+// DonatePage.jsx — Donation Flow with Category Picker and Simple Form
 import { useState, useEffect, useMemo } from 'react';
-import { useSearchParams, Link, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { ngos, statusLabels } from '../appData';
+import { ngos } from '../appData';
 import { useAuth } from '../context/AuthContext';
 import api from '../api';
 
@@ -73,13 +73,6 @@ const DONATION_TYPES = [
   }
 ];
 
-const STATUS_STEPS = [
-  { key: 'requested', label: 'Requested' },
-  { key: 'verified', label: 'Verified' },
-  { key: 'pickedUp', label: 'Picked Up' },
-  { key: 'delivered', label: 'Delivered' }
-];
-
 export default function DonatePage() {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
@@ -96,11 +89,6 @@ export default function DonatePage() {
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [locStatus, setLocStatus] = useState('');
-  const [isDetectingLoc, setIsDetectingLoc] = useState(false);
-
-  const [donations, setDonations] = useState([]);
-  const [loadingDonations, setLoadingDonations] = useState(false);
 
   // Pre-fill NGO from query parameter if provided
   useEffect(() => {
@@ -109,57 +97,6 @@ export default function DonatePage() {
       setForm(prev => ({ ...prev, ngoId: ngoParam }));
     }
   }, [searchParams]);
-
-  // Load user donations if logged in
-  const loadDonations = async () => {
-    if (!user) return;
-    setLoadingDonations(true);
-    try {
-      const res = await api.get('/donations');
-      setDonations(res.data);
-    } catch {
-      setDonations([]);
-    } finally {
-      setLoadingDonations(false);
-    }
-  };
-
-  useEffect(() => {
-    loadDonations();
-  }, [user]);
-
-  // Geolocation detection
-  const handleDetectLocation = () => {
-    if (!navigator.geolocation) {
-      setLocStatus('Geolocation is not supported by your browser.');
-      return;
-    }
-    setIsDetectingLoc(true);
-    setLocStatus('Detecting Chandigarh Tricity coordinates...');
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        // Check if near Chandigarh roughly (lat 30.6 - 30.8)
-        let areaHint = 'Chandigarh Region';
-        if (latitude > 30.70 && latitude < 30.77) areaHint = 'Chandigarh (UT)';
-        else if (latitude <= 30.70 && longitude > 76.8) areaHint = 'Panchkula';
-        else if (longitude < 76.73) areaHint = 'Mohali (SAS Nagar)';
-
-        setForm(prev => ({
-          ...prev,
-          pickupAddress: `${areaHint} [Lat: ${latitude.toFixed(4)}, Lng: ${longitude.toFixed(4)}]`
-        }));
-        setLocStatus(`✓ Location set to ${areaHint} (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`);
-        setIsDetectingLoc(false);
-        setErrors(prev => ({ ...prev, pickupAddress: '' }));
-      },
-      () => {
-        setLocStatus('Could not retrieve GPS location. Please type your street / sector manually.');
-        setIsDetectingLoc(false);
-      },
-      { timeout: 8000 }
-    );
-  };
 
   const validate = () => {
     const errs = {};
@@ -179,7 +116,7 @@ export default function DonatePage() {
     if (Object.keys(errs).length > 0) return;
 
     if (!user) {
-      alert('Please sign in or create an account to submit your donation request and track doorstep pickup!');
+      alert('Please sign in or create an account to submit your donation request.');
       navigate('/login');
       return;
     }
@@ -197,7 +134,7 @@ export default function DonatePage() {
         ngoName: selectedNgo ? selectedNgo.name : ''
       });
 
-      setSuccess(`Donation request confirmed! Pickup Reference: ${res.data.donationRef}`);
+      setSuccess(`Donation request submitted successfully! Pickup Reference: ${res.data.donationRef}`);
       setForm({
         type: 'food',
         description: '',
@@ -205,7 +142,6 @@ export default function DonatePage() {
         pickupAddress: '',
         ngoId: ''
       });
-      loadDonations();
     } catch (err) {
       alert(err.response?.data?.error || 'Failed to submit donation request.');
     } finally {
@@ -224,29 +160,29 @@ export default function DonatePage() {
       <Header />
 
       {/* Hero Header */}
-      <section className="page-header" style={{ position: 'relative', overflow: 'hidden' }}>
-        <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-          <div className="live-region-badge" style={{ margin: '0 auto var(--space-4)' }}>
-            <span className="live-dot pulse"></span>
-            <span>Free Doorstep Pickup • Chandigarh Tricity &amp; Punjab</span>
+      <section className="page-header">
+        <div className="container">
+          <div className="region-badge" style={{ margin: '0 auto var(--space-4)' }}>
+            <span className="live-dot"></span>
+            <span>Doorstep Pickup • Chandigarh Tricity &amp; Punjab</span>
           </div>
 
           <h1>
-            Donate Essentials, <span className="hero-gradient-text">Transform Lives</span>
+            Donate Essentials, <span className="gradient-text">Transform Lives</span>
           </h1>
           <p style={{ maxWidth: 680, margin: '0 auto var(--space-6)' }}>
-            100% transparent item donations. Pack your surplus clothes, dry rations, or books, and our verified volunteer partners will collect them from your door.
+            Transparent item donations. Pack your surplus clothes, dry rations, or books, and our verified volunteer partners will collect them from your door.
           </p>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-6)', flexWrap: 'wrap' }}>
             <div className="hero-feature-chip">
-              <span><strong>100% Free</strong> Doorstep Pickup</span>
+              <span><strong>Free</strong> Doorstep Pickup</span>
             </div>
             <div className="hero-feature-chip">
               <span><strong>Verified</strong> Non-Profits Only</span>
             </div>
             <div className="hero-feature-chip">
-              <span><strong>Real-Time</strong> Status Tracking</span>
+              <span><strong>Direct</strong> Delivery</span>
             </div>
           </div>
         </div>
@@ -254,27 +190,22 @@ export default function DonatePage() {
 
       <section className="page-content">
         <div className="container">
-          <div className="form-page-layout" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 1fr)', gap: 'var(--space-8)', alignItems: 'start' }}>
+          <div className="form-page-layout">
 
             {/* Donation Form Card */}
-            <div className="form-wrapper" style={{
-              background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
-              border: '1px solid rgba(16, 185, 129, 0.2)',
-              boxShadow: '0 20px 40px -15px rgba(5, 150, 105, 0.08), 0 0 0 1px rgba(16, 185, 129, 0.06)',
-              borderRadius: 'var(--radius-xl)'
-            }}>
+            <div className="form-wrapper">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-6)' }}>
                 <div>
                   <h2 style={{ fontSize: 'var(--font-size-xl)', margin: 0 }}>Schedule a Pickup</h2>
                   <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginTop: 4 }}>
-                    Step 1 of 2: Item details &amp; destination
+                    Fill in item details and select an organisation
                   </p>
                 </div>
                 <span className="badge badge-verified">Direct Delivery</span>
               </div>
 
               {success && (
-                <div className="form-success visible" role="alert" style={{ marginBottom: 'var(--space-6)', animation: 'fadeIn 0.3s ease' }}>
+                <div className="form-success visible" role="alert" style={{ marginBottom: 'var(--space-6)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <span style={{ fontSize: '1.25rem', color: 'var(--color-primary)', fontWeight: 'bold' }}>&#x2713;</span>
                     <div>
@@ -282,17 +213,12 @@ export default function DonatePage() {
                       <p style={{ fontSize: 'var(--font-size-xs)', margin: '4px 0 0' }}>{success}</p>
                     </div>
                   </div>
-                  <div style={{ marginTop: 'var(--space-3)' }}>
-                    <Link to="/profile" className="btn btn-primary btn-sm">
-                      View Live Tracker in Profile →
-                    </Link>
-                  </div>
                 </div>
               )}
 
               <form id="donation-form" noValidate onSubmit={handleSubmit}>
 
-                {/* Visual Category Selector */}
+                {/* Category Selector */}
                 <div className="form-group" style={{ marginBottom: 'var(--space-6)' }}>
                   <label style={{ display: 'block', fontWeight: 600, marginBottom: 'var(--space-2)' }}>
                     1. Choose What You Wish to Donate <span className="required">*</span>
@@ -318,12 +244,11 @@ export default function DonatePage() {
                             alignItems: 'center',
                             textAlign: 'center',
                             padding: '12px 8px',
-                            borderRadius: 'var(--radius-lg)',
+                            borderRadius: 'var(--radius-md)',
                             border: `2px solid ${isSelected ? 'var(--color-primary)' : 'var(--color-border)'}`,
                             background: isSelected ? 'var(--color-primary-bg)' : 'var(--color-white)',
                             cursor: 'pointer',
-                            transition: 'all 0.2s ease',
-                            boxShadow: isSelected ? '0 4px 12px rgba(5, 150, 105, 0.15)' : 'none'
+                            transition: 'border-color var(--transition-fast)'
                           }}
                         >
                           <span style={{ color: isSelected ? 'var(--color-primary)' : 'var(--color-text-secondary)', marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -383,48 +308,24 @@ export default function DonatePage() {
                   {errors.quantity && <span className="form-error">{errors.quantity}</span>}
                 </div>
 
-                {/* Pickup Address with Location Auto-detect */}
+                {/* Pickup Address */}
                 <div className={`form-group${errors.pickupAddress ? ' has-error' : ''}`}>
                   <label htmlFor="donation-address">
                     4. Doorstep Pickup Address (Tricity / Punjab) <span className="required">*</span>
                   </label>
-                  <div className="input-with-btn">
-                    <input
-                      type="text"
-                      id="donation-address"
-                      className="form-input"
-                      placeholder="Flat/House No., Sector or Landmark, City (e.g. Sector 35-C, Chandigarh)"
-                      value={form.pickupAddress}
-                      onChange={e => {
-                        setForm(prev => ({ ...prev, pickupAddress: e.target.value }));
-                        setErrors(prev => ({ ...prev, pickupAddress: '' }));
-                      }}
-                      required
-                    />
-                    <button
-                      type="button"
-                      id="use-location-btn"
-                      className="btn btn-ghost btn-sm"
-                      onClick={handleDetectLocation}
-                      disabled={isDetectingLoc}
-                      style={{ whiteSpace: 'nowrap' }}
-                    >
-                      <span>{isDetectingLoc ? 'Detecting...' : 'Auto-Detect'}</span>
-                    </button>
-                  </div>
+                  <input
+                    type="text"
+                    id="donation-address"
+                    className="form-input"
+                    placeholder="Flat/House No., Sector or Landmark, City (e.g. Sector 35-C, Chandigarh)"
+                    value={form.pickupAddress}
+                    onChange={e => {
+                      setForm(prev => ({ ...prev, pickupAddress: e.target.value }));
+                      setErrors(prev => ({ ...prev, pickupAddress: '' }));
+                    }}
+                    required
+                  />
                   {errors.pickupAddress && <span className="form-error">{errors.pickupAddress}</span>}
-                  {locStatus && (
-                    <div style={{
-                      fontSize: 'var(--font-size-xs)',
-                      color: locStatus.startsWith('✓') ? 'var(--color-primary)' : 'var(--color-text-secondary)',
-                      marginTop: 6,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4
-                    }}>
-                      <span>{locStatus}</span>
-                    </div>
-                  )}
                 </div>
 
                 {/* NGO Selection */}
@@ -484,135 +385,6 @@ export default function DonatePage() {
                   <span>→</span>
                 </button>
               </form>
-            </div>
-
-            {/* Donation Tracking Dashboard Column */}
-            <div className="form-wrapper" style={{
-              background: 'var(--color-white)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-xl)',
-              boxShadow: 'var(--shadow-md)'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
-                <div>
-                  <h3 style={{ fontSize: 'var(--font-size-lg)', margin: 0 }}>Live Pickup Tracker</h3>
-                  <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', margin: '2px 0 0' }}>
-                    Real-time status updates from our field team
-                  </p>
-                </div>
-                <span className="live-dot pulse" title="Live Sync Active"></span>
-              </div>
-
-              {!user ? (
-                <div className="empty-state" style={{ padding: 'var(--space-8) var(--space-4)', textAlign: 'center' }}>
-                  <h4>Sign In to View Your Donations</h4>
-                  <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
-                    Track previous donation deliveries and live volunteer pickups in real time.
-                  </p>
-                  <Link to="/login" className="btn btn-secondary btn-sm">
-                    Sign In to iVolunteer
-                  </Link>
-                </div>
-              ) : loadingDonations ? (
-                <div style={{ padding: 'var(--space-8)', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
-                  <div className="spinner" style={{ margin: '0 auto var(--space-2)' }}></div>
-                  <p style={{ fontSize: 'var(--font-size-sm)' }}>Fetching your pickup records...</p>
-                </div>
-              ) : donations.length === 0 ? (
-                <div className="empty-state" style={{ padding: 'var(--space-8) var(--space-4)', textAlign: 'center' }}>
-                  <h4>No Donations Logged Yet</h4>
-                  <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                    Fill out the form on the left to schedule your first doorstep pickup in Chandigarh Tricity.
-                  </p>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-                  {donations.map(d => {
-                    const typeObj = DONATION_TYPES.find(t => t.id === d.type) || { icon: null, label: d.type };
-                    const isDelivered = d.status === 'delivered';
-
-                    return (
-                      <div
-                        className="card"
-                        key={d.id}
-                        style={{
-                          padding: 'var(--space-4)',
-                          borderRadius: 'var(--radius-lg)',
-                          border: isDelivered ? '1.5px solid #10B981' : '1px solid var(--color-border)',
-                          background: isDelivered ? 'rgba(16, 185, 129, 0.02)' : 'var(--color-white)',
-                          boxShadow: 'var(--shadow-xs)'
-                        }}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            {typeObj.icon && (
-                              <span style={{ color: 'var(--color-primary)', display: 'flex', alignItems: 'center' }}>
-                                {typeObj.icon}
-                              </span>
-                            )}
-                            <div>
-                              <strong style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text)' }}>
-                                {d.description}
-                              </strong>
-                              <div style={{ fontSize: '11px', color: 'var(--color-text-tertiary)' }}>
-                                Ref: <code>{d.donationRef}</code>
-                              </div>
-                            </div>
-                          </div>
-                          <span className={`badge dh-status-badge ${d.status}`}>
-                            {statusLabels[d.status] || d.status}
-                          </span>
-                        </div>
-
-                        {/* Progress Stepper */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, margin: '12px 0 8px' }}>
-                          {STATUS_STEPS.map((step, sIdx) => {
-                            const active =
-                              step.key === d.status ||
-                              (d.status === 'delivered') ||
-                              (d.status === 'pickedUp' && sIdx <= 2) ||
-                              (sIdx === 0);
-
-                            return (
-                              <div key={step.key} style={{ flex: 1, textAlign: 'center' }}>
-                                <div style={{
-                                  height: 4,
-                                  borderRadius: 2,
-                                  background: active ? 'var(--color-primary)' : 'var(--color-border)',
-                                  marginBottom: 4
-                                }}></div>
-                                <span style={{
-                                  fontSize: '10px',
-                                  fontWeight: active ? 600 : 400,
-                                  color: active ? 'var(--color-primary-dark)' : 'var(--color-text-tertiary)'
-                                }}>
-                                  {step.label}
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </div>
-
-                        <div style={{
-                          fontSize: 'var(--font-size-xs)',
-                          color: 'var(--color-text-secondary)',
-                          background: 'var(--color-bg)',
-                          padding: '6px 10px',
-                          borderRadius: 'var(--radius-sm)',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          flexWrap: 'wrap',
-                          gap: 4
-                        }}>
-                          <span>{d.ngoName || 'Verified Partner'}</span>
-                          <span>Qty: {d.quantity}</span>
-                          <span>Date: {d.date}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
             </div>
 
           </div>
