@@ -1,11 +1,7 @@
-// api.js — Zero-database browser localStorage API client
-// Replaces external MySQL backend with self-contained browser storage & mock data.
+// api.js — Zero-database browser in-memory API client
+// Replaces external MySQL backend with self-contained in-memory mock data.
 
 'use strict';
-
-const STORAGE_USERS_KEY     = 'ivolunteer_mock_users_v2';
-const STORAGE_DONATIONS_KEY = 'ivolunteer_mock_donations_v2';
-const TOKEN_KEY             = 'iv_token';
 
 /* ─── Seed Data (Real Chandigarh Tricity & Punjab) ─── */
 // NOTE: Passwords below are stored in plaintext for client-side demo purposes only.
@@ -99,57 +95,42 @@ const INITIAL_DONATIONS = [
   }
 ];
 
-/* ─── LocalStorage Helpers ─── */
+let currentToken = null;
+let inMemoryUsers = JSON.parse(JSON.stringify(INITIAL_USERS));
+let inMemoryDonations = JSON.parse(JSON.stringify(INITIAL_DONATIONS));
+
+export function setToken(token) {
+  currentToken = token;
+}
+
+export function clearToken() {
+  currentToken = null;
+}
+
+export function getToken() {
+  return currentToken;
+}
+
+/* ─── In-Memory Storage Helpers ─── */
 function getStoredUsers() {
-  try {
-    // Clear legacy mock data if present
-    localStorage.removeItem('ivolunteer_mock_users');
-    const raw = localStorage.getItem(STORAGE_USERS_KEY);
-    if (!raw) {
-      localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(INITIAL_USERS));
-      return INITIAL_USERS;
-    }
-    return JSON.parse(raw);
-  } catch {
-    return INITIAL_USERS;
-  }
+  return inMemoryUsers;
 }
 
 function saveStoredUsers(users) {
-  try {
-    localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
-  } catch (e) {
-    console.error('Failed to save users to localStorage', e);
-  }
+  inMemoryUsers = users;
 }
 
 function getStoredDonations() {
-  try {
-    // Clear legacy mock data if present
-    localStorage.removeItem('ivolunteer_mock_donations');
-    const raw = localStorage.getItem(STORAGE_DONATIONS_KEY);
-    if (!raw) {
-      localStorage.setItem(STORAGE_DONATIONS_KEY, JSON.stringify(INITIAL_DONATIONS));
-      return INITIAL_DONATIONS;
-    }
-    return JSON.parse(raw);
-  } catch {
-    return INITIAL_DONATIONS;
-  }
+  return inMemoryDonations;
 }
 
 function saveStoredDonations(donations) {
-  try {
-    localStorage.setItem(STORAGE_DONATIONS_KEY, JSON.stringify(donations));
-  } catch (e) {
-    console.error('Failed to save donations to localStorage', e);
-  }
+  inMemoryDonations = donations;
 }
 
 function getCurrentUserId() {
-  const token = localStorage.getItem(TOKEN_KEY);
-  if (!token) return null;
-  const match = token.match(/^mock_token_(\d+)_/);
+  if (!currentToken) return null;
+  const match = currentToken.match(/^mock_token_(\d+)_/);
   return match ? parseInt(match[1], 10) : null;
 }
 
@@ -196,7 +177,7 @@ const api = {
 
     // Health check
     if (cleanUrl === '/health') {
-      return { data: { status: 'ok', engine: 'localStorage-mock', time: new Date().toISOString() } };
+      return { data: { status: 'ok', engine: 'in-memory-mock', time: new Date().toISOString() } };
     }
 
     // Profile endpoint
@@ -207,7 +188,7 @@ const api = {
       const users = getStoredUsers();
       const user = users.find((u) => u.id === userId);
       if (!user) {
-        localStorage.removeItem(TOKEN_KEY);
+        currentToken = null;
         throw createError('User not found.', 404);
       }
 
@@ -293,7 +274,7 @@ const api = {
       saveStoredUsers(users);
 
       const token = `mock_token_${newId}_${Date.now()}`;
-      localStorage.setItem(TOKEN_KEY, token);
+      currentToken = token;
 
       const { password: _, ...safeUser } = newUser;
       return {
@@ -324,7 +305,7 @@ const api = {
       }
 
       const token = `mock_token_${user.id}_${Date.now()}`;
-      localStorage.setItem(TOKEN_KEY, token);
+      currentToken = token;
 
       const { password: _, ...safeUser } = user;
       return {
@@ -588,7 +569,11 @@ const api = {
     }
 
     throw createError(`Not Found: PUT ${url}`, 404);
-  }
+  },
+
+  setToken,
+  clearToken,
+  getToken
 };
 
 export default api;

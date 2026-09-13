@@ -1,4 +1,4 @@
-// OrganisationsPage.jsx — Premium verified organisations directory with interactive modal & filters
+// OrganisationsPage.jsx — Verified organisations directory with interactive modal & filters
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import Header from '../components/Header';
@@ -7,11 +7,11 @@ import { ngos, categoryLabels } from '../appData';
 
 function getCategoryColor(category) {
   const colors = {
-    ngo: ['#059669', '#10B981'],
-    orphanage: ['#D97706', '#F59E0B'],
-    oldAgeHome: ['#6366F1', '#8B5CF6']
+    ngo: '#059669',
+    orphanage: '#D97706',
+    oldAgeHome: '#6366F1'
   };
-  return colors[category] || ['#059669', '#10B981'];
+  return colors[category] || '#059669';
 }
 
 function getCategoryEmoji(category) {
@@ -23,26 +23,12 @@ function getCategoryEmoji(category) {
   return emojis[category] || '🏢';
 }
 
-function calculateDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * (Math.PI / 180);
-  const dLon = (lon2 - lon1) * (Math.PI / 180);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
-
 export default function OrganisationsPage() {
   const [searchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeLocation, setActiveLocation] = useState('all');
   const [selectedNgo, setSelectedNgo] = useState(null);
-  const [userCoords, setUserCoords] = useState(null);
-  const [distanceLoading, setDistanceLoading] = useState(false);
 
   useEffect(() => {
     const urlSearch = searchParams.get('search');
@@ -56,17 +42,7 @@ export default function OrganisationsPage() {
     }
   }, [searchParams]);
 
-  const handleDistanceSort = () => {
-    if (userCoords) { setUserCoords(null); return; }
-    if (!navigator.geolocation) { alert('Geolocation is not supported by your browser.'); return; }
-    setDistanceLoading(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => { setUserCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }); setDistanceLoading(false); },
-      () => { setUserCoords({ lat: 30.7333, lng: 76.7794 }); setDistanceLoading(false); }
-    );
-  };
-
-  let filteredNgos = ngos.filter(ngo => {
+  const filteredNgos = ngos.filter(ngo => {
     const matchCategory = activeCategory === 'all' || ngo.category === activeCategory;
     const matchLocation =
       activeLocation === 'all' ||
@@ -83,14 +59,6 @@ export default function OrganisationsPage() {
     return matchCategory && matchLocation && matchSearch;
   });
 
-  if (userCoords) {
-    filteredNgos = [...filteredNgos].sort((a, b) => {
-      const distA = calculateDistance(userCoords.lat, userCoords.lng, a.lat, a.lng);
-      const distB = calculateDistance(userCoords.lat, userCoords.lng, b.lat, b.lng);
-      return distA - distB;
-    });
-  }
-
   return (
     <>
       <Header />
@@ -99,7 +67,7 @@ export default function OrganisationsPage() {
         <div className="container">
           <div className="region-badge">
             <span className="live-dot"></span>
-            <span>Real-Time Verified Directory • Chandigarh Tricity & Punjab</span>
+            <span>Verified Directory • Chandigarh Tricity &amp; Punjab</span>
           </div>
           <h1>Verified <span className="gradient-text">Organisations</span></h1>
           <p>Find genuine non-profit organisations, children homes, and elder care facilities near Chandigarh, Mohali, Panchkula, and across Punjab.</p>
@@ -110,7 +78,7 @@ export default function OrganisationsPage() {
         <div className="container">
 
           {/* Location / Region Filter Bar */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-3)', marginBottom: 'var(--space-4)', padding: 'var(--space-3) var(--space-5)', background: 'var(--color-white)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-xs)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-3)', marginBottom: 'var(--space-4)', padding: 'var(--space-3) var(--space-5)', background: 'var(--color-white)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-xs)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
               <span style={{ fontSize: 'var(--font-size-xs)', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-secondary)', marginRight: 4 }}>
                 Region:
@@ -134,7 +102,7 @@ export default function OrganisationsPage() {
             </div>
 
             <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 20, height: 20, borderRadius: '50%', background: 'linear-gradient(135deg, #059669, #10B981)', color: 'white', fontSize: 11, fontWeight: 700 }}>{filteredNgos.length}</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 20, height: 20, borderRadius: '50%', background: 'var(--color-primary)', color: 'white', fontSize: 11, fontWeight: 700 }}>{filteredNgos.length}</span>
               verified organisation{filteredNgos.length !== 1 ? 's' : ''}
             </div>
           </div>
@@ -162,17 +130,6 @@ export default function OrganisationsPage() {
                   onClick={() => setActiveCategory(key)}>{label}</button>
               ))}
             </div>
-            <button
-              id="distance-sort-btn"
-              className={`btn btn-ghost btn-sm${userCoords ? ' active' : ''}`}
-              onClick={handleDistanceSort} disabled={distanceLoading}
-              style={userCoords ? { background: 'rgba(16,185,129,0.08)', borderColor: 'var(--color-primary)', color: 'var(--color-primary)' } : {}}
-            >
-              <svg viewBox="0 0 24 24" width="16" height="16">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
-              </svg>
-              {distanceLoading ? 'Locating...' : userCoords ? 'Nearest First' : 'Sort by Distance'}
-            </button>
           </div>
 
           {/* NGO Grid */}
@@ -183,28 +140,22 @@ export default function OrganisationsPage() {
                 <p>No organisations found matching your filters in Chandigarh or Punjab.</p>
               </div>
             ) : (
-              filteredNgos.map((ngo, idx) => {
-                const distanceKm = userCoords && ngo.lat && ngo.lng
-                  ? (Math.round(calculateDistance(userCoords.lat, userCoords.lng, ngo.lat, ngo.lng) * 10) / 10)
-                  : null;
-                const distStr = distanceKm !== null ? `${distanceKm} km away` : null;
-                const [c1, c2] = getCategoryColor(ngo.category);
+              filteredNgos.map(ngo => {
+                const color = getCategoryColor(ngo.category);
 
                 return (
-                  <div className="card ngo-interactive-card" key={ngo.id} style={{ animationDelay: `${idx * 0.05}s` }}>
+                  <div className="card ngo-interactive-card" key={ngo.id}>
                     <div className="card-image" style={{ position: 'relative' }}>
                       <div style={{
                         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                         width: '100%', height: '100%', minHeight: 140,
-                        background: `linear-gradient(135deg, ${c1} 0%, ${c2} 50%, #0F172A 100%)`,
+                        background: color,
                         padding: 'var(--space-4)', textAlign: 'center', position: 'relative', overflow: 'hidden'
                       }}>
-                        <div style={{ position: 'absolute', top: -30, right: -30, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.08)' }}></div>
-                        <div style={{ position: 'absolute', bottom: -20, left: -20, width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }}></div>
-                        <span style={{ fontSize: 40, fontWeight: 800, color: 'var(--color-white)', letterSpacing: 1, textShadow: '0 2px 8px rgba(0,0,0,0.2)', position: 'relative', zIndex: 1 }}>
+                        <span style={{ fontSize: 40, fontWeight: 800, color: 'var(--color-white)', letterSpacing: 1, position: 'relative', zIndex: 1 }}>
                           {ngo.name.charAt(0)}
                         </span>
-                        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)', marginTop: 6, fontWeight: 600, position: 'relative', zIndex: 1 }}>
+                        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.9)', marginTop: 6, fontWeight: 600, position: 'relative', zIndex: 1 }}>
                           Est. {ngo.founded || '2000'} • {ngo.city}
                         </span>
                       </div>
@@ -240,7 +191,7 @@ export default function OrganisationsPage() {
                         </strong>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                           {ngo.urgentNeeds?.slice(0, 4).map((n, i) => (
-                            <span key={i} className="badge" style={{ background: 'linear-gradient(135deg, #FFF7ED, #FFEDD5)', color: '#C2410C', fontSize: 11, border: '1px solid rgba(194,65,12,0.12)' }}>
+                            <span key={i} className="badge" style={{ background: '#FFF7ED', color: '#C2410C', fontSize: 11, border: '1px solid rgba(194,65,12,0.12)' }}>
                               {n}
                             </span>
                           ))}
@@ -252,12 +203,6 @@ export default function OrganisationsPage() {
                           <svg viewBox="0 0 24 24" width="14" height="14"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                           {ngo.address}, {ngo.city}
                         </span>
-                        {distStr && (
-                          <span className="card-meta-item" style={{ color: 'var(--color-primary)', fontWeight: 700 }}>
-                            <svg viewBox="0 0 24 24" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                            {distStr}
-                          </span>
-                        )}
                       </div>
 
                       <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'auto' }}>
@@ -298,7 +243,7 @@ export default function OrganisationsPage() {
                   <span className="badge badge-category">
                     {getCategoryEmoji(selectedNgo.category)} {categoryLabels[selectedNgo.category] || selectedNgo.category}
                   </span>
-                  <span className="badge" style={{ background: 'linear-gradient(135deg, #E0F2FE, #BAE6FD)', color: '#0369A1', border: '1px solid rgba(3,105,161,0.12)' }}>
+                  <span className="badge" style={{ background: '#E0F2FE', color: '#0369A1', border: '1px solid rgba(3,105,161,0.12)' }}>
                     {selectedNgo.city}, {selectedNgo.state}
                   </span>
                 </div>
@@ -327,13 +272,13 @@ export default function OrganisationsPage() {
                       <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#F97316', flexShrink: 0 }}></span>
                       {need}
                     </li>
-                  )) || <li>• Food, clothes, books & essential supplies</li>}
+                  )) || <li>• Food, clothes, books &amp; essential supplies</li>}
                 </ul>
               </div>
 
               <div className="profile-grid" style={{ gap: 'var(--space-4)' }}>
                 <div>
-                  <strong style={{ color: 'var(--color-text-secondary)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Address & Location</strong>
+                  <strong style={{ color: 'var(--color-text-secondary)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Address &amp; Location</strong>
                   <p style={{ marginTop: 2 }}>{selectedNgo.address}, {selectedNgo.city}</p>
                 </div>
                 <div>
