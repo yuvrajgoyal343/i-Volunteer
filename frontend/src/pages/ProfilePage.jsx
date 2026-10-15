@@ -1,7 +1,7 @@
 // ProfilePage.jsx — Real user profile from SQL backend, zero demo/hardcoded data
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, useTheme } from '../context';
 import api from '../api';
 import { donationTypeLabels, statusLabels, activityTypeLabels } from '../appData';
 import Header from '../components/Header';
@@ -16,6 +16,7 @@ function getInitials(name) {
 
 export default function ProfilePage() {
   const { user, refreshProfile } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   const [activeTab,       setActiveTab]       = useState('overview');
   const [donations,       setDonations]       = useState([]);
@@ -166,8 +167,41 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* Edit Profile Action Button */}
+              {/* Profile Actions: Theme Switcher & Edit Profile */}
               <div className="profile-hero-actions">
+                <button
+                  type="button"
+                  id="profile-theme-toggle-btn"
+                  className="btn btn-theme-toggle"
+                  onClick={toggleTheme}
+                  title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Theme`}
+                  aria-label={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Theme`}
+                >
+                  {theme === 'dark' ? (
+                    <>
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="5" />
+                        <line x1="12" y1="1" x2="12" y2="3" />
+                        <line x1="12" y1="21" x2="12" y2="23" />
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                        <line x1="1" y1="12" x2="3" y2="12" />
+                        <line x1="21" y1="12" x2="23" y2="12" />
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                      </svg>
+                      <span>Light Theme</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                      </svg>
+                      <span>Dark Theme</span>
+                    </>
+                  )}
+                </button>
+
                 <button
                   type="button"
                   className="btn btn-edit-profile"
@@ -255,6 +289,72 @@ export default function ProfilePage() {
                     <div className="cta-box-mini">
                       <p><strong>Want to make a new donation?</strong> Pick up requested food, clothing, books, or medicines.</p>
                       <Link to="/donate" className="btn btn-primary btn-sm" style={{ marginTop: 'var(--space-2)', display: 'inline-block' }}>Make a Donation</Link>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Theme & Display Preferences Card */}
+                <div className="card theme-preference-card" style={{ gridColumn: '1 / -1' }}>
+                  <div className="card-body">
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-4)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+                        <div className="theme-card-icon">
+                          {theme === 'dark' ? (
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                            </svg>
+                          ) : (
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <circle cx="12" cy="12" r="5" />
+                              <line x1="12" y1="1" x2="12" y2="3" />
+                              <line x1="12" y1="21" x2="12" y2="23" />
+                              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                              <line x1="1" y1="12" x2="3" y2="12" />
+                              <line x1="21" y1="12" x2="23" y2="12" />
+                              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                            </svg>
+                          )}
+                        </div>
+                        <div>
+                          <h3 style={{ margin: 0, fontSize: 'var(--font-size-md)', fontWeight: 600 }}>Theme &amp; Appearance</h3>
+                          <p style={{ margin: '4px 0 0 0', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
+                            Currently using <strong>{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</strong> across iVolunteer. Saved using React Context API.
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        id="profile-theme-toggle-overview-btn"
+                        className="btn btn-outline-theme"
+                        onClick={toggleTheme}
+                      >
+                        {theme === 'dark' ? (
+                          <>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <circle cx="12" cy="12" r="5" />
+                              <line x1="12" y1="1" x2="12" y2="3" />
+                              <line x1="12" y1="21" x2="12" y2="23" />
+                              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                              <line x1="1" y1="12" x2="3" y2="12" />
+                              <line x1="21" y1="12" x2="23" y2="12" />
+                              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                            </svg>
+                            Switch to Light Mode
+                          </>
+                        ) : (
+                          <>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                            </svg>
+                            Switch to Dark Mode
+                          </>
+                        )}
+                      </button>
                     </div>
                   </div>
                 </div>
