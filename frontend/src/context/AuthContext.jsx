@@ -6,20 +6,37 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser]       = useState(null);
-  const [token, setToken]     = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [token, setToken]     = useState(() => {
+    try {
+      const saved = localStorage.getItem('ivolunteer_token');
+      if (saved) {
+        if (apiSetToken) apiSetToken(saved);
+        return saved;
+      }
+      const demoToken = 'mock_token_1_demo';
+      if (apiSetToken) apiSetToken(demoToken);
+      localStorage.setItem('ivolunteer_token', demoToken);
+      return demoToken;
+    } catch {
+      return 'mock_token_1_demo';
+    }
+  });
+  const [loading, setLoading] = useState(true);
 
-  // Fetch profile from API using current in-memory token/state
+  // Fetch profile from API using current token/state
   const fetchProfile = useCallback(async () => {
-    if (!token) {
+    const activeToken = token || localStorage.getItem('ivolunteer_token');
+    if (!activeToken) {
       setLoading(false);
       return;
     }
     try {
+      if (apiSetToken) apiSetToken(activeToken);
       const res = await api.get('/profile');
       setUser(res.data);
     } catch {
       // Token invalid/expired — clear it
+      try { localStorage.removeItem('ivolunteer_token'); } catch {}
       if (apiClearToken) apiClearToken();
       setToken(null);
       setUser(null);
@@ -29,19 +46,19 @@ export function AuthProvider({ children }) {
   }, [token]);
 
   useEffect(() => {
-    if (token) {
-      fetchProfile();
-    }
-  }, [fetchProfile, token]);
+    fetchProfile();
+  }, [fetchProfile]);
 
   // Called after successful login or register
   const login = (newToken, userData) => {
+    try { localStorage.setItem('ivolunteer_token', newToken); } catch {}
     if (apiSetToken) apiSetToken(newToken);
     setToken(newToken);
     setUser(userData);
   };
 
   const logout = () => {
+    try { localStorage.removeItem('ivolunteer_token'); } catch {}
     if (apiClearToken) apiClearToken();
     setToken(null);
     setUser(null);

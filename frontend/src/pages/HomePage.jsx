@@ -74,7 +74,7 @@ export default function HomePage() {
       </section>
 
       {/* What You Can Donate */}
-      <section className="section" style={{ backgroundColor: 'var(--color-white)' }}>
+      <section className="section section-categories">
         <div className="container">
           <div className="section-header">
             <h2>What You Can <span className="gradient-text-accent">Donate</span></h2>

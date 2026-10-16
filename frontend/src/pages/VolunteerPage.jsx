@@ -444,7 +444,7 @@ export default function VolunteerPage() {
             flexWrap: 'wrap',
             marginBottom: 'var(--space-8)',
             padding: 'var(--space-4)',
-            background: 'var(--color-white)',
+            background: 'var(--surface-card)',
             borderRadius: 'var(--radius-lg)',
             border: '1px solid var(--color-border)',
             boxShadow: 'var(--shadow-xs)'
@@ -470,7 +470,7 @@ export default function VolunteerPage() {
                     padding: '6px 14px',
                     borderRadius: 'var(--radius-full)',
                     border: activeCategory === cat.id ? '1.5px solid var(--color-primary)' : '1px solid var(--color-border)',
-                    background: activeCategory === cat.id ? 'var(--color-primary)' : 'var(--color-white)',
+                    background: activeCategory === cat.id ? 'var(--color-primary)' : 'var(--surface-card)',
                     color: activeCategory === cat.id ? 'var(--color-white)' : 'var(--color-text-secondary)',
                     fontWeight: activeCategory === cat.id ? 600 : 500,
                     fontSize: 'var(--font-size-xs)',
@@ -629,7 +629,7 @@ export default function VolunteerPage() {
           <div
             className="modal-card"
             style={{
-              background: 'var(--color-white)',
+              background: 'var(--surface-card)',
               borderRadius: 'var(--radius-xl)',
               maxWidth: 500,
               width: '100%',

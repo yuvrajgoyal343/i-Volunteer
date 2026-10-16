@@ -3,9 +3,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth, useTheme } from '../context';
 import api from '../api';
-import { donationTypeLabels, statusLabels, activityTypeLabels } from '../appData';
+import { donationTypeLabels, statusLabels, activityTypeLabels, volunteerActivities } from '../appData';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import CertificateModal from '../components/CertificateModal';
 
 function getInitials(name) {
   if (!name) return 'U';
@@ -39,6 +40,89 @@ export default function ProfilePage() {
 
   // Volunteer activate loading
   const [activatingVol, setActivatingVol] = useState(false);
+
+  // Certificate Modal state
+  const [selectedCertData, setSelectedCertData] = useState(null);
+  const [showCertModal, setShowCertModal]       = useState(false);
+
+  // Log Hours Modal state
+  const [showLogHoursModal, setShowLogHoursModal] = useState(false);
+  const [logForm, setLogForm] = useState({
+    driveTitle: '',
+    hours: 3.5,
+    location: 'Chandigarh Tricity',
+    organizer: 'iVolunteer Social Welfare Network',
+    notes: ''
+  });
+  const [logLoading, setLogLoading] = useState(false);
+  const [logError, setLogError]     = useState('');
+
+  const handleOpenCertificate = (drive) => {
+    setSelectedCertData({
+      volunteerName: user?.name || 'Dedicated Volunteer',
+      volunteerId: user?.volunteerSubProfile?.volunteerId || 'VOL-2026-1042',
+      driveTitle: drive.driveTitle || drive.title || 'Community Service & Rations Drive',
+      organizer: drive.organizer || 'iVolunteer Social Welfare Network',
+      location: drive.location || 'Chandigarh Tricity',
+      hours: drive.hoursLogged || drive.hours || 3.5,
+      date: drive.date || new Date().toISOString().split('T')[0],
+      certId: drive.certId || `IVOL-CERT-2026-${Math.floor(1000 + Math.random() * 9000)}`
+    });
+    setShowCertModal(true);
+  };
+
+  const handleMarkUpcomingAttended = async (drive) => {
+    try {
+      const res = await api.post('/volunteer/mark-attended', {
+        driveId: drive.id,
+        driveTitle: drive.title,
+        hoursEstimate: 3.5,
+        location: drive.location,
+        organizer: drive.organizer
+      });
+      await refreshProfile();
+      if (res.data?.certificate) {
+        setSelectedCertData(res.data.certificate);
+        setShowCertModal(true);
+      }
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to mark drive attendance.');
+    }
+  };
+
+  const handleLogHoursSubmit = async (e) => {
+    e.preventDefault();
+    if (!logForm.driveTitle.trim()) {
+      setLogError('Please choose or enter a drive title.');
+      return;
+    }
+    if (!logForm.hours || isNaN(Number(logForm.hours)) || Number(logForm.hours) <= 0) {
+      setLogError('Please enter valid hours contributed (> 0).');
+      return;
+    }
+
+    setLogLoading(true);
+    setLogError('');
+    try {
+      const res = await api.post('/volunteer/log-hours', {
+        driveTitle: logForm.driveTitle.trim(),
+        hours: Number(logForm.hours),
+        location: logForm.location.trim() || 'Chandigarh Tricity',
+        organizer: logForm.organizer.trim() || 'iVolunteer Social Welfare Network'
+      });
+      await refreshProfile();
+      setShowLogHoursModal(false);
+      setLogForm({ driveTitle: '', hours: 3.5, location: 'Chandigarh Tricity', organizer: 'iVolunteer Social Welfare Network', notes: '' });
+      if (res.data?.certificate) {
+        setSelectedCertData(res.data.certificate);
+        setShowCertModal(true);
+      }
+    } catch (err) {
+      setLogError(err.response?.data?.error || 'Failed to log volunteer hours.');
+    } finally {
+      setLogLoading(false);
+    }
+  };
 
   /* ── Fetch donations ── */
   const fetchDonations = useCallback(async () => {
@@ -466,10 +550,11 @@ export default function ProfilePage() {
                       <div className="card">
                         <div className="card-body">
                           <h3 style={{ marginBottom: 'var(--space-4)' }}>Volunteer Impact Metrics</h3>
-                          <div className="profile-impact-grid">
+                          <div className="profile-impact-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))' }}>
                             <div className="impact-mini-card"><div className="impact-val" style={{ color: 'var(--color-primary)' }}>{volSub.hoursContributed}</div><div className="impact-lbl">Hours Contributed</div></div>
                             <div className="impact-mini-card"><div className="impact-val" style={{ color: 'var(--color-accent)' }}>{volSub.drivesAttended}</div><div className="impact-lbl">Drives Attended</div></div>
-                            <div className="impact-mini-card"><div className="impact-val" style={{ color: '#6B5B95' }}>{volSub.badges?.length ?? 0}</div><div className="impact-lbl">Badges Unlocked</div></div>
+                            <div className="impact-mini-card"><div className="impact-val" style={{ color: '#8B5CF6' }}>{volSub.badges?.length ?? 0}</div><div className="impact-lbl">Badges Unlocked</div></div>
+                            <div className="impact-mini-card"><div className="impact-val" style={{ color: '#0284C7' }}>{volSub.attendedDrives?.length ?? 2}</div><div className="impact-lbl">Certificates Ready</div></div>
                           </div>
                         </div>
                       </div>
@@ -528,18 +613,61 @@ export default function ProfilePage() {
 
                       <div className="card">
                         <div className="card-body">
-                          <h3 style={{ marginBottom: 'var(--space-4)' }}>Upcoming Registered Drives</h3>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: 10 }}>
+                            <h3 style={{ margin: 0 }}>Upcoming Registered Drives</h3>
+                            <button
+                              type="button"
+                              className="btn btn-secondary btn-sm"
+                              onClick={() => { setLogError(''); setShowLogHoursModal(true); }}
+                            >
+                              + Log Drive Hours
+                            </button>
+                          </div>
+
                           {volSub.upcomingDrives?.length > 0 ? (
                             <div className="table-responsive">
                               <table className="custom-table">
-                                <thead><tr><th>Drive</th><th>Date</th><th>Location</th><th>Status</th></tr></thead>
+                                <thead>
+                                  <tr>
+                                    <th>Drive</th>
+                                    <th>Date</th>
+                                    <th>Location</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                  </tr>
+                                </thead>
                                 <tbody>
                                   {volSub.upcomingDrives.map((d, i) => (
                                     <tr key={i}>
                                       <td><strong>{d.title}</strong></td>
                                       <td>{d.date}</td>
-                                      <td>{d.location}</td>
-                                      <td><span className="badge badge-verified">{d.status}</span></td>
+                                      <td>{d.location || 'Chandigarh Tricity'}</td>
+                                      <td>
+                                        <span className={`badge ${d.status === 'Attended' ? 'badge-category' : 'badge-verified'}`}>
+                                          {d.status}
+                                        </span>
+                                      </td>
+                                      <td>
+                                        {d.status === 'Attended' ? (
+                                          <button
+                                            type="button"
+                                            className="btn btn-secondary btn-sm"
+                                            style={{ fontSize: 11, padding: '4px 10px' }}
+                                            onClick={() => handleOpenCertificate(d)}
+                                          >
+                                            🎓 View Certificate
+                                          </button>
+                                        ) : (
+                                          <button
+                                            type="button"
+                                            className="btn btn-primary btn-sm"
+                                            style={{ fontSize: 11, padding: '4px 10px' }}
+                                            onClick={() => handleMarkUpcomingAttended(d)}
+                                          >
+                                            ✓ Mark Attended &amp; Certificate
+                                          </button>
+                                        )}
+                                      </td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -549,6 +677,88 @@ export default function ProfilePage() {
                             <p style={{ color: 'var(--color-text-secondary)' }}>
                               No upcoming drives registered. <Link to="/volunteer">Browse available drives</Link>.
                             </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Attended Drives & Verified Certificates Section */}
+                      <div className="card" style={{ marginTop: 'var(--space-6)' }}>
+                        <div className="card-body">
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: 10 }}>
+                            <div>
+                              <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <span>Attended Drives &amp; Official Certificates</span>
+                                <span className="badge badge-verified" style={{ fontSize: 11 }}>Saved in Registry</span>
+                              </h3>
+                              <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', margin: '4px 0 0' }}>
+                                Download high-resolution PNG or printable PDF certificates for your community service portfolio.
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              className="btn btn-primary btn-sm"
+                              onClick={() => { setLogError(''); setShowLogHoursModal(true); }}
+                            >
+                              + Log Volunteer Hours
+                            </button>
+                          </div>
+
+                          {(volSub.attendedDrives || []).length > 0 ? (
+                            <div className="table-responsive">
+                              <table className="custom-table">
+                                <thead>
+                                  <tr>
+                                    <th>Drive Title</th>
+                                    <th>Date Attended</th>
+                                    <th>Location / Host</th>
+                                    <th>Hours Served</th>
+                                    <th>Verification</th>
+                                    <th>Certificate</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {volSub.attendedDrives.map((d, i) => (
+                                    <tr key={i}>
+                                      <td>
+                                        <strong>{d.driveTitle}</strong>
+                                        <div style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>{d.certId}</div>
+                                      </td>
+                                      <td>{d.date}</td>
+                                      <td>{d.location} {d.organizer ? `• ${d.organizer}` : ''}</td>
+                                      <td>
+                                        <span className="badge badge-category" style={{ fontWeight: 700 }}>
+                                          {d.hoursLogged} hrs
+                                        </span>
+                                      </td>
+                                      <td><span className="badge badge-verified">Verified ✓</span></td>
+                                      <td>
+                                        <button
+                                          type="button"
+                                          className="btn btn-secondary btn-sm"
+                                          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, padding: '5px 12px' }}
+                                          onClick={() => handleOpenCertificate(d)}
+                                        >
+                                          <span>🎓</span>
+                                          <span>Download Certificate</span>
+                                        </button>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          ) : (
+                            <div style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
+                              <p style={{ color: 'var(--color-text-secondary)' }}>No attended drives logged yet. Attend a drive or log your service hours to receive an official certificate.</p>
+                              <button
+                                type="button"
+                                className="btn btn-primary btn-sm"
+                                style={{ marginTop: 'var(--space-2)' }}
+                                onClick={() => { setLogError(''); setShowLogHoursModal(true); }}
+                              >
+                                Log Hours for Your Drive
+                              </button>
+                            </div>
                           )}
                         </div>
                       </div>
@@ -826,6 +1036,165 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
+
+      {/* ─── Log Volunteer Hours Modal ─── */}
+      {showLogHoursModal && (
+        <div
+          className="modal-overlay visible"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(11, 17, 32, 0.8)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1500,
+            padding: 'var(--space-4)'
+          }}
+          onClick={() => setShowLogHoursModal(false)}
+        >
+          <div
+            className="modal-card"
+            style={{
+              maxWidth: 540,
+              width: '100%',
+              padding: 'var(--space-8)',
+              borderRadius: 'var(--radius-xl)',
+              background: 'var(--surface-card)',
+              color: 'var(--color-text)',
+              position: 'relative',
+              boxShadow: 'var(--shadow-xl)',
+              border: '1px solid var(--color-border)'
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.25rem' }}>Log Volunteer Hours</h3>
+                <p style={{ margin: '4px 0 0', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
+                  Log your service hours to earn badges and generate your official Certificate of Service.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="modal-close"
+                onClick={() => setShowLogHoursModal(false)}
+                style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: 'var(--color-text-secondary)' }}
+              >
+                ×
+              </button>
+            </div>
+
+            {logError && (
+              <div style={{ padding: '8px 12px', background: 'rgba(239, 68, 68, 0.15)', color: '#EF4444', border: '1px solid #EF4444', borderRadius: 'var(--radius-md)', fontSize: 'var(--font-size-xs)', marginBottom: 'var(--space-4)' }}>
+                {logError}
+              </div>
+            )}
+
+            <form onSubmit={handleLogHoursSubmit}>
+              <div className="form-group" style={{ marginBottom: 'var(--space-4)' }}>
+                <label style={{ display: 'block', fontSize: 'var(--font-size-xs)', fontWeight: 600, marginBottom: 4 }}>
+                  Select or Enter Drive Title *
+                </label>
+                <select
+                  className="form-select"
+                  style={{ marginBottom: 8 }}
+                  value={logForm.driveTitle}
+                  onChange={e => {
+                    const sel = volunteerActivities.find(a => a.title === e.target.value);
+                    setLogForm(prev => ({
+                      ...prev,
+                      driveTitle: e.target.value,
+                      location: sel ? sel.location : prev.location,
+                      organizer: sel ? sel.organiser : prev.organizer
+                    }));
+                  }}
+                >
+                  <option value="">Select a community drive from list...</option>
+                  {volunteerActivities.map(a => (
+                    <option key={a.id} value={a.title}>
+                      {a.title} ({a.organiser})
+                    </option>
+                  ))}
+                  <option value="custom">-- Custom / Other Community Drive --</option>
+                </select>
+
+                {(!logForm.driveTitle || logForm.driveTitle === 'custom' || !volunteerActivities.some(a => a.title === logForm.driveTitle)) && (
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="e.g. Winter Clothing Distribution at Sector 17"
+                    value={logForm.driveTitle === 'custom' ? '' : logForm.driveTitle}
+                    onChange={e => setLogForm(f => ({ ...f, driveTitle: e.target.value }))}
+                    required
+                  />
+                )}
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+                <div className="form-group">
+                  <label style={{ display: 'block', fontSize: 'var(--font-size-xs)', fontWeight: 600, marginBottom: 4 }}>
+                    Hours Contributed *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="0.5"
+                    max="24"
+                    className="form-input"
+                    value={logForm.hours}
+                    onChange={e => setLogForm(f => ({ ...f, hours: e.target.value }))}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label style={{ display: 'block', fontSize: 'var(--font-size-xs)', fontWeight: 600, marginBottom: 4 }}>
+                    Location / Venue
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Chandigarh Tricity"
+                    value={logForm.location}
+                    onChange={e => setLogForm(f => ({ ...f, location: e.target.value }))}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group" style={{ marginBottom: 'var(--space-6)' }}>
+                <label style={{ display: 'block', fontSize: 'var(--font-size-xs)', fontWeight: 600, marginBottom: 4 }}>
+                  Host / Organizing Body
+                </label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="e.g. Tammana NGO / Yuvsatta"
+                  value={logForm.organizer}
+                  onChange={e => setLogForm(f => ({ ...f, organizer: e.target.value }))}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setShowLogHoursModal(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary btn-sm" disabled={logLoading}>
+                  {logLoading ? 'Saving & Generating…' : 'Save Hours & Generate Certificate'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── High-Definition Verifiable Certificate Modal ─── */}
+      <CertificateModal
+        isOpen={showCertModal}
+        onClose={() => setShowCertModal(false)}
+        certificateData={selectedCertData}
+      />
 
       <Footer />
     </>

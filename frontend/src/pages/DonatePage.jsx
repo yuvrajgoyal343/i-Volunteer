@@ -246,7 +246,7 @@ export default function DonatePage() {
                             padding: '12px 8px',
                             borderRadius: 'var(--radius-md)',
                             border: `2px solid ${isSelected ? 'var(--color-primary)' : 'var(--color-border)'}`,
-                            background: isSelected ? 'var(--color-primary-bg)' : 'var(--color-white)',
+                            background: isSelected ? 'var(--color-primary-bg)' : 'var(--surface-card)',
                             cursor: 'pointer',
                             transition: 'border-color var(--transition-fast)'
                           }}
