@@ -153,7 +153,7 @@ export default function AboutPage() {
 
           {/* Contact & Inquiries */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 'var(--space-8)', alignItems: 'start' }}>
-            <div className="form-wrapper" style={{ background: 'var(--color-white)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-md)', padding: 'var(--space-8)' }}>
+            <div className="form-wrapper" style={{ background: 'var(--surface-card)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-md)', padding: 'var(--space-8)' }}>
               <h3 style={{ fontSize: 'var(--font-size-xl)', marginBottom: 'var(--space-2)' }}>Get in Touch</h3>
               <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-6)' }}>
                 Have questions or need assistance with a large donation pickup? Send us a message.
