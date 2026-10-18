@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { volunteerActivities } from '../appData';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import api from '../api';
 
 const TYPE_CONFIG = {
@@ -515,7 +515,7 @@ export default function VolunteerPage() {
                 </button>
               </div>
             ) : (
-              filteredActivities.map((activity, idx) => {
+              filteredActivities.map((activity) => {
                 const conf = TYPE_CONFIG[activity.type] || {
                   label: activity.type,
                   icon: '',

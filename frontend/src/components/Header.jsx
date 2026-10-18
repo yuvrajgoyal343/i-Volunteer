@@ -1,7 +1,7 @@
 // Header.jsx — Site navigation with dynamic auth state
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 
 function getInitials(name) {
   if (!name) return 'U';

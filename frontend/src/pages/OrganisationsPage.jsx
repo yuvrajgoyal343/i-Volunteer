@@ -32,14 +32,16 @@ export default function OrganisationsPage() {
 
   useEffect(() => {
     const urlSearch = searchParams.get('search');
-    if (urlSearch) setSearchTerm(urlSearch);
+    // Keep directory filters synchronized when navigation changes URL params.
+    // oxlint-disable-next-line react/set-state-in-effect
+    setSearchTerm(urlSearch || '');
     const locParam = searchParams.get('location');
-    if (locParam) setActiveLocation(locParam);
+    // oxlint-disable-next-line react/set-state-in-effect
+    setActiveLocation(locParam || 'all');
     const ngoIdParam = searchParams.get('ngo') || searchParams.get('id');
-    if (ngoIdParam) {
-      const found = ngos.find(n => n.id === parseInt(ngoIdParam));
-      if (found) setSelectedNgo(found);
-    }
+    const found = ngos.find(n => n.id === Number.parseInt(ngoIdParam, 10));
+    // oxlint-disable-next-line react/set-state-in-effect
+    setSelectedNgo(found || null);
   }, [searchParams]);
 
   const filteredNgos = ngos.filter(ngo => {

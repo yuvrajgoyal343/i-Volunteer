@@ -1,7 +1,9 @@
 // ProfilePage.jsx — Real user profile from SQL backend, zero demo/hardcoded data
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { useAuth, useTheme } from '../context';
+import { loadDonations } from '../store/donationsSlice';
 import api from '../api';
 import { donationTypeLabels, statusLabels, activityTypeLabels, volunteerActivities } from '../appData';
 import Header from '../components/Header';
@@ -15,13 +17,19 @@ function getInitials(name) {
   return name.substring(0, 2).toUpperCase();
 }
 
+function createFallbackCertificateId() {
+  return `IVOL-CERT-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+}
+
 export default function ProfilePage() {
   const { user, refreshProfile } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const dispatch = useDispatch();
+  const donations = useSelector(state => state.donations.items);
+  const donationsStatus = useSelector(state => state.donations.status);
+  const donationsError = useSelector(state => state.donations.error);
 
   const [activeTab,       setActiveTab]       = useState('overview');
-  const [donations,       setDonations]       = useState([]);
-  const [donationsLoading,setDonationsLoading]= useState(true);
   const [donationFilter,  setDonationFilter]  = useState('all');
 
   // Edit profile modal & tab
@@ -66,7 +74,7 @@ export default function ProfilePage() {
       location: drive.location || 'Chandigarh Tricity',
       hours: drive.hoursLogged || drive.hours || 3.5,
       date: drive.date || new Date().toISOString().split('T')[0],
-      certId: drive.certId || `IVOL-CERT-2026-${Math.floor(1000 + Math.random() * 9000)}`
+      certId: drive.certId || createFallbackCertificateId()
     });
     setShowCertModal(true);
   };
@@ -124,20 +132,9 @@ export default function ProfilePage() {
     }
   };
 
-  /* ── Fetch donations ── */
-  const fetchDonations = useCallback(async () => {
-    setDonationsLoading(true);
-    try {
-      const res = await api.get('/donations');
-      setDonations(res.data);
-    } catch {
-      setDonations([]);
-    } finally {
-      setDonationsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { fetchDonations(); }, [fetchDonations]);
+  useEffect(() => {
+    dispatch(loadDonations(user.id));
+  }, [dispatch, user.id]);
 
   /* ── Open edit modal ── */
   const openEdit = () => {
@@ -473,8 +470,15 @@ export default function ProfilePage() {
                   </div>
 
                   {/* Donation list */}
-                  {donationsLoading ? (
+                  {donationsStatus === 'idle' || donationsStatus === 'loading' ? (
                     <p style={{ color: 'var(--color-text-secondary)' }}>Loading donations…</p>
+                  ) : donationsStatus === 'failed' ? (
+                    <div className="empty-state" role="alert">
+                      <p>{donationsError}</p>
+                      <button type="button" className="btn btn-outline btn-sm" onClick={() => dispatch(loadDonations(user.id))}>
+                        Retry
+                      </button>
+                    </div>
                   ) : filteredDonations.length === 0 ? (
                     <div className="empty-state">
                       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
