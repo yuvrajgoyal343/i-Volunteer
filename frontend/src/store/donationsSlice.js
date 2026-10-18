@@ -34,10 +34,11 @@ export const createDonation = createAsyncThunk(
     try {
       const donations = readStoredDonations();
       const date = new Date().toISOString().split('T')[0];
+      const id = Date.now();
       const savedDonation = {
         ...donation,
-        id: Date.now(),
-        donationRef: `DON-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        id,
+        donationRef: `DON-${id}-${Math.floor(Math.random() * 1000)}`,
         status: 'requested',
         date,
         lastUpdated: date
