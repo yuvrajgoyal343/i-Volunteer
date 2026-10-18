@@ -1,5 +1,5 @@
 // DonatePage.jsx — Donation Flow with Category Picker and Simple Form
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import Header from '../components/Header';
@@ -92,21 +92,16 @@ export default function DonatePage() {
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [lastNgoParam, setLastNgoParam] = useState(initialNgoParam);
 
   // Pre-fill NGO from query parameter if provided
   useEffect(() => {
     const ngoParam = searchParams.get('ngo') || searchParams.get('id');
-    if (ngoParam && ngoParam !== lastNgoParam) {
+    if (ngoParam) {
       // Query changes are an external navigation event that updates the form.
       // oxlint-disable-next-line react/set-state-in-effect
       setForm(prev => ({ ...prev, ngoId: ngoParam }));
     }
-    if (ngoParam !== lastNgoParam) {
-      // oxlint-disable-next-line react/set-state-in-effect
-      setLastNgoParam(ngoParam || '');
-    }
-  }, [lastNgoParam, searchParams]);
+  }, [searchParams]);
 
   const validate = () => {
     const errs = {};
@@ -161,10 +156,7 @@ export default function DonatePage() {
   };
 
   // Selected NGO info preview
-  const selectedNgoDetails = useMemo(() => {
-    if (!form.ngoId) return null;
-    return ngos.find(n => n.id === parseInt(form.ngoId));
-  }, [form.ngoId]);
+  const selectedNgoDetails = ngos.find(n => n.id === Number.parseInt(form.ngoId, 10)) || null;
 
   return (
     <>
