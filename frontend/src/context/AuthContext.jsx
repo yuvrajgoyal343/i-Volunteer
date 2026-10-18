@@ -1,78 +1,83 @@
 // AuthContext.jsx — Global authentication state using React useState (in-memory)
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useDispatch } from 'react-redux';
 import api, { setToken as apiSetToken, clearToken as apiClearToken } from '../api';
+import { clearDonations } from '../store/donationsSlice';
+import AuthContext from './AuthContextValue';
 
-const AuthContext = createContext(null);
+function readStoredToken() {
+  try {
+    return localStorage.getItem('ivolunteer_token');
+  } catch {
+    return null;
+  }
+}
 
 export function AuthProvider({ children }) {
+  const dispatch = useDispatch();
   const [user, setUser]       = useState(null);
   const [token, setToken]     = useState(() => {
-    try {
-      const saved = localStorage.getItem('ivolunteer_token');
-      if (saved) {
-        if (apiSetToken) apiSetToken(saved);
-        return saved;
-      }
-      const demoToken = 'mock_token_1_demo';
-      if (apiSetToken) apiSetToken(demoToken);
-      localStorage.setItem('ivolunteer_token', demoToken);
-      return demoToken;
-    } catch {
-      return 'mock_token_1_demo';
-    }
+    const saved = readStoredToken();
+    if (saved) apiSetToken(saved);
+    return saved;
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => Boolean(readStoredToken()));
 
   // Fetch profile from API using current token/state
   const fetchProfile = useCallback(async () => {
-    const activeToken = token || localStorage.getItem('ivolunteer_token');
+    const activeToken = token;
     if (!activeToken) {
-      setLoading(false);
       return;
     }
     try {
-      if (apiSetToken) apiSetToken(activeToken);
+      apiSetToken(activeToken);
       const res = await api.get('/profile');
       setUser(res.data);
-    } catch {
-      // Token invalid/expired — clear it
-      try { localStorage.removeItem('ivolunteer_token'); } catch {}
-      if (apiClearToken) apiClearToken();
-      setToken(null);
-      setUser(null);
+    } catch (error) {
+      if (error.response?.status === 401) {
+        try { localStorage.removeItem('ivolunteer_token'); } catch {}
+        apiClearToken();
+        dispatch(clearDonations());
+        setToken(null);
+        setUser(null);
+      } else {
+        console.error('Failed to load the authenticated profile.', error);
+      }
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [dispatch, token]);
 
+  // The async request owns loading and profile updates until it settles.
   useEffect(() => {
+    // oxlint-disable-next-line react/set-state-in-effect
     fetchProfile();
   }, [fetchProfile]);
 
   // Called after successful login or register
-  const login = (newToken, userData) => {
+  const login = useCallback((newToken, userData) => {
     try { localStorage.setItem('ivolunteer_token', newToken); } catch {}
-    if (apiSetToken) apiSetToken(newToken);
+    apiSetToken(newToken);
+    dispatch(clearDonations());
     setToken(newToken);
     setUser(userData);
-  };
+    setLoading(false);
+  }, [dispatch]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     try { localStorage.removeItem('ivolunteer_token'); } catch {}
-    if (apiClearToken) apiClearToken();
+    apiClearToken();
+    dispatch(clearDonations());
     setToken(null);
     setUser(null);
-  };
+    setLoading(false);
+  }, [dispatch]);
 
-  const refreshProfile = () => fetchProfile();
-
-  return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, refreshProfile }}>
-      {children}
-    </AuthContext.Provider>
+  const refreshProfile = useCallback(() => fetchProfile(), [fetchProfile]);
+  const value = useMemo(
+    () => ({ user, token, loading, login, logout, refreshProfile }),
+    [user, token, loading, login, logout, refreshProfile]
   );
-}
 
-export function useAuth() {
-  return useContext(AuthContext);
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

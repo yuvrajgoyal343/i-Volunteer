@@ -1,12 +1,6 @@
 // ThemeContext.jsx — Global theme state using React Context API
-import { createContext, useContext, useState, useEffect } from 'react';
-
-const ThemeContext = createContext({
-  theme: 'light',
-  isDark: false,
-  toggleTheme: () => {},
-  setTheme: () => {},
-});
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import ThemeContext from './ThemeContextValue';
 
 export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState(() => {
@@ -26,7 +20,7 @@ export function ThemeProvider({ children }) {
 
   const isDark = theme === 'dark';
 
-  const setTheme = (newTheme) => {
+  const setTheme = useCallback((newTheme) => {
     const validTheme = newTheme === 'dark' ? 'dark' : 'light';
     setThemeState(validTheme);
     try {
@@ -34,11 +28,11 @@ export function ThemeProvider({ children }) {
     } catch {
       // Storage access blocked or restricted
     }
-  };
+  }, []);
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     setTheme(theme === 'light' ? 'dark' : 'light');
-  };
+  }, [setTheme, theme]);
 
   useEffect(() => {
     try {
@@ -55,17 +49,10 @@ export function ThemeProvider({ children }) {
     }
   }, [theme]);
 
-  return (
-    <ThemeContext.Provider value={{ theme, isDark, toggleTheme, setTheme }}>
-      {children}
-    </ThemeContext.Provider>
+  const value = useMemo(
+    () => ({ theme, isDark, toggleTheme, setTheme }),
+    [theme, isDark, toggleTheme, setTheme]
   );
-}
 
-export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

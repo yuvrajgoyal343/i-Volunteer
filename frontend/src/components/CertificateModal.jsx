@@ -1,9 +1,14 @@
 // CertificateModal.jsx — Verifiable Volunteer Certificate Generator
 // Displays an authentic, framed certificate and exports high-resolution PNG / printable PDF
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback, useState } from 'react';
+
+function createCertificateId() {
+  return `IVOL-CERT-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+}
 
 export default function CertificateModal({ isOpen, onClose, certificateData }) {
   const canvasRef = useRef(null);
+  const [fallbackCertId] = useState(createCertificateId);
 
   const {
     volunteerName = 'Dedicated Volunteer',
@@ -13,16 +18,17 @@ export default function CertificateModal({ isOpen, onClose, certificateData }) {
     location = 'Chandigarh Tricity',
     hours = 4,
     date = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }),
-    certId = `IVOL-CERT-2026-${Math.floor(1000 + Math.random() * 9000)}`
+    certId = fallbackCertId
   } = certificateData || {};
 
   // Render high-resolution canvas for PNG export
-  const renderToCanvas = () => {
+  const renderToCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     try {
       const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Canvas 2D rendering is unavailable.');
       const width = 1600;
       const height = 1130;
       canvas.width = width;
@@ -211,13 +217,23 @@ export default function CertificateModal({ isOpen, onClose, certificateData }) {
     } catch (err) {
       console.warn('Canvas render fallback:', err);
     }
-  };
+  }, [
+    certId,
+    date,
+    driveTitle,
+    hours,
+    location,
+    organizer,
+    volunteerId,
+    volunteerName
+  ]);
 
   useEffect(() => {
     if (isOpen) {
-      setTimeout(renderToCanvas, 80);
+      const timeoutId = window.setTimeout(renderToCanvas, 80);
+      return () => window.clearTimeout(timeoutId);
     }
-  }, [isOpen, certificateData]);
+  }, [isOpen, renderToCanvas]);
 
   const handleDownload = () => {
     const canvas = canvasRef.current;
@@ -232,7 +248,7 @@ export default function CertificateModal({ isOpen, onClose, certificateData }) {
       link.download = filename;
       link.href = canvas.toDataURL('image/png', 1.0);
       link.click();
-    } catch (e) {
+    } catch {
       alert('Downloading certificate... Use Print / Save PDF if download is blocked by browser.');
     }
   };

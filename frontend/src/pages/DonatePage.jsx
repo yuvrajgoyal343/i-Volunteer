@@ -1,11 +1,12 @@
 // DonatePage.jsx — Donation Flow with Category Picker and Simple Form
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { ngos } from '../appData';
-import { useAuth } from '../context/AuthContext';
-import api from '../api';
+import { useAuth } from '../context/useAuth';
+import { createDonation } from '../store/donationsSlice';
 
 const DONATION_TYPES = [
   {
@@ -75,28 +76,37 @@ const DONATION_TYPES = [
 
 export default function DonatePage() {
   const { user } = useAuth();
+  const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  const initialNgoParam = searchParams.get('ngo') || searchParams.get('id') || '';
   const [form, setForm] = useState({
     type: 'food',
     description: '',
     quantity: '',
     pickupAddress: '',
-    ngoId: ''
+    ngoId: initialNgoParam
   });
 
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [lastNgoParam, setLastNgoParam] = useState(initialNgoParam);
 
   // Pre-fill NGO from query parameter if provided
   useEffect(() => {
     const ngoParam = searchParams.get('ngo') || searchParams.get('id');
-    if (ngoParam) {
+    if (ngoParam && ngoParam !== lastNgoParam) {
+      // Query changes are an external navigation event that updates the form.
+      // oxlint-disable-next-line react/set-state-in-effect
       setForm(prev => ({ ...prev, ngoId: ngoParam }));
     }
-  }, [searchParams]);
+    if (ngoParam !== lastNgoParam) {
+      // oxlint-disable-next-line react/set-state-in-effect
+      setLastNgoParam(ngoParam || '');
+    }
+  }, [lastNgoParam, searchParams]);
 
   const validate = () => {
     const errs = {};
@@ -125,16 +135,17 @@ export default function DonatePage() {
     setSuccess('');
     try {
       const selectedNgo = ngos.find(n => n.id === parseInt(form.ngoId));
-      const res = await api.post('/donations', {
+      const donation = await dispatch(createDonation({
+        userId: user.id,
         type: form.type,
         description: form.description.trim(),
         quantity: form.quantity.trim(),
         pickupAddress: form.pickupAddress.trim(),
-        ngoId: selectedNgo ? selectedNgo.id : null,
-        ngoName: selectedNgo ? selectedNgo.name : ''
-      });
+        ngoId: selectedNgo?.id ?? null,
+        ngoName: selectedNgo?.name ?? ''
+      })).unwrap();
 
-      setSuccess(`Donation request submitted successfully! Pickup Reference: ${res.data.donationRef}`);
+      setSuccess(`Donation request submitted successfully! Pickup Reference: ${donation.donationRef}`);
       setForm({
         type: 'food',
         description: '',
@@ -143,7 +154,7 @@ export default function DonatePage() {
         ngoId: ''
       });
     } catch (err) {
-      alert(err.response?.data?.error || 'Failed to submit donation request.');
+      alert(typeof err === 'string' ? err : err.response?.data?.error || err.message || 'Failed to submit donation request.');
     } finally {
       setSubmitting(false);
     }
