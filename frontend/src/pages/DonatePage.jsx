@@ -80,7 +80,12 @@ export default function DonatePage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const initialNgoParam = searchParams.get('ngo') || searchParams.get('id') || '';
+  const initialNgoParam = (() => {
+    const p = searchParams.get('ngo') || searchParams.get('id');
+    const parsed = Number.parseInt(p, 10);
+    return ngos.some(n => n.id === parsed) ? String(parsed) : '';
+  })();
+
   const [form, setForm] = useState({
     type: 'food',
     description: '',
@@ -93,13 +98,16 @@ export default function DonatePage() {
   const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  // Pre-fill NGO from query parameter if provided
+  // Pre-fill NGO from query parameter if provided and valid
   useEffect(() => {
     const ngoParam = searchParams.get('ngo') || searchParams.get('id');
     if (ngoParam) {
-      // Query changes are an external navigation event that updates the form.
-      // oxlint-disable-next-line react/set-state-in-effect
-      setForm(prev => ({ ...prev, ngoId: ngoParam }));
+      const parsed = Number.parseInt(ngoParam, 10);
+      if (ngos.some(n => n.id === parsed)) {
+        // Query changes are an external navigation event that updates the form.
+        // oxlint-disable-next-line react/set-state-in-effect
+        setForm(prev => ({ ...prev, ngoId: String(parsed) }));
+      }
     }
   }, [searchParams]);
 
@@ -110,7 +118,12 @@ export default function DonatePage() {
       errs.description = 'Please provide item details (at least 5 characters).';
     if (!form.quantity.trim()) errs.quantity = 'Please specify quantity / volume.';
     if (!form.pickupAddress.trim()) errs.pickupAddress = 'Please enter a pickup address in Tricity / Punjab.';
-    if (!form.ngoId) errs.ngoId = 'Please select a beneficiary organisation.';
+    
+    const parsedId = Number.parseInt(form.ngoId, 10);
+    const validNgo = ngos.find(n => n.id === parsedId);
+    if (!form.ngoId || !validNgo) {
+      errs.ngoId = 'Please select a valid beneficiary organisation.';
+    }
     return errs;
   };
 
@@ -129,7 +142,7 @@ export default function DonatePage() {
     setSubmitting(true);
     setSuccess('');
     try {
-      const selectedNgo = ngos.find(n => n.id === parseInt(form.ngoId));
+      const selectedNgo = ngos.find(n => n.id === Number.parseInt(form.ngoId, 10));
       const donation = await dispatch(createDonation({
         userId: user.id,
         type: form.type,

@@ -3,25 +3,36 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 const DONATIONS_STORAGE_KEY = 'ivolunteer_donations_v2';
 
 function readStoredDonations() {
-  const raw = localStorage.getItem(DONATIONS_STORAGE_KEY);
-  if (!raw) return [];
+  try {
+    const raw = localStorage.getItem(DONATIONS_STORAGE_KEY) || localStorage.getItem('ivolunteer_mock_donations_v2');
+    if (!raw) return [];
 
-  const donations = JSON.parse(raw);
-  if (!Array.isArray(donations)) {
-    throw new Error('Saved donation data is invalid.');
+    const donations = JSON.parse(raw);
+    if (!Array.isArray(donations)) {
+      return [];
+    }
+    return donations;
+  } catch {
+    return [];
   }
-  return donations;
 }
 
 function writeStoredDonations(donations) {
-  localStorage.setItem(DONATIONS_STORAGE_KEY, JSON.stringify(donations));
+  try {
+    localStorage.setItem(DONATIONS_STORAGE_KEY, JSON.stringify(donations));
+    localStorage.setItem('ivolunteer_mock_donations_v2', JSON.stringify(donations));
+  } catch {
+    // Gracefully handle storage quota or access issues
+  }
 }
 
 export const loadDonations = createAsyncThunk(
   'donations/load',
   async (userId, { rejectWithValue }) => {
     try {
-      return readStoredDonations().filter(donation => donation.userId === userId);
+      return readStoredDonations()
+        .filter(donation => donation.userId === userId)
+        .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0) || (b.id || 0) - (a.id || 0));
     } catch (error) {
       return rejectWithValue(error.message || 'Failed to load saved donations.');
     }

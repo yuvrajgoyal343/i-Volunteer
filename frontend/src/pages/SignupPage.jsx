@@ -166,7 +166,7 @@ export default function SignupPage() {
                 Enroll as Active Volunteer (Unlocks Badges &amp; Drive RSVP)
               </label>
               <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: 4, marginLeft: 24 }}>
-                Enables volunteer badges, drive hours tracking, and certificates in your profile.
+                Enables volunteer badges, drive hours tracking, and verified service history in your profile.
               </p>
             </div>
 

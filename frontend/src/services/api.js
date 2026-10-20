@@ -35,7 +35,8 @@ const INITIAL_USERS = [
         {
           id: 2,
           title: 'Weekend Langar & Rations Drive at PGI',
-          date: '2026-09-12',
+          date: '2026-10-24',
+          status: 'Confirmed',
           role: 'Distribution Coordinator',
           location: 'Outside PGIMER Emergency & GMCH 32, Chandigarh',
           organizer: 'Sri Guru Granth Sahib Sewa Society (Tera Hi Tera)'
@@ -48,9 +49,7 @@ const INITIAL_USERS = [
           date: '2026-08-16',
           location: 'Sukhna Lake & Nature Reserve, Sector 1, Chandigarh',
           organizer: 'Yuvsatta & Chandigarh Eco-Volunteers',
-          hoursLogged: 4.5,
-          certificateReady: true,
-          certId: 'IVOL-CERT-2026-1042-SL'
+          hoursLogged: 4.5
         },
         {
           driveId: 3,
@@ -58,9 +57,7 @@ const INITIAL_USERS = [
           date: '2026-08-28',
           location: 'Sector 17 Plaza & Dhanas Colony, Chandigarh',
           organizer: 'Tammana NGO',
-          hoursLogged: 5.0,
-          certificateReady: true,
-          certId: 'IVOL-CERT-2026-1042-WW'
+          hoursLogged: 5.0
         }
       ]
     }
@@ -130,34 +127,102 @@ let currentToken = null;
 const LS_USERS     = 'ivolunteer_users_v2';
 const LS_DONATIONS = 'ivolunteer_donations_v2';
 
-/* ─── Seed-once helpers ─── */
+/* ─── Seed-once helpers with automatic legacy migration ─── */
 function seedUsersOnce() {
   try {
+    let users = [];
     const raw = localStorage.getItem(LS_USERS);
-    if (!raw) {
-      localStorage.setItem(LS_USERS, JSON.stringify(INITIAL_USERS));
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) users = parsed;
+      } catch {}
+    }
+
+    // Automatically migrate any users from legacy storage keys (e.g. ivolunteer_mock_users_v2)
+    const legacyKeys = ['ivolunteer_mock_users_v2', 'ivolunteer_mock_users', 'ivolunteer_users'];
+    legacyKeys.forEach(key => {
+      try {
+        const legacyRaw = localStorage.getItem(key);
+        if (legacyRaw) {
+          const legacyUsers = JSON.parse(legacyRaw);
+          if (Array.isArray(legacyUsers)) {
+            legacyUsers.forEach(lu => {
+              if (lu && lu.email && !users.some(u => u.email?.toLowerCase() === lu.email.toLowerCase())) {
+                users.push(lu);
+              }
+            });
+          }
+        }
+      } catch {}
+    });
+
+    if (!users.length) {
+      users = JSON.parse(JSON.stringify(INITIAL_USERS));
     } else {
-      const users = JSON.parse(raw);
-      let modified = false;
-      users.forEach(u => {
-        if (u.isVolunteer && u.volunteerSubProfile && (!u.volunteerSubProfile.attendedDrives || u.volunteerSubProfile.attendedDrives.length === 0)) {
-          u.volunteerSubProfile.attendedDrives = JSON.parse(JSON.stringify(INITIAL_USERS[0].volunteerSubProfile.attendedDrives));
-          modified = true;
+      // Ensure initial demo users exist if not present
+      INITIAL_USERS.forEach(iu => {
+        if (!users.some(u => u.id === iu.id || u.email?.toLowerCase() === iu.email.toLowerCase())) {
+          users.push(iu);
         }
       });
-      if (modified) {
-        localStorage.setItem(LS_USERS, JSON.stringify(users));
-      }
     }
+
+    // Clean up demo drives from non-demo accounts
+    users.forEach(u => {
+      if (u.id !== 1 && u.isVolunteer && u.volunteerSubProfile?.attendedDrives) {
+        const hadCopied = u.volunteerSubProfile.attendedDrives.some(
+          d => d.driveId === 1 || d.driveId === 3
+        );
+        if (hadCopied) {
+          u.volunteerSubProfile.attendedDrives = [];
+        }
+      }
+      if (u.id === 1 && u.volunteerSubProfile?.upcomingDrives?.[0] && !u.volunteerSubProfile.upcomingDrives[0].status) {
+        u.volunteerSubProfile.upcomingDrives[0].status = 'Confirmed';
+        u.volunteerSubProfile.upcomingDrives[0].date = '2026-10-24';
+      }
+    });
+
+    localStorage.setItem(LS_USERS, JSON.stringify(users));
+    localStorage.setItem('ivolunteer_mock_users_v2', JSON.stringify(users));
   } catch { /* storage blocked */ }
 }
 
 function seedDonationsOnce() {
   try {
+    let donations = [];
     const raw = localStorage.getItem(LS_DONATIONS);
-    if (!raw) {
-      localStorage.setItem(LS_DONATIONS, JSON.stringify(INITIAL_DONATIONS));
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) donations = parsed;
+      } catch {}
     }
+
+    const legacyKeys = ['ivolunteer_mock_donations_v2', 'ivolunteer_mock_donations', 'ivolunteer_donations'];
+    legacyKeys.forEach(key => {
+      try {
+        const legacyRaw = localStorage.getItem(key);
+        if (legacyRaw) {
+          const legacyDonations = JSON.parse(legacyRaw);
+          if (Array.isArray(legacyDonations)) {
+            legacyDonations.forEach(ld => {
+              if (ld && ld.id && !donations.some(d => d.id === ld.id)) {
+                donations.push(ld);
+              }
+            });
+          }
+        }
+      } catch {}
+    });
+
+    if (!donations.length) {
+      donations = JSON.parse(JSON.stringify(INITIAL_DONATIONS));
+    }
+
+    localStorage.setItem(LS_DONATIONS, JSON.stringify(donations));
+    localStorage.setItem('ivolunteer_mock_donations_v2', JSON.stringify(donations));
   } catch { /* storage blocked */ }
 }
 
@@ -165,25 +230,51 @@ function seedDonationsOnce() {
 seedUsersOnce();
 seedDonationsOnce();
 
-export function setToken(token) {
+export function setToken(token, remember = true) {
   currentToken = token;
   try {
-    if (token) localStorage.setItem('ivolunteer_token', token);
-    else localStorage.removeItem('ivolunteer_token');
+    if (token) {
+      if (remember) {
+        localStorage.setItem('ivolunteer_token', token);
+        localStorage.setItem('iv_token', token);
+        sessionStorage.removeItem('ivolunteer_token');
+        sessionStorage.removeItem('iv_token');
+      } else {
+        sessionStorage.setItem('ivolunteer_token', token);
+        sessionStorage.setItem('iv_token', token);
+        localStorage.removeItem('ivolunteer_token');
+        localStorage.removeItem('iv_token');
+      }
+    } else {
+      localStorage.removeItem('ivolunteer_token');
+      localStorage.removeItem('iv_token');
+      sessionStorage.removeItem('ivolunteer_token');
+      sessionStorage.removeItem('iv_token');
+    }
   } catch {}
 }
 
 export function clearToken() {
   currentToken = null;
-  try { localStorage.removeItem('ivolunteer_token'); } catch {}
+  try {
+    localStorage.removeItem('ivolunteer_token');
+    localStorage.removeItem('iv_token');
+    sessionStorage.removeItem('ivolunteer_token');
+    sessionStorage.removeItem('iv_token');
+  } catch {}
 }
 
 export function getToken() {
   if (!currentToken) {
     try {
-      currentToken = localStorage.getItem('ivolunteer_token') || 'mock_token_1_demo';
+      currentToken =
+        localStorage.getItem('ivolunteer_token') ||
+        localStorage.getItem('iv_token') ||
+        sessionStorage.getItem('ivolunteer_token') ||
+        sessionStorage.getItem('iv_token') ||
+        null;
     } catch {
-      currentToken = 'mock_token_1_demo';
+      currentToken = null;
     }
   }
   return currentToken;
@@ -192,7 +283,7 @@ export function getToken() {
 /* ─── localStorage Storage Helpers ─── */
 function getStoredUsers() {
   try {
-    const raw = localStorage.getItem(LS_USERS);
+    const raw = localStorage.getItem(LS_USERS) || localStorage.getItem('ivolunteer_mock_users_v2');
     return raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(INITIAL_USERS));
   } catch {
     return JSON.parse(JSON.stringify(INITIAL_USERS));
@@ -202,12 +293,13 @@ function getStoredUsers() {
 function saveStoredUsers(users) {
   try {
     localStorage.setItem(LS_USERS, JSON.stringify(users));
+    localStorage.setItem('ivolunteer_mock_users_v2', JSON.stringify(users));
   } catch { /* storage full or blocked */ }
 }
 
 function getStoredDonations() {
   try {
-    const raw = localStorage.getItem(LS_DONATIONS);
+    const raw = localStorage.getItem(LS_DONATIONS) || localStorage.getItem('ivolunteer_mock_donations_v2');
     return raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(INITIAL_DONATIONS));
   } catch {
     return JSON.parse(JSON.stringify(INITIAL_DONATIONS));
@@ -217,6 +309,7 @@ function getStoredDonations() {
 function saveStoredDonations(donations) {
   try {
     localStorage.setItem(LS_DONATIONS, JSON.stringify(donations));
+    localStorage.setItem('ivolunteer_mock_donations_v2', JSON.stringify(donations));
   } catch { /* storage full or blocked */ }
 }
 
@@ -224,7 +317,10 @@ function getCurrentUserId() {
   const token = getToken();
   if (!token) return null;
   const match = token.match(/^mock_token_(\d+)/);
-  return match ? parseInt(match[1], 10) : 1;
+  if (!match) return null;
+  const id = parseInt(match[1], 10);
+  const users = getStoredUsers();
+  return users.some(u => u.id === id) ? id : null;
 }
 
 function createError(message, status = 400) {
@@ -276,12 +372,15 @@ const api = {
     // Profile endpoint
     if (cleanUrl === '/profile') {
       const userId = getCurrentUserId();
-      if (!userId) throw createError('No token provided.', 401);
+      if (!userId) {
+        clearToken();
+        throw createError('No token provided.', 401);
+      }
 
       const users = getStoredUsers();
       const user = users.find((u) => u.id === userId);
       if (!user) {
-        currentToken = null;
+        clearToken();
         throw createError('User not found.', 404);
       }
 
@@ -297,7 +396,7 @@ const api = {
       const donations = getStoredDonations();
       const userDonations = donations
         .filter((d) => d.userId === userId)
-        .sort((a, b) => (b.id || 0) - (a.id || 0));
+        .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0) || (b.id || 0) - (a.id || 0));
 
       return { data: userDonations };
     }
@@ -344,9 +443,10 @@ const api = {
           interests: ['foodDrive', 'clothingDrive'],
           skills: ['Community Outreach'],
           badges: [
-            { name: 'New Volunteer', icon: '', desc: 'Joined iVolunteer active volunteer network' }
+            { name: 'New Volunteer', icon: '🌱', desc: 'Joined iVolunteer active volunteer network' }
           ],
-          upcomingDrives: []
+          upcomingDrives: [],
+          attendedDrives: []
         };
       }
 
@@ -473,11 +573,11 @@ const api = {
         availability: user.volunteerSubProfile?.availability || 'weekends',
         interests: user.volunteerSubProfile?.interests || ['foodDrive', 'clothingDrive'],
         skills: user.volunteerSubProfile?.skills || ['Community Support'],
-        badges: user.volunteerSubProfile?.badges || [
-          { name: 'First Drive', icon: '', desc: 'Joined iVolunteer active volunteer network' },
-          { name: 'Kind Heart', icon: '', desc: 'Activated volunteer subprofile' }
+        badges: user.volunteerSubProfile?.badges?.length ? user.volunteerSubProfile.badges : [
+          { name: 'New Volunteer', icon: '🌱', desc: 'Joined iVolunteer active volunteer network' }
         ],
-        upcomingDrives: user.volunteerSubProfile?.upcomingDrives || []
+        upcomingDrives: user.volunteerSubProfile?.upcomingDrives || [],
+        attendedDrives: user.volunteerSubProfile?.attendedDrives || []
       };
 
       users[userIndex] = user;
@@ -520,11 +620,11 @@ const api = {
           availability: user.volunteerSubProfile?.availability || 'weekends',
           interests: user.volunteerSubProfile?.interests || ['foodDrive', 'clothingDrive'],
           skills: user.volunteerSubProfile?.skills || ['Community Support'],
-          badges: user.volunteerSubProfile?.badges || [
-            { name: 'First Drive', icon: '', desc: 'Joined iVolunteer active volunteer network' },
-            { name: 'Kind Heart', icon: '', desc: 'Activated volunteer subprofile' }
+          badges: [
+            { name: 'New Volunteer', icon: '🌱', desc: 'Joined iVolunteer active volunteer network' }
           ],
-          upcomingDrives: []
+          upcomingDrives: [],
+          attendedDrives: []
         };
       }
 
@@ -532,7 +632,7 @@ const api = {
         user.volunteerSubProfile.upcomingDrives = [];
       }
 
-      // Check for duplicate RSVP by drive id or title
+      // Check for duplicate RSVP by drive id or title in upcoming drives
       const alreadyRegistered = user.volunteerSubProfile.upcomingDrives.some(
         (d) => (drive.id && d.id === drive.id) || (drive.title && d.title === drive.title)
       );
@@ -541,27 +641,26 @@ const api = {
         throw createError('You have already confirmed attendance for this drive.', 409);
       }
 
+      // Also check if already attended
+      const alreadyAttended = (user.volunteerSubProfile.attendedDrives || []).some(
+        (d) => (drive.id && d.driveId === drive.id) || (drive.title && d.driveTitle === drive.title)
+      );
+
+      if (alreadyAttended) {
+        throw createError('You have already attended this drive.', 409);
+      }
+
       const driveEntry = {
         id: drive.id,
         title: drive.title,
         date: drive.date || todayStr(),
         location: drive.location || 'Chandigarh Tricity',
+        organizer: drive.organiser || drive.organizer || 'iVolunteer Social Welfare Network',
         status: 'Confirmed',
         role: drive.role || 'Volunteer'
       };
 
       user.volunteerSubProfile.upcomingDrives.push(driveEntry);
-
-      // Award "First Drive" badge if not already present
-      const badges = user.volunteerSubProfile.badges || [];
-      const hasFirstDrive = badges.some(b => b.name === 'First Drive');
-      if (!hasFirstDrive) {
-        user.volunteerSubProfile.badges = [
-          ...badges,
-          { name: 'First Drive', icon: '⭐', desc: 'RSVPed for your first community volunteer drive!' }
-        ];
-      }
-
       users[userIndex] = user;
       saveStoredUsers(users);
 
@@ -587,7 +686,7 @@ const api = {
         throw createError('Drive identifier (id or title) is required.', 400);
       }
 
-      const hrs = Math.min(Number(hours), 24); // cap at 24h per log
+      const hrs = Math.min(Number(hours), 12); // reasonable cap per drive log
 
       const users = getStoredUsers();
       const userIndex = users.findIndex(u => u.id === userId);
@@ -599,17 +698,40 @@ const api = {
       }
 
       const sub = user.volunteerSubProfile;
+      if (!Array.isArray(sub.attendedDrives)) sub.attendedDrives = [];
+      if (!Array.isArray(sub.upcomingDrives)) sub.upcomingDrives = [];
 
-      // Add hours to total
+      // Check duplicate log
+      const alreadyAttended = sub.attendedDrives.find(
+        d => (driveId && d.driveId === driveId) || (driveTitle && d.driveTitle === driveTitle)
+      );
+      if (alreadyAttended) {
+        throw createError('Hours have already been logged for this drive.', 409);
+      }
+
+      const driveMatch = sub.upcomingDrives.find(
+        d => (driveId && d.id === driveId) || (driveTitle && d.title === driveTitle)
+      );
+
+      const resolvedDate = (driveMatch?.date && !driveMatch.date.toLowerCase().startsWith('every'))
+        ? driveMatch.date
+        : todayStr();
+      const resolvedLocation = body.location || driveMatch?.location || 'Chandigarh Tricity';
+      const resolvedOrganizer = body.organizer || driveMatch?.organizer || 'iVolunteer Social Welfare Network';
+
+      // Update counters
+      sub.drivesAttended = (sub.drivesAttended || 0) + 1;
       sub.hoursContributed = Math.round(((sub.hoursContributed || 0) + hrs) * 10) / 10;
 
       // Badge logic
       const badgesBefore = sub.badges || [];
       const newBadges = [...badgesBefore];
-
       const hasBadge = (name) => newBadges.some(b => b.name === name);
 
-      if (sub.hoursContributed >= 5  && !hasBadge('Community Helper')) {
+      if (sub.drivesAttended >= 1 && !hasBadge('First Drive')) {
+        newBadges.push({ name: 'First Drive', icon: '⭐', desc: 'Attended your first community volunteer drive!' });
+      }
+      if (sub.hoursContributed >= 5 && !hasBadge('Community Helper')) {
         newBadges.push({ name: 'Community Helper', icon: '🤝', desc: 'Logged 5+ volunteer hours on iVolunteer.' });
       }
       if (sub.hoursContributed >= 25 && !hasBadge('Community Star')) {
@@ -618,58 +740,29 @@ const api = {
       if (sub.hoursContributed >= 50 && !hasBadge('Tricity Champion')) {
         newBadges.push({ name: 'Tricity Champion', icon: '🏆', desc: 'An exceptional 50+ hours contributed across the Tricity!' });
       }
-      if (sub.hoursContributed >= 100 && !hasBadge('Legend Volunteer')) {
-        newBadges.push({ name: 'Legend Volunteer', icon: '🦁', desc: '100+ hours! You are a true iVolunteer legend.' });
-      }
-
       sub.badges = newBadges;
 
-      // Mark drive as attended (log against upcoming drive entry if present)
-      if (Array.isArray(sub.upcomingDrives)) {
-        const driveIdx = sub.upcomingDrives.findIndex(
-          d => (driveId && d.id === driveId) || (driveTitle && d.title === driveTitle)
-        );
-        if (driveIdx !== -1) {
-          sub.upcomingDrives[driveIdx] = {
-            ...sub.upcomingDrives[driveIdx],
-            status: 'Attended',
-            hoursLogged: (sub.upcomingDrives[driveIdx].hoursLogged || 0) + hrs,
-            certificateReady: true
-          };
-        }
-      }
-
-      // Persist attended drives history
-      if (!Array.isArray(sub.attendedDrives)) sub.attendedDrives = [];
-      const driveMatch = Array.isArray(sub.upcomingDrives) ? sub.upcomingDrives.find(d => (driveId && d.id === driveId) || (driveTitle && d.title === driveTitle)) : null;
-      const resolvedLocation = body.location || driveMatch?.location || 'Chandigarh Tricity';
-      const resolvedOrganizer = body.organizer || driveMatch?.organizer || 'iVolunteer Social Welfare Network';
-      const resolvedCertId = `IVOL-CERT-2026-${Math.floor(1000 + Math.random() * 9000)}`;
-
-      const alreadyLogged = sub.attendedDrives.find(
-        d => (driveId && d.driveId === driveId) || (driveTitle && d.driveTitle === driveTitle)
+      // Update upcoming drive if present
+      const upcomingIdx = sub.upcomingDrives.findIndex(
+        d => (driveId && d.id === driveId) || (driveTitle && d.title === driveTitle)
       );
-
-      let savedEntry;
-      if (alreadyLogged) {
-        alreadyLogged.hoursLogged = Math.round((alreadyLogged.hoursLogged + hrs) * 10) / 10;
-        alreadyLogged.lastUpdated = todayStr();
-        alreadyLogged.certificateReady = true;
-        if (!alreadyLogged.certId) alreadyLogged.certId = resolvedCertId;
-        savedEntry = alreadyLogged;
-      } else {
-        savedEntry = {
-          driveId,
-          driveTitle,
-          hoursLogged: hrs,
-          date: todayStr(),
-          location: resolvedLocation,
-          organizer: resolvedOrganizer,
-          certId: resolvedCertId,
-          certificateReady: true
+      if (upcomingIdx !== -1) {
+        sub.upcomingDrives[upcomingIdx] = {
+          ...sub.upcomingDrives[upcomingIdx],
+          status: 'Attended',
+          hoursLogged: hrs
         };
-        sub.attendedDrives.unshift(savedEntry);
       }
+
+      const savedEntry = {
+        driveId: driveId || driveMatch?.id,
+        driveTitle: driveTitle || driveMatch?.title,
+        hoursLogged: hrs,
+        date: resolvedDate,
+        location: resolvedLocation,
+        organizer: resolvedOrganizer
+      };
+      sub.attendedDrives.unshift(savedEntry);
 
       user.volunteerSubProfile = sub;
       users[userIndex] = user;
@@ -677,20 +770,11 @@ const api = {
 
       return {
         data: {
-          message: `${hrs} hours logged successfully for "${driveTitle || 'drive'}". Certificate ready!`,
+          message: `${hrs} hours logged successfully for "${savedEntry.driveTitle}".`,
           totalHours: sub.hoursContributed,
+          drivesAttended: sub.drivesAttended,
           newBadgesEarned: newBadges.length - badgesBefore.length,
-          badges: newBadges,
-          certificate: {
-            volunteerName: user.name,
-            volunteerId: sub.volunteerId,
-            driveTitle: savedEntry.driveTitle,
-            hours: savedEntry.hoursLogged,
-            date: savedEntry.date,
-            location: savedEntry.location,
-            organizer: savedEntry.organizer,
-            certId: savedEntry.certId
-          }
+          badges: newBadges
         }
       };
     }
@@ -701,7 +785,7 @@ const api = {
       const userId = getCurrentUserId();
       if (!userId) throw createError('No token provided.', 401);
 
-      const { driveId, driveTitle, hoursEstimate = 3, location = '', organizer = '' } = body;
+      const { driveId, driveTitle, hoursEstimate = 3.5, location = '', organizer = '' } = body;
 
       const users = getStoredUsers();
       const userIndex = users.findIndex(u => u.id === userId);
@@ -713,53 +797,70 @@ const api = {
       }
 
       const sub = user.volunteerSubProfile;
-      const hrs = Math.min(Number(hoursEstimate) || 3, 24);
+      if (!Array.isArray(sub.attendedDrives)) sub.attendedDrives = [];
+      if (!Array.isArray(sub.upcomingDrives)) sub.upcomingDrives = [];
 
-      // Increment drives attended
+      // Check if ALREADY attended! (Duplicate check)
+      const existingAttended = sub.attendedDrives.find(
+        d => (driveId && d.driveId === driveId) || (driveTitle && d.driveTitle === driveTitle)
+      );
+      if (existingAttended) {
+        throw createError('You have already attended and logged attendance for this drive.', 409);
+      }
+
+      // Check upcoming drive match
+      const upcomingIdx = sub.upcomingDrives.findIndex(
+        d => (driveId && d.id === driveId) || (driveTitle && d.title === driveTitle)
+      );
+      const driveMatch = upcomingIdx !== -1 ? sub.upcomingDrives[upcomingIdx] : null;
+
+      const hrs = Math.min(Number(hoursEstimate) || 3.5, 12);
+      const resolvedDate = (driveMatch?.date && !driveMatch.date.toLowerCase().startsWith('every'))
+        ? driveMatch.date
+        : todayStr();
+      const resolvedLocation = location || driveMatch?.location || 'Chandigarh Tricity';
+      const resolvedOrganizer = organizer || driveMatch?.organizer || 'iVolunteer Social Welfare Network';
+
+      // Increment drives attended and hours contributed
       sub.drivesAttended = (sub.drivesAttended || 0) + 1;
       sub.hoursContributed = Math.round(((sub.hoursContributed || 0) + hrs) * 10) / 10;
 
-      // Badge checks
+      // Badges
       const badges = sub.badges || [];
       const hasBadge = (name) => badges.some(b => b.name === name);
-      if (sub.drivesAttended >= 1  && !hasBadge('Drive Rookie'))    badges.push({ name: 'Drive Rookie',    icon: '🚀', desc: 'Attended your very first volunteer drive!' });
-      if (sub.drivesAttended >= 5  && !hasBadge('Drive Regular'))   badges.push({ name: 'Drive Regular',   icon: '🎯', desc: 'Attended 5 drives — a reliable iVolunteer!' });
-      if (sub.drivesAttended >= 10 && !hasBadge('Drive Pro'))       badges.push({ name: 'Drive Pro',       icon: '💪', desc: '10+ drives attended — true dedication!' });
-      if (sub.hoursContributed >= 25 && !hasBadge('Community Star')) badges.push({ name: 'Community Star', icon: '🌟', desc: 'Completed over 25 volunteer hours — outstanding commitment!' });
+      if (sub.drivesAttended >= 1 && !hasBadge('First Drive')) {
+        badges.push({ name: 'First Drive', icon: '⭐', desc: 'Attended your first community volunteer drive!' });
+      }
+      if (sub.drivesAttended >= 5 && !hasBadge('Drive Regular')) {
+        badges.push({ name: 'Drive Regular', icon: '🎯', desc: 'Attended 5 drives — a reliable iVolunteer!' });
+      }
+      if (sub.drivesAttended >= 10 && !hasBadge('Drive Pro')) {
+        badges.push({ name: 'Drive Pro', icon: '💪', desc: '10+ drives attended — true dedication!' });
+      }
+      if (sub.hoursContributed >= 25 && !hasBadge('Community Star')) {
+        badges.push({ name: 'Community Star', icon: '🌟', desc: 'Completed over 25 volunteer hours!' });
+      }
+      if (sub.hoursContributed >= 50 && !hasBadge('Tricity Champion')) {
+        badges.push({ name: 'Tricity Champion', icon: '🏆', desc: 'An exceptional 50+ hours contributed across the Tricity!' });
+      }
       sub.badges = badges;
 
       // Mark in upcomingDrives list
-      let driveMatch = null;
-      if (Array.isArray(sub.upcomingDrives)) {
-        const idx = sub.upcomingDrives.findIndex(
-          d => (driveId && d.id === driveId) || (driveTitle && d.title === driveTitle)
-        );
-        if (idx !== -1) {
-          driveMatch = sub.upcomingDrives[idx];
-          sub.upcomingDrives[idx] = {
-            ...sub.upcomingDrives[idx],
-            status: 'Attended',
-            hoursLogged: hrs,
-            certificateReady: true
-          };
-        }
+      if (upcomingIdx !== -1) {
+        sub.upcomingDrives[upcomingIdx] = {
+          ...sub.upcomingDrives[upcomingIdx],
+          status: 'Attended',
+          hoursLogged: hrs
+        };
       }
 
-      // Attended drives log
-      if (!Array.isArray(sub.attendedDrives)) sub.attendedDrives = [];
-      const resolvedLocation = location || driveMatch?.location || 'Chandigarh Tricity';
-      const resolvedOrganizer = organizer || driveMatch?.organizer || 'iVolunteer Social Welfare Network';
-      const certId = `IVOL-CERT-2026-${Math.floor(1000 + Math.random() * 9000)}`;
-
       const newAttended = {
-        driveId,
-        driveTitle,
+        driveId: driveId || driveMatch?.id,
+        driveTitle: driveTitle || driveMatch?.title,
         hoursLogged: hrs,
-        date: todayStr(),
+        date: resolvedDate,
         location: resolvedLocation,
-        organizer: resolvedOrganizer,
-        certId,
-        certificateReady: true
+        organizer: resolvedOrganizer
       };
 
       sub.attendedDrives.unshift(newAttended);
@@ -770,20 +871,9 @@ const api = {
 
       return {
         data: {
-          message: `Attendance marked for "${driveTitle || 'drive'}". Certificate is ready!`,
+          message: `Attendance marked for "${newAttended.driveTitle}".`,
           drivesAttended: sub.drivesAttended,
-          totalHours: sub.hoursContributed,
-          certificateReady: true,
-          certificate: {
-            volunteerName: user.name,
-            volunteerId: sub.volunteerId,
-            driveTitle: newAttended.driveTitle,
-            hours: newAttended.hoursLogged,
-            date: newAttended.date,
-            location: newAttended.location,
-            organizer: newAttended.organizer,
-            certId: newAttended.certId
-          }
+          totalHours: sub.hoursContributed
         }
       };
     }
@@ -811,7 +901,7 @@ const api = {
 
       const existingUser = users[userIndex];
       const updatedIsVol = typeof isVolunteer === 'boolean' ? isVolunteer : existingUser.isVolunteer;
-      
+
       let updatedSubProfile = existingUser.volunteerSubProfile;
       if (updatedIsVol && !updatedSubProfile) {
         updatedSubProfile = {
@@ -824,9 +914,10 @@ const api = {
           interests: ['foodDrive', 'clothingDrive'],
           skills: ['Community Support'],
           badges: [
-            { name: 'Active Volunteer', icon: '', desc: 'Joined iVolunteer active volunteer network' }
+            { name: 'New Volunteer', icon: '🌱', desc: 'Joined iVolunteer active volunteer network' }
           ],
-          upcomingDrives: []
+          upcomingDrives: [],
+          attendedDrives: []
         };
       } else if (updatedSubProfile && availability) {
         updatedSubProfile = {
@@ -854,7 +945,7 @@ const api = {
       const userId = getCurrentUserId();
       if (!userId) throw createError('No token provided.', 401);
 
-      const { availability = 'weekends', interests = [], skills = [] } = body;
+      const { availability = 'weekends', interests = [], skills = [], priorExperience = '' } = body;
 
       const users = getStoredUsers();
       const userIndex = users.findIndex((u) => u.id === userId);
@@ -871,14 +962,21 @@ const api = {
           drivesAttended: 0,
           availability,
           interests,
-          skills,
-          badges: [{ name: 'New Volunteer', icon: '', desc: 'Joined active volunteer network' }],
-          upcomingDrives: []
+          skills: Array.isArray(skills) && skills.length ? skills : ['Community Support'],
+          priorExperience: priorExperience.trim(),
+          badges: [{ name: 'New Volunteer', icon: '🌱', desc: 'Joined active volunteer network' }],
+          upcomingDrives: [],
+          attendedDrives: []
         };
       } else {
         user.volunteerSubProfile.availability = availability;
         user.volunteerSubProfile.interests    = interests;
-        user.volunteerSubProfile.skills       = skills;
+        if (Array.isArray(skills) && skills.length) {
+          user.volunteerSubProfile.skills = skills;
+        }
+        if (priorExperience !== undefined) {
+          user.volunteerSubProfile.priorExperience = priorExperience.trim();
+        }
       }
 
       users[userIndex] = user;

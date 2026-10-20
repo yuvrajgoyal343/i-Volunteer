@@ -5,11 +5,15 @@ import api, { setToken as apiSetToken, clearToken as apiClearToken } from '../ap
 import { clearDonations } from '../store/donationsSlice';
 import AuthContext from './AuthContextValue';
 
-function readStoredToken() {
+function readStoredSession() {
   try {
-    return localStorage.getItem('ivolunteer_token');
+    const local = localStorage.getItem('ivolunteer_token') || localStorage.getItem('iv_token');
+    if (local) return { token: local, isPersistent: true };
+    const session = sessionStorage.getItem('ivolunteer_token') || sessionStorage.getItem('iv_token');
+    if (session) return { token: session, isPersistent: false };
+    return { token: null, isPersistent: false };
   } catch {
-    return null;
+    return { token: null, isPersistent: false };
   }
 }
 
@@ -17,25 +21,29 @@ export function AuthProvider({ children }) {
   const dispatch = useDispatch();
   const [user, setUser]       = useState(null);
   const [token, setToken]     = useState(() => {
-    const saved = readStoredToken();
-    if (saved) apiSetToken(saved);
-    return saved;
+    const session = readStoredSession();
+    if (session.token) {
+      apiSetToken(session.token, session.isPersistent);
+      return session.token;
+    }
+    return null;
   });
-  const [loading, setLoading] = useState(() => Boolean(readStoredToken()));
+  const [loading, setLoading] = useState(() => Boolean(readStoredSession().token));
 
   // Fetch profile from API using current token/state
   const fetchProfile = useCallback(async () => {
-    const activeToken = token;
+    const session = readStoredSession();
+    const activeToken = token || session.token;
     if (!activeToken) {
+      setLoading(false);
       return;
     }
     try {
-      apiSetToken(activeToken);
+      apiSetToken(activeToken, session.isPersistent);
       const res = await api.get('/profile');
       setUser(res.data);
     } catch (error) {
-      if (error.response?.status === 401) {
-        try { localStorage.removeItem('ivolunteer_token'); } catch {}
+      if (error.response?.status === 401 || error.response?.status === 404) {
         apiClearToken();
         dispatch(clearDonations());
         setToken(null);
@@ -55,9 +63,8 @@ export function AuthProvider({ children }) {
   }, [fetchProfile]);
 
   // Called after successful login or register
-  const login = useCallback((newToken, userData) => {
-    try { localStorage.setItem('ivolunteer_token', newToken); } catch {}
-    apiSetToken(newToken);
+  const login = useCallback((newToken, userData, remember = true) => {
+    apiSetToken(newToken, remember);
     dispatch(clearDonations());
     setToken(newToken);
     setUser(userData);
@@ -65,7 +72,6 @@ export function AuthProvider({ children }) {
   }, [dispatch]);
 
   const logout = useCallback(() => {
-    try { localStorage.removeItem('ivolunteer_token'); } catch {}
     apiClearToken();
     dispatch(clearDonations());
     setToken(null);

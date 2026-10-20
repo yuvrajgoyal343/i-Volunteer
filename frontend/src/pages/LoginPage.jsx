@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
+  const [keepSignedIn, setKeepSignedIn] = useState(true);
 
   const validate = () => {
     const e = {};
@@ -34,9 +35,9 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const res = await api.post('/auth/login', { email: form.email, password: form.password });
-      login(res.data.token, res.data.user);
+      login(res.data.token, res.data.user, keepSignedIn);
       setSuccess('Signed in successfully! Entering website…');
-      setTimeout(() => navigate('/'), 700);
+      setTimeout(() => navigate('/profile'), 700);
     } catch (err) {
       setApiError(err.response?.data?.error || 'Login failed. Please try again.');
     } finally {
@@ -181,7 +182,13 @@ export default function LoginPage() {
             {/* Remember me */}
             <div className="form-group">
               <label className="checkbox-item">
-                <input type="checkbox" id="login-remember" name="remember" />
+                <input
+                  type="checkbox"
+                  id="login-remember"
+                  name="remember"
+                  checked={keepSignedIn}
+                  onChange={e => setKeepSignedIn(e.target.checked)}
+                />
                 Keep me signed in
               </label>
             </div>

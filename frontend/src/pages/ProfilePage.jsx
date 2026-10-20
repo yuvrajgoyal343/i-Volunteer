@@ -8,7 +8,6 @@ import api from '../api';
 import { donationTypeLabels, statusLabels, activityTypeLabels, volunteerActivities } from '../appData';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import CertificateModal from '../components/CertificateModal';
 
 function getInitials(name) {
   if (!name) return 'U';
@@ -17,8 +16,12 @@ function getInitials(name) {
   return name.substring(0, 2).toUpperCase();
 }
 
-function createFallbackCertificateId() {
-  return `IVOL-CERT-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+function formatDisplayDate(dateStr) {
+  if (!dateStr) return '';
+  if (/^[A-Za-z]+ \d{4}$/.test(dateStr)) return dateStr;
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 export default function ProfilePage() {
@@ -48,9 +51,6 @@ export default function ProfilePage() {
   // Volunteer activate loading
   const [activatingVol, setActivatingVol] = useState(false);
 
-  // Certificate Modal state
-  const [selectedCertData, setSelectedCertData] = useState(null);
-  const [showCertModal, setShowCertModal]       = useState(false);
 
   // Log Hours Modal state
   const [showLogHoursModal, setShowLogHoursModal] = useState(false);
@@ -64,34 +64,17 @@ export default function ProfilePage() {
   const [logLoading, setLogLoading] = useState(false);
   const [logError, setLogError]     = useState('');
 
-  const handleOpenCertificate = (drive) => {
-    setSelectedCertData({
-      volunteerName: user?.name || 'Dedicated Volunteer',
-      volunteerId: user?.volunteerSubProfile?.volunteerId || 'VOL-2026-1042',
-      driveTitle: drive.driveTitle || drive.title || 'Community Service & Rations Drive',
-      organizer: drive.organizer || 'iVolunteer Social Welfare Network',
-      location: drive.location || 'Chandigarh Tricity',
-      hours: drive.hoursLogged || drive.hours || 3.5,
-      date: drive.date || new Date().toISOString().split('T')[0],
-      certId: drive.certId || createFallbackCertificateId()
-    });
-    setShowCertModal(true);
-  };
-
   const handleMarkUpcomingAttended = async (drive) => {
     try {
-      const res = await api.post('/volunteer/mark-attended', {
+      await api.post('/volunteer/mark-attended', {
         driveId: drive.id,
         driveTitle: drive.title,
-        hoursEstimate: 3.5,
+        hoursEstimate: drive.hours || 3.5,
         location: drive.location,
-        organizer: drive.organizer
+        organizer: drive.organizer || drive.organiser
       });
       await refreshProfile();
-      if (res.data?.certificate) {
-        setSelectedCertData(res.data.certificate);
-        setShowCertModal(true);
-      }
+      alert('Drive attendance marked successfully!');
     } catch (err) {
       alert(err.response?.data?.error || 'Failed to mark drive attendance.');
     }
@@ -111,7 +94,7 @@ export default function ProfilePage() {
     setLogLoading(true);
     setLogError('');
     try {
-      const res = await api.post('/volunteer/log-hours', {
+      await api.post('/volunteer/log-hours', {
         driveTitle: logForm.driveTitle.trim(),
         hours: Number(logForm.hours),
         location: logForm.location.trim() || 'Chandigarh Tricity',
@@ -120,10 +103,6 @@ export default function ProfilePage() {
       await refreshProfile();
       setShowLogHoursModal(false);
       setLogForm({ driveTitle: '', hours: 3.5, location: 'Chandigarh Tricity', organizer: 'iVolunteer Social Welfare Network', notes: '' });
-      if (res.data?.certificate) {
-        setSelectedCertData(res.data.certificate);
-        setShowCertModal(true);
-      }
     } catch (err) {
       setLogError(err.response?.data?.error || 'Failed to log volunteer hours.');
     } finally {
@@ -132,8 +111,28 @@ export default function ProfilePage() {
   };
 
   useEffect(() => {
-    dispatch(loadDonations(user.id));
-  }, [dispatch, user.id]);
+    if (user?.id) {
+      dispatch(loadDonations(user.id));
+    }
+  }, [dispatch, user?.id]);
+
+  // Modal accessibility: Escape key and scroll lock
+  useEffect(() => {
+    const isModalOpen = showEditModal || showLogHoursModal;
+    if (!isModalOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setShowEditModal(false);
+        setShowLogHoursModal(false);
+      }
+    };
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showEditModal, showLogHoursModal]);
 
   /* ── Open edit modal ── */
   const openEdit = () => {
@@ -202,15 +201,15 @@ export default function ProfilePage() {
   };
 
   /* ── Derived stats ── */
-  const totalDonations  = donations.length;
-  const deliveredItems  = donations.filter(d => d.status === 'delivered').length;
+  const totalDonations  = donations?.length || 0;
+  const deliveredItems  = (donations || []).filter(d => d.status === 'delivered').length;
   const volSub          = user?.volunteerSubProfile;
   const volHours        = volSub?.hoursContributed ?? 0;
   const volDrives       = volSub?.drivesAttended   ?? 0;
 
   const filteredDonations = donationFilter === 'all'
-    ? donations
-    : donations.filter(d => d.status === donationFilter);
+    ? (donations || [])
+    : (donations || []).filter(d => d.status === donationFilter);
 
   if (!user) return null;
 
@@ -442,7 +441,7 @@ export default function ProfilePage() {
                           <span className="vol-id-tag">{volSub.volunteerId}</span>
                         </div>
                         <p style={{ color: 'rgba(255,255,255,0.85)', marginTop: 4 }}>
-                          Status: {volSub.status} • Member since {volSub.joinedDate}
+                          Status: {volSub.status} • Member since {formatDisplayDate(volSub.joinedDate)}
                         </p>
                       </div>
                       <Link to="/volunteer" className="btn btn-secondary btn-sm">Find New Drives</Link>
@@ -459,7 +458,7 @@ export default function ProfilePage() {
                             <div className="impact-mini-card"><div className="impact-val" style={{ color: 'var(--color-primary)' }}>{volSub.hoursContributed}</div><div className="impact-lbl">Hours Contributed</div></div>
                             <div className="impact-mini-card"><div className="impact-val" style={{ color: 'var(--color-accent)' }}>{volSub.drivesAttended}</div><div className="impact-lbl">Drives Attended</div></div>
                             <div className="impact-mini-card"><div className="impact-val" style={{ color: '#8B5CF6' }}>{volSub.badges?.length ?? 0}</div><div className="impact-lbl">Badges Unlocked</div></div>
-                            <div className="impact-mini-card"><div className="impact-val" style={{ color: '#0284C7' }}>{volSub.attendedDrives?.length ?? 2}</div><div className="impact-lbl">Certificates Ready</div></div>
+                            <div className="impact-mini-card"><div className="impact-val" style={{ color: '#0284C7' }}>{volSub.attendedDrives?.length || 0}</div><div className="impact-lbl">Completed Drives</div></div>
                           </div>
                         </div>
                       </div>
@@ -471,10 +470,14 @@ export default function ProfilePage() {
                             <div className="vol-badges-grid">
                               {volSub.badges.map((b, i) => (
                                 <div className="vol-badge-card" key={i}>
-                                  <div className="vol-badge-icon" style={{ color: 'var(--color-primary)' }}>
-                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
+                                  <div className="vol-badge-icon" style={{ color: 'var(--color-primary)', fontSize: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    {b.icon ? (
+                                      <span>{b.icon}</span>
+                                    ) : (
+                                      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                      </svg>
+                                    )}
                                   </div>
                                   <div className="vol-badge-name">{b.name}</div>
                                   <div className="vol-badge-desc">{b.desc}</div>
@@ -554,14 +557,9 @@ export default function ProfilePage() {
                                       </td>
                                       <td>
                                         {d.status === 'Attended' ? (
-                                          <button
-                                            type="button"
-                                            className="btn btn-secondary btn-sm"
-                                            style={{ fontSize: 11, padding: '4px 10px' }}
-                                            onClick={() => handleOpenCertificate(d)}
-                                          >
-                                            🎓 View Certificate
-                                          </button>
+                                          <span className="badge badge-verified" style={{ fontSize: 11, padding: '4px 8px' }}>
+                                            Attended ✓
+                                          </span>
                                         ) : (
                                           <button
                                             type="button"
@@ -569,7 +567,7 @@ export default function ProfilePage() {
                                             style={{ fontSize: 11, padding: '4px 10px' }}
                                             onClick={() => handleMarkUpcomingAttended(d)}
                                           >
-                                            ✓ Mark Attended &amp; Certificate
+                                            ✓ Mark Attended
                                           </button>
                                         )}
                                       </td>
@@ -586,17 +584,17 @@ export default function ProfilePage() {
                         </div>
                       </div>
 
-                      {/* Attended Drives & Verified Certificates Section */}
+                      {/* Attended Drives Section */}
                       <div className="card" style={{ marginTop: 'var(--space-6)' }}>
                         <div className="card-body">
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: 10 }}>
                             <div>
                               <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <span>Attended Drives &amp; Official Certificates</span>
+                                <span>Attended Drives History</span>
                                 <span className="badge badge-verified" style={{ fontSize: 11 }}>Saved in Registry</span>
                               </h3>
                               <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', margin: '4px 0 0' }}>
-                                Download high-resolution PNG or printable PDF certificates for your community service portfolio.
+                                View your completed volunteer drives and community service participation records.
                               </p>
                             </div>
                             <button
@@ -617,8 +615,7 @@ export default function ProfilePage() {
                                     <th>Date Attended</th>
                                     <th>Location / Host</th>
                                     <th>Hours Served</th>
-                                    <th>Verification</th>
-                                    <th>Certificate</th>
+                                    <th>Status</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -626,7 +623,6 @@ export default function ProfilePage() {
                                     <tr key={i}>
                                       <td>
                                         <strong>{d.driveTitle}</strong>
-                                        <div style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>{d.certId}</div>
                                       </td>
                                       <td>{d.date}</td>
                                       <td>{d.location} {d.organizer ? `• ${d.organizer}` : ''}</td>
@@ -636,17 +632,6 @@ export default function ProfilePage() {
                                         </span>
                                       </td>
                                       <td><span className="badge badge-verified">Verified ✓</span></td>
-                                      <td>
-                                        <button
-                                          type="button"
-                                          className="btn btn-secondary btn-sm"
-                                          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, padding: '5px 12px' }}
-                                          onClick={() => handleOpenCertificate(d)}
-                                        >
-                                          <span>🎓</span>
-                                          <span>Download Certificate</span>
-                                        </button>
-                                      </td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -654,7 +639,7 @@ export default function ProfilePage() {
                             </div>
                           ) : (
                             <div style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
-                              <p style={{ color: 'var(--color-text-secondary)' }}>No attended drives logged yet. Attend a drive or log your service hours to receive an official certificate.</p>
+                              <p style={{ color: 'var(--color-text-secondary)' }}>No attended drives logged yet. Attend a drive or log your service hours to build your community service history.</p>
                               <button
                                 type="button"
                                 className="btn btn-primary btn-sm"
@@ -796,6 +781,7 @@ export default function ProfilePage() {
                           >
                             <option value="weekends">Weekends Only</option>
                             <option value="weekdays">Weekdays</option>
+                            <option value="both">Both Weekdays &amp; Weekends</option>
                             <option value="flexible">Flexible / Any Time</option>
                           </select>
                         </div>
@@ -923,6 +909,7 @@ export default function ProfilePage() {
                     >
                       <option value="weekends">Weekends Only</option>
                       <option value="weekdays">Weekdays</option>
+                      <option value="both">Both Weekdays &amp; Weekends</option>
                       <option value="flexible">Flexible / Any Time</option>
                     </select>
                   </div>
@@ -978,7 +965,7 @@ export default function ProfilePage() {
               <div>
                 <h3 style={{ margin: 0, fontSize: '1.25rem' }}>Log Volunteer Hours</h3>
                 <p style={{ margin: '4px 0 0', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
-                  Log your service hours to earn badges and generate your official Certificate of Service.
+                  Log your service hours to track your contribution and earn achievement badges.
                 </p>
               </div>
               <button
@@ -1000,41 +987,42 @@ export default function ProfilePage() {
             <form onSubmit={handleLogHoursSubmit}>
               <div className="form-group" style={{ marginBottom: 'var(--space-4)' }}>
                 <label style={{ display: 'block', fontSize: 'var(--font-size-xs)', fontWeight: 600, marginBottom: 4 }}>
-                  Select or Enter Drive Title *
+                  Select Registered or Verified Community Drive *
                 </label>
                 <select
                   className="form-select"
                   style={{ marginBottom: 8 }}
                   value={logForm.driveTitle}
                   onChange={e => {
-                    const sel = volunteerActivities.find(a => a.title === e.target.value);
+                    const selUpcoming = (volSub?.upcomingDrives || []).find(d => d.title === e.target.value);
+                    const sel = selUpcoming || volunteerActivities.find(a => a.title === e.target.value);
                     setLogForm(prev => ({
                       ...prev,
                       driveTitle: e.target.value,
                       location: sel ? sel.location : prev.location,
-                      organizer: sel ? sel.organiser : prev.organizer
+                      organizer: sel ? (sel.organiser || sel.organizer) : prev.organizer
                     }));
                   }}
+                  required
                 >
-                  <option value="">Select a community drive from list...</option>
-                  {volunteerActivities.map(a => (
-                    <option key={a.id} value={a.title}>
-                      {a.title} ({a.organiser})
-                    </option>
-                  ))}
-                  <option value="custom">-- Custom / Other Community Drive --</option>
+                  <option value="">Select a community drive from the verified list...</option>
+                  {volSub?.upcomingDrives?.length > 0 && (
+                    <optgroup label="Your Registered Drives">
+                      {volSub.upcomingDrives.map((d, idx) => (
+                        <option key={`up-${idx}`} value={d.title}>
+                          {d.title} ({d.organizer || d.organiser})
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
+                  <optgroup label="Verified Community Drives">
+                    {volunteerActivities.map(a => (
+                      <option key={a.id} value={a.title}>
+                        {a.title} ({a.organiser})
+                      </option>
+                    ))}
+                  </optgroup>
                 </select>
-
-                {(!logForm.driveTitle || logForm.driveTitle === 'custom' || !volunteerActivities.some(a => a.title === logForm.driveTitle)) && (
-                  <input
-                    type="text"
-                    className="form-input"
-                    placeholder="e.g. Winter Clothing Distribution at Sector 17"
-                    value={logForm.driveTitle === 'custom' ? '' : logForm.driveTitle}
-                    onChange={e => setLogForm(f => ({ ...f, driveTitle: e.target.value }))}
-                    required
-                  />
-                )}
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
@@ -1086,7 +1074,7 @@ export default function ProfilePage() {
                   Cancel
                 </button>
                 <button type="submit" className="btn btn-primary btn-sm" disabled={logLoading}>
-                  {logLoading ? 'Saving & Generating…' : 'Save Hours & Generate Certificate'}
+                  {logLoading ? 'Saving…' : 'Save Volunteer Hours'}
                 </button>
               </div>
             </form>
@@ -1094,12 +1082,6 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* ─── High-Definition Verifiable Certificate Modal ─── */}
-      <CertificateModal
-        isOpen={showCertModal}
-        onClose={() => setShowCertModal(false)}
-        certificateData={selectedCertData}
-      />
 
       <Footer />
     </>

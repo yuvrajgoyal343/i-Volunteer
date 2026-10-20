@@ -44,12 +44,32 @@ export default function OrganisationsPage() {
     setSelectedNgo(found || null);
   }, [searchParams]);
 
+  useEffect(() => {
+    if (!selectedNgo) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setSelectedNgo(null);
+    };
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedNgo]);
+
   const filteredNgos = ngos.filter(ngo => {
     const matchCategory = activeCategory === 'all' || ngo.category === activeCategory;
+    const cityLower = ngo.city.toLowerCase();
     const matchLocation =
       activeLocation === 'all' ||
-      ngo.city.toLowerCase() === activeLocation.toLowerCase() ||
-      (activeLocation === 'punjab' && (ngo.state?.toLowerCase().includes('punjab') || ngo.city.toLowerCase() === 'ludhiana' || ngo.city.toLowerCase() === 'amritsar' || ngo.city.toLowerCase() === 'mohali'));
+      (activeLocation === 'chandigarh' && cityLower === 'chandigarh') ||
+      (activeLocation === 'mohali' && cityLower === 'mohali') ||
+      (activeLocation === 'panchkula' && cityLower === 'panchkula') ||
+      (activeLocation === 'punjab' &&
+        cityLower !== 'chandigarh' &&
+        cityLower !== 'mohali' &&
+        cityLower !== 'panchkula' &&
+        (ngo.state?.toLowerCase().includes('punjab') || cityLower === 'ludhiana' || cityLower === 'amritsar'));
     const term = searchTerm.toLowerCase().trim();
     const matchSearch =
       !term ||
@@ -228,12 +248,18 @@ export default function OrganisationsPage() {
 
       {/* Modal */}
       {selectedNgo && (
-        <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) setSelectedNgo(null); }}>
+        <div
+          className="modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="ngo-modal-title"
+          onClick={(e) => { if (e.target === e.currentTarget) setSelectedNgo(null); }}
+        >
           <div className="modal-card" style={{ maxWidth: 600 }}>
             <div className="modal-header">
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <h3 style={{ margin: 0 }}>{selectedNgo.name}</h3>
+                  <h3 id="ngo-modal-title" style={{ margin: 0 }}>{selectedNgo.name}</h3>
                   {selectedNgo.verified && (
                     <span className="badge badge-verified">
                       <svg viewBox="0 0 24 24" width="12" height="12"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
@@ -311,7 +337,7 @@ export default function OrganisationsPage() {
               <div style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-4)' }}>
                 <Link to={`/donate?ngo=${selectedNgo.id}`} className="btn btn-primary btn-lg"
                   style={{ flex: 1, textAlign: 'center' }} onClick={() => setSelectedNgo(null)}>
-                  Donate to {selectedNgo.name ? selectedNgo.name.split(' ')[0] : 'Organisation'}
+                  Donate to {selectedNgo.name || 'Organisation'}
                 </Link>
                 <button type="button" className="btn btn-ghost btn-lg" onClick={() => setSelectedNgo(null)}>
                   Close

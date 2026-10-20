@@ -1,6 +1,11 @@
 :root {
   /* ─── Modern Emerald & Warm Amber Palette ─── */
   --color-primary: #059669;
+  --color-primary-50: #ECFDF5;
+  --color-primary-100: #D1FAE5;
+  --color-primary-200: #A7F3D0;
+  --color-primary-600: #059669;
+  --color-primary-800: #065F46;
   --color-primary-light: #10B981;
   --color-primary-lighter: #34D399;
   --color-primary-dark: #047857;
@@ -24,6 +29,7 @@
   --color-white: #FFFFFF;
   --color-text: #0F172A;
   --color-text-secondary: #475569;
+  --color-neutral-600: #475569;
   --color-text-tertiary: #94A3B8;
   --color-border: #E2E8F0;
   --color-border-light: #F1F5F9;
@@ -40,6 +46,7 @@
   --color-warning: #F59E0B;
   --color-info: #0284C7;
   --color-error: #EF4444;
+  --color-error-border: #FECACA;
 
   /* Semantic backgrounds */
   --color-success-bg: #ECFDF5;
