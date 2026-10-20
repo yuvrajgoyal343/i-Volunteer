@@ -48,8 +48,19 @@ body.dark-theme {
 
   /* ─── Translucent Tinted Accent Backgrounds ─── */
   --color-primary-bg: rgba(16, 185, 129, 0.16);
+  --color-primary-50: rgba(16, 185, 129, 0.12);
+  --color-primary-100: rgba(16, 185, 129, 0.18);
+  --color-primary-200: rgba(16, 185, 129, 0.28);
+  --color-primary-600: #10B981;
+  --color-primary-800: #34D399;
+  --color-neutral-600: #94A3B8;
+  --color-error-border: rgba(239, 68, 68, 0.4);
   --color-accent-bg: rgba(245, 158, 11, 0.16);
   --color-primary-darkest: #042F24;
+
+  /* ─── KEY FIX: Remap --color-white to a dark surface ─── */
+  /* All layout/component CSS that uses `background: var(--color-white)` now gets dark */
+  --color-white: #151E2E;
 
   /* ─── Elevation Shadows ─── */
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.45);
@@ -74,6 +85,10 @@ body.dark-theme {
 [data-theme="dark"] section.section-alt,
 [data-theme="dark"] section.section-categories,
 [data-theme="dark"] .how-it-works,
+[data-theme="dark"] .hero,
+[data-theme="dark"] .impact-section,
+[data-theme="dark"] .homepage-collage-section,
+[data-theme="dark"] .cta-section,
 [data-theme="dark"] .login-body,
 [data-theme="dark"] .login-page,
 [data-theme="dark"] .login-form-panel {
@@ -82,7 +97,77 @@ body.dark-theme {
   border-color: #243247 !important;
 }
 
-/* Fix for inline white background sections (e.g. on HomePage) */
+/* Site header & nav */
+[data-theme="dark"] .site-header {
+  background: #111C2E !important;
+  border-bottom-color: #243247 !important;
+}
+
+[data-theme="dark"] .main-nav {
+  background-color: #111C2E !important;
+  border-color: #243247 !important;
+}
+
+[data-theme="dark"] .main-nav a,
+[data-theme="dark"] .main-nav .nav-link {
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .main-nav a:hover,
+[data-theme="dark"] .main-nav .nav-link:hover,
+[data-theme="dark"] .main-nav a.active,
+[data-theme="dark"] .main-nav .nav-link.active {
+  color: #34D399 !important;
+}
+
+/* Hero content text */
+[data-theme="dark"] .hero-content h1,
+[data-theme="dark"] .hero-content p,
+[data-theme="dark"] .section-header h2,
+[data-theme="dark"] .section-header p,
+[data-theme="dark"] .stat-label,
+[data-theme="dark"] .stat-number {
+  color: #F8FAFC !important;
+}
+
+/* Region badge */
+[data-theme="dark"] .region-badge,
+[data-theme="dark"] .live-region-badge {
+  background: #1A2639 !important;
+  border-color: #2E4060 !important;
+  color: #94A3B8 !important;
+}
+
+/* Hero trust items */
+[data-theme="dark"] .hero-feature-chip {
+  background: #151E2E !important;
+  border-color: #243247 !important;
+  color: #F8FAFC !important;
+}
+
+/* Filters bar */
+[data-theme="dark"] .filters-bar {
+  background: #111C2E !important;
+  border-color: #243247 !important;
+}
+
+/* Header profile button */
+[data-theme="dark"] .header-profile-btn {
+  background: #1A2639 !important;
+  border-color: #243247 !important;
+  color: #F8FAFC !important;
+}
+
+[data-theme="dark"] .header-profile-btn:hover {
+  background: #243247 !important;
+  border-color: #10B981 !important;
+}
+
+[data-theme="dark"] .header-username {
+  color: #F8FAFC !important;
+}
+
+/* Fix for inline white background sections */
 [data-theme="dark"] section[style*="backgroundColor"],
 [data-theme="dark"] section[style*="background-color"],
 [data-theme="dark"] section[style*="background: var(--color-white)"] {
@@ -90,6 +175,7 @@ body.dark-theme {
 }
 
 /* Crisp White Text for Action Buttons and Badges */
+/* These must stay white even though --color-white is remapped to dark surface */
 .btn-primary,
 .btn-accent,
 .logo-icon,
@@ -103,6 +189,21 @@ body.dark-theme {
 .step-number {
   color: #FFFFFF !important;
 }
+
+/* In dark mode: anything that sets its text color via var(--color-white) must stay #FFFFFF */
+[data-theme="dark"] .login-brand-panel,
+[data-theme="dark"] .login-brand-heading,
+[data-theme="dark"] .login-brand-subtext,
+[data-theme="dark"] .login-brand-tagline,
+[data-theme="dark"] .nav-cta .btn-primary,
+[data-theme="dark"] .btn-primary span,
+[data-theme="dark"] .btn-accent span,
+[data-theme="dark"] .collage-overlay,
+[data-theme="dark"] .collage-title,
+[data-theme="dark"] .collage-sub {
+  color: #FFFFFF !important;
+}
+
 
 /* ==========================================================================
    CARDS, WRAPPERS, CONTAINERS & SURFACES
@@ -498,6 +599,26 @@ body.dark-theme {
   color: #FFFFFF !important;
 }
 
+[data-theme="dark"] .btn-outline,
+body.dark-theme .btn-outline {
+  color: #34D399 !important;
+  border-color: #10B981 !important;
+  background-color: transparent !important;
+}
+
+[data-theme="dark"] .btn-outline:hover,
+body.dark-theme .btn-outline:hover {
+  background-color: #059669 !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .badge-warning,
+body.dark-theme .badge-warning {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+  color: #FCD34D !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
 /* ==========================================================================
    BUTTONS IN DARK MODE
    ========================================================================== */
@@ -540,3 +661,4 @@ body.dark-theme {
 [data-theme="dark"] .empty-state p {
   color: #94A3B8 !important;
 }
+

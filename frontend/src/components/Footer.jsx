@@ -37,7 +37,7 @@ export default function Footer() {
           <div className="footer-col">
             <h4>Contact</h4>
             <ul>
-              <li><a href="mailto:hello@ivolunteer.org">hello@ivolunteer.org</a></li>
+              <li><a href="mailto:support@ivolunteer.org">support@ivolunteer.org</a></li>
               <li><Link to="/about">Contact Form</Link></li>
               <li><Link to="/login">Sign In</Link></li>
             </ul>

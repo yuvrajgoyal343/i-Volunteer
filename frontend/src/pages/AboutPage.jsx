@@ -5,16 +5,16 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 const IMPACT_METRICS = [
-  { val: '8+', lbl: 'Verified Partner Homes & Missions' },
+  { val: '12', lbl: 'Verified Partner Homes & Missions' },
   { val: '12k+', lbl: 'Children, Elders & Families Supported' },
   { val: '₹0', lbl: 'Platform Fees (100% Free Doorstep Pickup)' },
-  { val: '1,200+', lbl: 'Active Community Volunteers Enrolled' }
+  { val: '1,400+', lbl: 'Active Community Volunteers Enrolled' }
 ];
 
 const VERIFICATION_STEPS = [
   { num: 1, color: '#059669', bg: 'var(--color-primary-bg)', text: 'var(--color-primary)', title: 'Legal & Tax Audit', desc: 'Verification of 12A/80G tax exemption certificates, state society registration under the Societies Act, and CWC (Child Welfare Committee) approvals.' },
   { num: 2, color: '#F59E0B', bg: 'var(--color-accent-bg)', text: 'var(--color-accent-dark)', title: 'On-Ground Inspection', desc: 'Our field coordinators conduct physical visits to inspect facility hygiene, resident welfare, storage conditions, and direct community utilization.' },
-  { num: 3, color: '#6366F1', bg: '#EEF2FF', text: '#4F46E5', title: 'Continuous Delivery Receipts', desc: 'Donation deliveries are documented with date-stamped pickup proofs and annual re-verification to maintain list status.' }
+  { num: 3, color: '#6366F1', bg: 'rgba(99, 102, 241, 0.12)', text: '#4F46E5', title: 'Continuous Delivery Receipts', desc: 'Donation deliveries are documented with date-stamped pickup proofs and annual re-verification to maintain list status.' }
 ];
 
 const CORE_VALUES = [
@@ -43,7 +43,7 @@ export default function AboutPage() {
     const errs = validate();
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
-    setSuccess('Thank you for reaching out! Our Chandigarh support team will reply within 24 hours.');
+    setSuccess('Thank you for reaching out! In this demo environment, your message has been logged. You can reach our team directly at support@ivolunteer.org.');
     setContactForm({ name: '', email: '', subject: '', message: '' });
     setTimeout(() => setSuccess(''), 6000);
   };
@@ -189,8 +189,8 @@ export default function AboutPage() {
             {/* Helpdesk Contacts */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
               {[
-                { title: 'General Inquiries', desc: 'For questions about doorstep pickup coverage or drive volunteer guidelines.', email: 'support@ivolunteer-tricity.org' },
-                { title: 'NGO Listing & Verification', desc: 'Run an orphanage, senior home, or charitable dispensary in Chandigarh Tricity or Punjab? Get audited and verified for listings.', email: 'partners@ivolunteer-tricity.org' }
+                { title: 'General Inquiries', desc: 'For questions about doorstep pickup coverage or drive volunteer guidelines.', email: 'support@ivolunteer.org' },
+                { title: 'NGO Listing & Verification', desc: 'Run an orphanage, senior home, or charitable dispensary in Chandigarh Tricity or Punjab? Get audited and verified for listings.', email: 'partners@ivolunteer.org' }
               ].map(c => (
                 <div key={c.title} className="card" style={{ padding: 'var(--space-6)', borderRadius: 'var(--radius-xl)' }}>
                   <h4 style={{ fontSize: 'var(--font-size-md)', marginBottom: 4 }}>{c.title}</h4>

@@ -68,6 +68,20 @@
   border-color: transparent;
 }
 
+/* Outline button */
+.btn-outline {
+  background-color: transparent;
+  color: var(--color-primary);
+  border: 1.5px solid var(--color-primary);
+  transition: all var(--transition-fast);
+}
+
+.btn-outline:hover {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+}
+
 /* Ghost button */
 .btn-ghost {
   background-color: transparent;
@@ -282,6 +296,12 @@
 .badge-pickedUp {
   background-color: var(--color-warning-bg);
   color: var(--color-warning);
+}
+
+.badge-warning {
+  background-color: var(--color-warning-bg);
+  color: #92400E;
+  border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .badge-delivered {

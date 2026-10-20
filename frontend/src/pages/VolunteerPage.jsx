@@ -1,5 +1,5 @@
 // VolunteerPage.jsx — Premium Volunteer Hub for Chandigarh Tricity & Punjab
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -67,10 +67,43 @@ export default function VolunteerPage() {
   const [rsvpSubmitting, setRsvpSubmitting] = useState(false);
   const [rsvpError, setRsvpError] = useState('');
 
+  // Pre-fill form when user loads asynchronously
+  useEffect(() => {
+    if (user) {
+      // oxlint-disable-next-line react/set-state-in-effect
+      setForm(prev => ({
+        ...prev,
+        name: user.name || prev.name,
+        email: user.email || prev.email,
+        phone: user.phone || prev.phone,
+        availability: user.volunteerSubProfile?.availability || prev.availability,
+        interests: (user.volunteerSubProfile?.interests?.length) ? user.volunteerSubProfile.interests : prev.interests,
+        message: user.volunteerSubProfile?.priorExperience || prev.message
+      }));
+    }
+  }, [user]);
+
+  // Handle modal scroll lock and Escape key
+  useEffect(() => {
+    if (!selectedDrive) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && !rsvpSubmitting) setSelectedDrive(null);
+    };
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedDrive, rsvpSubmitting]);
+
   const isDriveRegistered = (drive) => {
-    if (!user || !user.volunteerSubProfile?.upcomingDrives || !drive) return false;
-    return user.volunteerSubProfile.upcomingDrives.some(
-      d => (drive.id && d.id === drive.id) || (drive.title && d.title === drive.title)
+    if (!user || !drive) return false;
+    const upcoming = user.volunteerSubProfile?.upcomingDrives || [];
+    const attended = user.volunteerSubProfile?.attendedDrives || [];
+    return (
+      upcoming.some(d => (drive.id && d.id === drive.id) || (drive.title && d.title === drive.title)) ||
+      attended.some(d => (drive.id && d.driveId === drive.id) || (drive.title && d.driveTitle === drive.title))
     );
   };
 
@@ -110,15 +143,66 @@ export default function VolunteerPage() {
         if (!user.isVolunteer) {
           await api.post('/volunteer/activate');
         }
+        // Save name, phone and availability
+        await api.put('/profile', {
+          name: form.name.trim(),
+          phone: form.phone.trim(),
+          isVolunteer: true,
+          availability: form.availability
+        });
+
+        // Preserve and extend skills
+        const existingSkills = user.volunteerSubProfile?.skills || [];
+        const additionalSkills = form.message
+          ? form.message.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean)
+          : [];
+        const combinedSkills = Array.from(new Set([...existingSkills, ...additionalSkills]));
+
         await api.put('/volunteer/profile', {
           availability: form.availability,
           interests: form.interests,
-          skills: ['Community Outreach & Logistics']
+          skills: combinedSkills.length ? combinedSkills : ['Community Support'],
+          priorExperience: form.message.trim()
         });
         await refreshProfile();
-        setSuccess('Awesome! Your Volunteer profile is now active with iVolunteer Chandigarh.');
+        setSuccess('Awesome! Your volunteer profile is now active and updated.');
       } else {
-        setSuccess('Registration received! Create an account to log volunteer hours, earn badges, and receive drive reminder SMS.');
+        // Persist guest volunteer registration safely without duplicates
+        try {
+          const raw = localStorage.getItem('ivolunteer_guest_registrations');
+          let guestVolunteers = [];
+          if (raw) {
+            try {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed)) guestVolunteers = parsed;
+            } catch {}
+          }
+          const emailLower = form.email.trim().toLowerCase();
+          const existingIdx = guestVolunteers.findIndex(
+            g => g.email && g.email.trim().toLowerCase() === emailLower
+          );
+          const guestRecord = {
+            name: form.name.trim(),
+            email: form.email.trim(),
+            phone: form.phone.trim(),
+            availability: form.availability,
+            interests: form.interests,
+            priorExperience: form.message.trim(),
+            registeredAt: new Date().toISOString()
+          };
+          if (existingIdx !== -1) {
+            guestVolunteers[existingIdx] = {
+              ...guestVolunteers[existingIdx],
+              ...guestRecord
+            };
+          } else {
+            guestVolunteers.push(guestRecord);
+          }
+          localStorage.setItem('ivolunteer_guest_registrations', JSON.stringify(guestVolunteers));
+          setSuccess(`Registration received for ${form.name}! Please sign in or create an account to view confirmed drives and service milestones.`);
+        } catch {
+          setSuccess(`Registration received for ${form.name}! Please sign in or create an account to view confirmed drives and service milestones.`);
+        }
       }
     } catch (err) {
       alert(err.response?.data?.error || 'Something went wrong. Please try again.');
@@ -156,7 +240,7 @@ export default function VolunteerPage() {
         setSelectedDrive(null);
         setRsvpSuccess(false);
         setRsvpError('');
-      }, 2200);
+      }, 2000);
     } catch (err) {
       setRsvpError(err.response?.data?.error || 'Failed to confirm RSVP. Please try again.');
     } finally {
@@ -202,10 +286,10 @@ export default function VolunteerPage() {
               <span><strong>8+</strong> Weekly Drives</span>
             </div>
             <div className="hero-feature-chip">
-              <span><strong>1,200+</strong> Volunteers Joined</span>
+              <span><strong>1,400+</strong> Volunteers Joined</span>
             </div>
             <div className="hero-feature-chip">
-              <span>Volunteer Hour Certificates</span>
+              <span>Drive Tracking &amp; Badges</span>
             </div>
             <div className="hero-feature-chip">
               <span>Verified Local NGOs Only</span>
@@ -236,7 +320,7 @@ export default function VolunteerPage() {
             <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center', borderTop: '4px solid var(--color-secondary-indigo)' }}>
               <h3 style={{ fontSize: 'var(--font-size-md)', marginBottom: 'var(--space-2)' }}>Recognition &amp; Badges</h3>
               <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                Track your hours, earn community milestone badges, and receive verified volunteering certificates for college and career portfolios.
+                Track your hours, earn community milestone badges, and build your social impact record for your profile.
               </p>
             </div>
           </div>
@@ -379,7 +463,7 @@ export default function VolunteerPage() {
                             padding: '10px 14px',
                             borderRadius: 'var(--radius-md)',
                             border: `1.5px solid ${selected ? 'var(--color-primary)' : 'var(--color-border)'}`,
-                            background: selected ? 'var(--color-primary-bg)' : 'var(--color-white)',
+                            background: selected ? 'var(--color-primary-bg)' : 'var(--surface-card)',
                             color: selected ? 'var(--color-primary-dark)' : 'var(--color-text)',
                             fontWeight: selected ? 600 : 500,
                             cursor: 'pointer',
@@ -624,7 +708,9 @@ export default function VolunteerPage() {
             zIndex: 1000,
             padding: 'var(--space-4)'
           }}
-          onClick={() => setSelectedDrive(null)}
+          role="dialog"
+          aria-modal="true"
+          onClick={() => { if (!rsvpSubmitting) setSelectedDrive(null); }}
         >
           <div
             className="modal-card"
@@ -642,7 +728,7 @@ export default function VolunteerPage() {
             <button
               type="button"
               className="modal-close"
-              onClick={() => setSelectedDrive(null)}
+              onClick={() => { if (!rsvpSubmitting) setSelectedDrive(null); }}
               style={{
                 position: 'absolute',
                 top: 16,
@@ -661,7 +747,7 @@ export default function VolunteerPage() {
               <div style={{ textAlign: 'center', padding: 'var(--space-6) 0' }}>
                 <h3 style={{ fontSize: 'var(--font-size-xl)', color: 'var(--color-primary)' }}>You&apos;re Confirmed!</h3>
                 <p style={{ color: 'var(--color-text-secondary)', marginTop: 'var(--space-2)' }}>
-                  A confirmation SMS &amp; drive briefing have been dispatched. See you at <strong>{selectedDrive.title}</strong>!
+                  Your spot has been registered! You can view this drive and track your volunteer hours directly in your profile.
                 </p>
               </div>
             ) : (
