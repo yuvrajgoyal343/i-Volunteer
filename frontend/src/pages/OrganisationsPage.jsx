@@ -14,15 +14,6 @@ function getCategoryColor(category) {
   return colors[category] || '#059669';
 }
 
-function getCategoryEmoji(category) {
-  const emojis = {
-    ngo: '🤝',
-    orphanage: '🧒',
-    oldAgeHome: '👴'
-  };
-  return emojis[category] || '🏢';
-}
-
 export default function OrganisationsPage() {
   const [searchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
@@ -87,10 +78,6 @@ export default function OrganisationsPage() {
 
       <section className="page-header">
         <div className="container">
-          <div className="region-badge">
-            <span className="live-dot"></span>
-            <span>Verified Directory • Chandigarh Tricity &amp; Punjab</span>
-          </div>
           <h1>Verified <span className="gradient-text">Organisations</span></h1>
           <p>Find genuine non-profit organisations, children homes, and elder care facilities near Chandigarh, Mohali, Panchkula, and across Punjab.</p>
         </div>
@@ -196,7 +183,7 @@ export default function OrganisationsPage() {
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)', flexWrap: 'wrap' }}>
                         <span className="badge badge-category">
-                          {getCategoryEmoji(ngo.category)} {categoryLabels[ngo.category] || ngo.category}
+                          {categoryLabels[ngo.category] || ngo.category}
                         </span>
                         {ngo.beneficiariesServed && (
                           <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
@@ -269,7 +256,7 @@ export default function OrganisationsPage() {
                 </div>
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 6, flexWrap: 'wrap' }}>
                   <span className="badge badge-category">
-                    {getCategoryEmoji(selectedNgo.category)} {categoryLabels[selectedNgo.category] || selectedNgo.category}
+                    {categoryLabels[selectedNgo.category] || selectedNgo.category}
                   </span>
                   <span className="badge" style={{ background: '#E0F2FE', color: '#0369A1', border: '1px solid rgba(3,105,161,0.12)' }}>
                     {selectedNgo.city}, {selectedNgo.state}
@@ -316,7 +303,7 @@ export default function OrganisationsPage() {
                 <div>
                   <strong style={{ color: 'var(--color-text-secondary)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Verification</strong>
                   <p style={{ marginTop: 2, fontSize: 'var(--font-size-xs)', color: 'var(--color-success)', fontWeight: 600 }}>
-                    ✓ {selectedNgo.verificationDetails || 'Verified 2026'}
+                    {selectedNgo.verificationDetails || 'Verified 2026'}
                   </p>
                 </div>
                 <div>

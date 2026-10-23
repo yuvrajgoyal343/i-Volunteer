@@ -178,11 +178,6 @@ export default function DonatePage() {
       {/* Hero Header */}
       <section className="page-header">
         <div className="container">
-          <div className="region-badge" style={{ margin: '0 auto var(--space-4)' }}>
-            <span className="live-dot"></span>
-            <span>Doorstep Pickup • Chandigarh Tricity &amp; Punjab</span>
-          </div>
-
           <h1>
             Donate Essentials, <span className="gradient-text">Transform Lives</span>
           </h1>
@@ -223,7 +218,7 @@ export default function DonatePage() {
               {success && (
                 <div className="form-success visible" role="alert" style={{ marginBottom: 'var(--space-6)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: '1.25rem', color: 'var(--color-primary)', fontWeight: 'bold' }}>&#x2713;</span>
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--color-primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     <div>
                       <strong>Pickup Booked!</strong>
                       <p style={{ fontSize: 'var(--font-size-xs)', margin: '4px 0 0' }}>{success}</p>

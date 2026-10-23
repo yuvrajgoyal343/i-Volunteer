@@ -64,7 +64,6 @@ export default function LoginPage() {
               </div>
             ))}
           </div>
-          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginTop: 'var(--space-4)' }}>* Impact metrics across Chandigarh, Mohali, Panchkula & Punjab</p>
         </div>
         <div className="login-brand-decor">
           <div className="decor-circle decor-circle-1"></div>

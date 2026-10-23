@@ -14,7 +14,7 @@ export default function SignupPage() {
     phone: '',
     city: 'Chandigarh',
     password: '',
-    isVolunteer: true
+    isVolunteer: false
   });
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState('');
@@ -83,9 +83,6 @@ export default function SignupPage() {
               </div>
             ))}
           </div>
-          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginTop: 'var(--space-4)' }}>
-            * Verified impact metrics across Chandigarh, Mohali, Panchkula &amp; Punjab
-          </p>
         </div>
         <div className="login-brand-decor">
           <div className="decor-circle decor-circle-1"></div>
@@ -163,10 +160,10 @@ export default function SignupPage() {
             <div className="form-group" style={{ backgroundColor: 'var(--color-primary-bg)', padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--radius-md)', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
               <label className="checkbox-item" style={{ fontWeight: 'var(--font-weight-semibold)', color: 'var(--color-primary-dark)' }}>
                 <input type="checkbox" id="signup-is-volunteer" checked={form.isVolunteer} onChange={setField('isVolunteer')} />
-                Enroll as Active Volunteer (Unlocks Badges &amp; Drive RSVP)
+                Do you want to become a volunteer?
               </label>
               <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: 4, marginLeft: 24 }}>
-                Enables volunteer badges, drive hours tracking, and verified service history in your profile.
+                Check this option to create a Volunteer Subprofile and participate in community drives.
               </p>
             </div>
 

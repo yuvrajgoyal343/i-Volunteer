@@ -48,14 +48,15 @@ export default function VolunteerPage() {
     name: user?.name || '',
     email: user?.email || '',
     phone: user?.phone || '',
-    interests: ['foodDrive', 'clothingDrive'],
-    availability: 'weekends',
+    interests: [],
+    availability: '',
     message: ''
   });
 
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
 
   // Filters for activities
   const [activeCategory, setActiveCategory] = useState('all');
@@ -140,32 +141,32 @@ export default function VolunteerPage() {
 
     try {
       if (user) {
-        if (!user.isVolunteer) {
-          await api.post('/volunteer/activate');
-        }
+        const customSkills = form.message
+          ? form.message.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean)
+          : [];
+        const combinedSkills = customSkills.length ? customSkills : (user.volunteerSubProfile?.skills || ['Community Outreach']);
+
+        // Update volunteer subprofile with user's selected interests and availability
+        await api.put('/volunteer/profile', {
+          availability: form.availability,
+          interests: form.interests,
+          skills: combinedSkills,
+          priorExperience: form.message.trim()
+        });
+
         // Save name, phone and availability
         await api.put('/profile', {
           name: form.name.trim(),
           phone: form.phone.trim(),
           isVolunteer: true,
-          availability: form.availability
-        });
-
-        // Preserve and extend skills
-        const existingSkills = user.volunteerSubProfile?.skills || [];
-        const additionalSkills = form.message
-          ? form.message.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean)
-          : [];
-        const combinedSkills = Array.from(new Set([...existingSkills, ...additionalSkills]));
-
-        await api.put('/volunteer/profile', {
           availability: form.availability,
           interests: form.interests,
-          skills: combinedSkills.length ? combinedSkills : ['Community Support'],
-          priorExperience: form.message.trim()
+          skills: combinedSkills
         });
+
         await refreshProfile();
         setSuccess('Awesome! Your volunteer profile is now active and updated.');
+        setShowUpdateForm(false);
       } else {
         // Persist guest volunteer registration safely without duplicates
         try {
@@ -269,11 +270,6 @@ export default function VolunteerPage() {
       {/* Hero Section */}
       <section className="page-header" style={{ position: 'relative', overflow: 'hidden' }}>
         <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-          <div className="region-badge" style={{ margin: '0 auto var(--space-4)' }}>
-            <span className="live-dot"></span>
-            <span>Tricity Volunteer Network • Chandigarh, Mohali, Panchkula &amp; Punjab</span>
-          </div>
-
           <h1>
             Give Your Time, <span className="gradient-text">Spark Real Change</span>
           </h1>
@@ -325,16 +321,74 @@ export default function VolunteerPage() {
             </div>
           </div>
 
-          {/* Volunteer Sign-Up Form Card */}
+          {/* Volunteer Sign-Up Form or Active Volunteer Card */}
           <div className="form-page-layout" style={{ marginBottom: 'var(--space-16)', maxWidth: 840, margin: '0 auto var(--space-16)' }}>
-            <div className="form-wrapper">
-              <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
-                <span className="badge badge-verified" style={{ marginBottom: 'var(--space-2)' }}>Quick Enrollment</span>
-                <h2 style={{ fontSize: 'var(--font-size-xl)' }}>Become an Active Volunteer</h2>
-                <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-                  Join the volunteer WhatsApp &amp; SMS broadcast for upcoming Chandigarh Tricity drives.
+            {user?.isVolunteer && !showUpdateForm ? (
+              <div className="form-wrapper" style={{ textAlign: 'center', padding: 'var(--space-10) var(--space-8)' }}>
+                <div style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: '50%',
+                  background: 'var(--color-primary-bg, #ecfdf5)',
+                  color: 'var(--color-primary, #059669)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto var(--space-3)'
+                }}>
+                  <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+
+                <h2 style={{ fontSize: 'var(--font-size-2xl)', marginBottom: 'var(--space-2)' }}>
+                  You are already a volunteer
+                </h2>
+
+                <p style={{ color: 'var(--color-text-secondary)', maxWidth: 540, margin: '0 auto var(--space-6)', fontSize: 'var(--font-size-md)', lineHeight: 1.6 }}>
+                  Your volunteer profile is active. You can browse and RSVP to community drives below, track your contribution hours, or edit your preferred causes and availability anytime.
                 </p>
+
+                <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <Link to="/profile" className="btn btn-primary btn-md">
+                    View Volunteer Profile
+                  </Link>
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-md"
+                    onClick={() => setShowUpdateForm(true)}
+                  >
+                    Change Preferences
+                  </button>
+                  <a href="#community-drives" className="btn btn-ghost btn-md">
+                    Explore Community Drives Below
+                  </a>
+                </div>
               </div>
+            ) : (
+              <div className="form-wrapper">
+                <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <span className="badge badge-verified" style={{ marginBottom: 'var(--space-2)' }}>
+                      {user?.isVolunteer ? 'Update Volunteer Profile' : 'Quick Enrollment'}
+                    </span>
+                    {user?.isVolunteer && (
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        onClick={() => setShowUpdateForm(false)}
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+                  <h2 style={{ fontSize: 'var(--font-size-xl)' }}>
+                    {user?.isVolunteer ? 'Update Your Causes & Availability' : 'Become an Active Volunteer'}
+                  </h2>
+                  <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+                    Select the causes you wish to support and when you are available for community drives.
+                  </p>
+                </div>
 
               {success && (
                 <div className="form-success visible" role="alert" style={{ marginBottom: 'var(--space-6)' }}>
@@ -505,14 +559,11 @@ export default function VolunteerPage() {
                 </button>
               </form>
             </div>
+            )}
           </div>
 
           {/* Ongoing Activities Section */}
-          <div className="section-header" style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
-            <div className="live-region-badge" style={{ margin: '0 auto var(--space-2)' }}>
-              <span className="live-dot"></span>
-              <span>Live Opportunities</span>
-            </div>
+          <div className="section-header" id="community-drives" style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
             <h2>Upcoming Community Drives in Chandigarh &amp; Punjab</h2>
             <p style={{ maxWidth: 640, margin: '0 auto' }}>
               Explore confirmed volunteer drives happening this week. Click any drive to RSVP your spot.
