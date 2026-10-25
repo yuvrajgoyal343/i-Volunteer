@@ -58,10 +58,6 @@ export default function AboutPage() {
       <Header />
       <section className="page-header" style={{ position: 'relative', overflow: 'hidden' }}>
         <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-          <div className="region-badge" style={{ margin: '0 auto var(--space-4)' }}>
-            <span className="live-dot"></span>
-            <span>Our Mission &amp; Transparent Verification • Chandigarh Tricity &amp; Punjab</span>
-          </div>
           <h1>Connecting Compassion with <span className="gradient-text">Verified Need</span></h1>
           <p style={{ maxWidth: 720, margin: '0 auto var(--space-6)' }}>
             iVolunteer was founded to eliminate opacity in charity. We ensure every warm sweater, book, and meal reaches genuine orphanages, elderly shelters, and community langars across Chandigarh, Mohali, Panchkula, and Punjab.
@@ -160,7 +156,7 @@ export default function AboutPage() {
               </p>
               {success && (
                 <div className="form-success visible" role="alert" style={{ marginBottom: 'var(--space-4)' }}>
-                  ✓ {success}
+                  {success}
                 </div>
               )}
               <form id="contact-form" noValidate onSubmit={handleSubmit}>

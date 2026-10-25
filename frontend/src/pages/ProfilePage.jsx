@@ -1,6 +1,6 @@
 // ProfilePage.jsx — Real user profile from SQL backend, zero demo/hardcoded data
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAuth } from '../context';
 import { loadDonations } from '../store/donationsSlice';
@@ -16,15 +16,8 @@ function getInitials(name) {
   return name.substring(0, 2).toUpperCase();
 }
 
-function formatDisplayDate(dateStr) {
-  if (!dateStr) return '';
-  if (/^[A-Za-z]+ \d{4}$/.test(dateStr)) return dateStr;
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return dateStr;
-  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-}
-
 export default function ProfilePage() {
+  const navigate = useNavigate();
   const { user, refreshProfile } = useAuth();
   const dispatch = useDispatch();
   const donations = useSelector(state => state.donations.items);
@@ -42,14 +35,58 @@ export default function ProfilePage() {
     city: '',
     bio: '',
     isVolunteer: false,
-    availability: 'weekends'
+    availability: ''
   });
   const [editLoading, setEditLoading]     = useState(false);
   const [editError, setEditError]         = useState('');
   const [editSuccess, setEditSuccess]     = useState('');
 
-  // Volunteer activate loading
-  const [activatingVol, setActivatingVol] = useState(false);
+  // Volunteer deactivate loading
+  const [deactivatingVol, setDeactivatingVol] = useState(false);
+
+  // Volunteer Preferences Edit Modal state
+  const [showVolPrefModal, setShowVolPrefModal] = useState(false);
+  const [volPrefForm, setVolPrefForm] = useState({
+    availability: '',
+    interests: [],
+    skills: ''
+  });
+  const [volPrefLoading, setVolPrefLoading] = useState(false);
+  const [volPrefError, setVolPrefError] = useState('');
+
+  const openEditVolPreferences = () => {
+    setVolPrefForm({
+      availability: volSub?.availability || '',
+      interests: volSub?.interests || [],
+      skills: (volSub?.skills || []).join(', ')
+    });
+    setVolPrefError('');
+    setShowVolPrefModal(true);
+  };
+
+  const handleVolPrefSubmit = async (e) => {
+    e.preventDefault();
+    setVolPrefLoading(true);
+    setVolPrefError('');
+    try {
+      const skillsArray = volPrefForm.skills
+        ? volPrefForm.skills.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean)
+        : (volSub?.skills || ['Community Outreach']);
+
+      await api.put('/volunteer/profile', {
+        availability: volPrefForm.availability,
+        interests: volPrefForm.interests,
+        skills: skillsArray.length ? skillsArray : ['Community Outreach']
+      });
+
+      await refreshProfile();
+      setShowVolPrefModal(false);
+    } catch (err) {
+      setVolPrefError(err.response?.data?.error || 'Failed to update preferences.');
+    } finally {
+      setVolPrefLoading(false);
+    }
+  };
 
 
   // Log Hours Modal state
@@ -187,16 +224,20 @@ export default function ProfilePage() {
     }
   };
 
-  /* ── Activate volunteer subprofile ── */
-  const activateVolunteer = async () => {
-    setActivatingVol(true);
+
+  /* ── Deactivate volunteer subprofile ── */
+  const deactivateVolunteer = async () => {
+    if (!window.confirm('Are you sure you want to leave the volunteer program? You can re-activate anytime.')) {
+      return;
+    }
+    setDeactivatingVol(true);
     try {
-      await api.post('/volunteer/activate');
+      await api.post('/volunteer/deactivate');
       await refreshProfile();
     } catch (err) {
-      alert(err.response?.data?.error || 'Could not activate volunteer profile.');
+      alert(err.response?.data?.error || 'Could not update volunteer status.');
     } finally {
-      setActivatingVol(false);
+      setDeactivatingVol(false);
     }
   };
 
@@ -421,12 +462,12 @@ export default function ProfilePage() {
                     <div className="vol-prompt-icon">
                       <svg viewBox="0 0 24 24" width="48" height="48" fill="var(--color-primary)"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                     </div>
-                    <h2 style={{ marginBottom: 'var(--space-3)' }}>Activate Your Volunteer Subprofile</h2>
+                    <h2 style={{ marginBottom: 'var(--space-3)' }}>Become an Active Volunteer</h2>
                     <p style={{ maxWidth: 540, margin: '0 auto var(--space-6)', color: 'var(--color-text-secondary)' }}>
-                      When you choose to volunteer on iVolunteer, a dedicated <strong>Volunteer Subprofile</strong> is created inside your main profile. Track your volunteer hours, earn achievement badges, and participate in community drives!
+                      Choose your preferred causes, availability, and skills to register as a volunteer and participate in verified community drives across Chandigarh Tricity &amp; Punjab.
                     </p>
-                    <button type="button" className="btn btn-primary btn-lg" onClick={activateVolunteer} disabled={activatingVol}>
-                      {activatingVol ? 'Activating…' : 'Activate Volunteer Subprofile Now'}
+                    <button type="button" className="btn btn-primary btn-lg" onClick={() => navigate('/volunteer')}>
+                      Become a Volunteer
                     </button>
                   </div>
                 </div>
@@ -441,10 +482,25 @@ export default function ProfilePage() {
                           <span className="vol-id-tag">{volSub.volunteerId}</span>
                         </div>
                         <p style={{ color: 'rgba(255,255,255,0.85)', marginTop: 4 }}>
-                          Status: {volSub.status} • Member since {formatDisplayDate(volSub.joinedDate)}
+                          Status: {volSub.status}
                         </p>
                       </div>
-                      <Link to="/volunteer" className="btn btn-secondary btn-sm">Find New Drives</Link>
+                      <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <Link to="/volunteer" className="btn btn-secondary btn-sm">Find New Drives</Link>
+                        <button
+                          type="button"
+                          className="btn btn-sm"
+                          style={{
+                            background: 'rgba(239, 68, 68, 0.2)',
+                            color: '#ffffff',
+                            border: '1px solid rgba(239, 68, 68, 0.4)'
+                          }}
+                          onClick={deactivateVolunteer}
+                          disabled={deactivatingVol}
+                        >
+                          {deactivatingVol ? 'Leaving…' : 'Leave Volunteer Role'}
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -470,14 +526,10 @@ export default function ProfilePage() {
                             <div className="vol-badges-grid">
                               {volSub.badges.map((b, i) => (
                                 <div className="vol-badge-card" key={i}>
-                                  <div className="vol-badge-icon" style={{ color: 'var(--color-primary)', fontSize: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    {b.icon ? (
-                                      <span>{b.icon}</span>
-                                    ) : (
-                                      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                      </svg>
-                                    )}
+                                  <div className="vol-badge-icon" style={{ color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
                                   </div>
                                   <div className="vol-badge-name">{b.name}</div>
                                   <div className="vol-badge-desc">{b.desc}</div>
@@ -493,7 +545,16 @@ export default function ProfilePage() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
                       <div className="card">
                         <div className="card-body">
-                          <h3 style={{ marginBottom: 'var(--space-4)' }}>Preferences &amp; Skills</h3>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: 10 }}>
+                            <h3 style={{ margin: 0 }}>Preferences &amp; Skills</h3>
+                            <button
+                              type="button"
+                              className="btn btn-secondary btn-sm"
+                              onClick={openEditVolPreferences}
+                            >
+                              Edit Preferences
+                            </button>
+                          </div>
                           <div style={{ marginBottom: 'var(--space-4)' }}>
                             <strong style={{ display: 'block', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', textTransform: 'uppercase', marginBottom: 'var(--space-2)' }}>Areas of Interest</strong>
                             <div>
@@ -514,7 +575,7 @@ export default function ProfilePage() {
                           </div>
                           <div>
                             <strong style={{ display: 'block', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', textTransform: 'uppercase', marginBottom: 'var(--space-1)' }}>Availability</strong>
-                            <span style={{ fontWeight: 'var(--font-weight-medium)', textTransform: 'capitalize' }}>{volSub.availability || 'Weekends'}</span>
+                            <span style={{ fontWeight: 'var(--font-weight-medium)', textTransform: 'capitalize' }}>{volSub.availability || 'Not set'}</span>
                           </div>
                         </div>
                       </div>
@@ -558,7 +619,7 @@ export default function ProfilePage() {
                                       <td>
                                         {d.status === 'Attended' ? (
                                           <span className="badge badge-verified" style={{ fontSize: 11, padding: '4px 8px' }}>
-                                            Attended ✓
+                                            Attended
                                           </span>
                                         ) : (
                                           <button
@@ -567,7 +628,7 @@ export default function ProfilePage() {
                                             style={{ fontSize: 11, padding: '4px 10px' }}
                                             onClick={() => handleMarkUpcomingAttended(d)}
                                           >
-                                            ✓ Mark Attended
+                                            Mark Attended
                                           </button>
                                         )}
                                       </td>
@@ -631,7 +692,7 @@ export default function ProfilePage() {
                                           {d.hoursLogged} hrs
                                         </span>
                                       </td>
-                                      <td><span className="badge badge-verified">Verified ✓</span></td>
+                                      <td><span className="badge badge-verified">Verified</span></td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -685,7 +746,7 @@ export default function ProfilePage() {
                   )}
                   {editSuccess && (
                     <div style={{ marginBottom: 'var(--space-4)', padding: '10px 14px', borderRadius: 'var(--radius-md)', background: '#dcfce7', color: '#166534', fontSize: 'var(--font-size-sm)', fontWeight: 600 }}>
-                      ✓ {editSuccess}
+                      {editSuccess}
                     </div>
                   )}
 
@@ -820,7 +881,7 @@ export default function ProfilePage() {
             )}
             {editSuccess && (
               <div style={{ marginBottom: 'var(--space-3)', padding: '8px 12px', borderRadius: 'var(--radius-md)', background: '#dcfce7', color: '#166534', fontSize: 'var(--font-size-sm)', fontWeight: 600 }}>
-                ✓ {editSuccess}
+                {editSuccess}
               </div>
             )}
             <form onSubmit={handleEditSubmit}>
@@ -889,7 +950,14 @@ export default function ProfilePage() {
                   <input
                     type="checkbox"
                     checked={editForm.isVolunteer}
-                    onChange={e => setEditForm(f => ({ ...f, isVolunteer: e.target.checked }))}
+                    onChange={e => {
+                      if (!editForm.isVolunteer && e.target.checked) {
+                        setShowEditModal(false);
+                        navigate('/volunteer');
+                      } else {
+                        setEditForm(f => ({ ...f, isVolunteer: e.target.checked }));
+                      }
+                    }}
                     style={{ accentColor: 'var(--color-primary)' }}
                   />
                   <span>Active Volunteer Network Member</span>
@@ -1075,6 +1143,134 @@ export default function ProfilePage() {
                 </button>
                 <button type="submit" className="btn btn-primary btn-sm" disabled={logLoading}>
                   {logLoading ? 'Saving…' : 'Save Volunteer Hours'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Edit Volunteer Preferences Modal ─── */}
+      {showVolPrefModal && (
+        <div
+          className="modal-overlay visible"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(11, 17, 32, 0.8)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1500,
+            padding: 'var(--space-4)'
+          }}
+          onClick={() => setShowVolPrefModal(false)}
+        >
+          <div
+            className="modal-card"
+            style={{ maxWidth: 540, width: '100%', background: 'var(--surface-card)', borderRadius: 'var(--radius-xl)', padding: 'var(--space-6)' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
+              <h3 style={{ margin: 0 }}>Edit Volunteer Preferences</h3>
+              <button type="button" className="modal-close" onClick={() => setShowVolPrefModal(false)}>×</button>
+            </div>
+
+            {volPrefError && (
+              <div style={{ marginBottom: 'var(--space-3)', padding: '8px 12px', borderRadius: 'var(--radius-md)', background: '#fee2e2', color: '#991b1b', fontSize: 'var(--font-size-sm)' }}>
+                {volPrefError}
+              </div>
+            )}
+
+            <form onSubmit={handleVolPrefSubmit}>
+              {/* Availability */}
+              <div className="form-group" style={{ marginBottom: 'var(--space-4)' }}>
+                <label htmlFor="pref-avail" style={{ fontWeight: 600, display: 'block', marginBottom: 'var(--space-2)' }}>
+                  Your Availability
+                </label>
+                <select
+                  id="pref-avail"
+                  className="form-select"
+                  value={volPrefForm.availability}
+                  onChange={e => setVolPrefForm(f => ({ ...f, availability: e.target.value }))}
+                >
+                  <option value="weekends">Weekends Only</option>
+                  <option value="weekdays">Weekdays</option>
+                  <option value="both">Both Weekdays &amp; Weekends</option>
+                  <option value="flexible">Flexible / Any Time</option>
+                </select>
+              </div>
+
+              {/* Interests */}
+              <div className="form-group" style={{ marginBottom: 'var(--space-4)' }}>
+                <label style={{ fontWeight: 600, display: 'block', marginBottom: 'var(--space-2)' }}>
+                  Causes &amp; Activities You Wish to Support
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 'var(--space-2)' }}>
+                  {[
+                    { val: 'foodDrive', label: 'Food Drives' },
+                    { val: 'clothingDrive', label: 'Winter Clothes' },
+                    { val: 'teaching', label: 'Teaching Children' },
+                    { val: 'elderCare', label: 'Elder Care' },
+                    { val: 'cleanup', label: 'Eco & Animal Care' }
+                  ].map(({ val, label }) => {
+                    const selected = volPrefForm.interests.includes(val);
+                    return (
+                      <button
+                        type="button"
+                        key={val}
+                        onClick={() => {
+                          setVolPrefForm(f => {
+                            const current = f.interests;
+                            const updated = current.includes(val)
+                              ? current.filter(x => x !== val)
+                              : [...current, val];
+                            return { ...f, interests: updated };
+                          });
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '8px 12px',
+                          borderRadius: 'var(--radius-md)',
+                          border: `1.5px solid ${selected ? 'var(--color-primary)' : 'var(--color-border)'}`,
+                          background: selected ? 'var(--color-primary-bg)' : 'var(--surface-card)',
+                          color: selected ? 'var(--color-primary-dark)' : 'var(--color-text)',
+                          fontWeight: selected ? 600 : 500,
+                          fontSize: 'var(--font-size-xs)',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Skills */}
+              <div className="form-group" style={{ marginBottom: 'var(--space-6)' }}>
+                <label htmlFor="pref-skills" style={{ fontWeight: 600, display: 'block', marginBottom: 'var(--space-2)' }}>
+                  Skills Offered (comma-separated)
+                </label>
+                <input
+                  type="text"
+                  id="pref-skills"
+                  className="form-input"
+                  placeholder="e.g. First Aid, Community Outreach, Teaching"
+                  value={volPrefForm.skills}
+                  onChange={e => setVolPrefForm(f => ({ ...f, skills: e.target.value }))}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
+                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowVolPrefModal(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary btn-sm" disabled={volPrefLoading}>
+                  {volPrefLoading ? 'Saving…' : 'Save Preferences'}
                 </button>
               </div>
             </form>

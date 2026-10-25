@@ -12,10 +12,6 @@ export default function HomePage() {
       <section className="hero">
         <div className="container">
           <div className="hero-content">
-            <div className="region-badge">
-              <span className="live-dot"></span>
-              <span>Verified Directory • Chandigarh Tricity & Punjab</span>
-            </div>
             <h1>Give What You Can. <span>Change a Life.</span></h1>
             <p>iVolunteer connects generous donors with verified NGOs, orphanages, and old-age homes across Chandigarh, Mohali, Panchkula & Punjab. Donate essentials, volunteer your time, and see the impact you make.</p>
             <div className="hero-actions">

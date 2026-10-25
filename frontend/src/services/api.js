@@ -27,9 +27,9 @@ const INITIAL_USERS = [
       interests: ['foodDrive', 'clothingDrive', 'teaching'],
       skills: ['Community Outreach', 'Logistics Coordination', 'First Aid'],
       badges: [
-        { name: 'First Drive', icon: '⭐', desc: 'Attended first community drive' },
-        { name: 'Community Star', icon: '🌟', desc: 'Completed over 25 volunteer hours' },
-        { name: 'Tricity Champion', icon: '🏆', desc: 'Active volunteer in Chandigarh & Punjab region' }
+        { name: 'First Drive', icon: '', desc: 'Attended first community drive' },
+        { name: 'Community Star', icon: '', desc: 'Completed over 25 volunteer hours' },
+        { name: 'Tricity Champion', icon: '', desc: 'Active volunteer in Chandigarh & Punjab region' }
       ],
       upcomingDrives: [
         {
@@ -439,11 +439,11 @@ const api = {
           joinedDate: todayStr(),
           hoursContributed: 0,
           drivesAttended: 0,
-          availability: 'weekends',
-          interests: ['foodDrive', 'clothingDrive'],
-          skills: ['Community Outreach'],
+          availability: body.availability || 'weekends',
+          interests: Array.isArray(body.interests) ? body.interests : [],
+          skills: Array.isArray(body.skills) && body.skills.length ? body.skills : ['Community Outreach'],
           badges: [
-            { name: 'New Volunteer', icon: '🌱', desc: 'Joined iVolunteer active volunteer network' }
+            { name: 'New Volunteer', icon: '', desc: 'Joined iVolunteer active volunteer network' }
           ],
           upcomingDrives: [],
           attendedDrives: []
@@ -570,11 +570,11 @@ const api = {
         joinedDate: user.volunteerSubProfile?.joinedDate || todayStr(),
         hoursContributed: user.volunteerSubProfile?.hoursContributed || 0,
         drivesAttended: user.volunteerSubProfile?.drivesAttended || 0,
-        availability: user.volunteerSubProfile?.availability || 'weekends',
-        interests: user.volunteerSubProfile?.interests || ['foodDrive', 'clothingDrive'],
-        skills: user.volunteerSubProfile?.skills || ['Community Support'],
+        availability: body.availability || user.volunteerSubProfile?.availability || 'weekends',
+        interests: Array.isArray(body.interests) ? body.interests : (user.volunteerSubProfile?.interests || []),
+        skills: Array.isArray(body.skills) && body.skills.length ? body.skills : (user.volunteerSubProfile?.skills || ['Community Outreach']),
         badges: user.volunteerSubProfile?.badges?.length ? user.volunteerSubProfile.badges : [
-          { name: 'New Volunteer', icon: '🌱', desc: 'Joined iVolunteer active volunteer network' }
+          { name: 'New Volunteer', icon: '', desc: 'Joined iVolunteer active volunteer network' }
         ],
         upcomingDrives: user.volunteerSubProfile?.upcomingDrives || [],
         attendedDrives: user.volunteerSubProfile?.attendedDrives || []
@@ -587,6 +587,27 @@ const api = {
         data: {
           message: 'Volunteer subprofile activated.',
           volunteerId: volId
+        }
+      };
+    }
+
+    // Deactivate Volunteer
+    if (cleanUrl === '/volunteer/deactivate') {
+      const userId = getCurrentUserId();
+      if (!userId) throw createError('No token provided.', 401);
+
+      const users = getStoredUsers();
+      const userIndex = users.findIndex((u) => u.id === userId);
+      if (userIndex === -1) throw createError('User not found.', 404);
+
+      users[userIndex].isVolunteer = false;
+      users[userIndex].volunteerSubProfile = null;
+      saveStoredUsers(users);
+
+      return {
+        data: {
+          message: 'Volunteer subprofile deactivated.',
+          user: users[userIndex]
         }
       };
     }
@@ -621,7 +642,7 @@ const api = {
           interests: user.volunteerSubProfile?.interests || ['foodDrive', 'clothingDrive'],
           skills: user.volunteerSubProfile?.skills || ['Community Support'],
           badges: [
-            { name: 'New Volunteer', icon: '🌱', desc: 'Joined iVolunteer active volunteer network' }
+            { name: 'New Volunteer', icon: '', desc: 'Joined iVolunteer active volunteer network' }
           ],
           upcomingDrives: [],
           attendedDrives: []
@@ -729,16 +750,16 @@ const api = {
       const hasBadge = (name) => newBadges.some(b => b.name === name);
 
       if (sub.drivesAttended >= 1 && !hasBadge('First Drive')) {
-        newBadges.push({ name: 'First Drive', icon: '⭐', desc: 'Attended your first community volunteer drive!' });
+        newBadges.push({ name: 'First Drive', icon: '', desc: 'Attended your first community volunteer drive!' });
       }
       if (sub.hoursContributed >= 5 && !hasBadge('Community Helper')) {
-        newBadges.push({ name: 'Community Helper', icon: '🤝', desc: 'Logged 5+ volunteer hours on iVolunteer.' });
+        newBadges.push({ name: 'Community Helper', icon: '', desc: 'Logged 5+ volunteer hours on iVolunteer.' });
       }
       if (sub.hoursContributed >= 25 && !hasBadge('Community Star')) {
-        newBadges.push({ name: 'Community Star', icon: '🌟', desc: 'Completed over 25 volunteer hours — outstanding commitment!' });
+        newBadges.push({ name: 'Community Star', icon: '', desc: 'Completed over 25 volunteer hours — outstanding commitment!' });
       }
       if (sub.hoursContributed >= 50 && !hasBadge('Tricity Champion')) {
-        newBadges.push({ name: 'Tricity Champion', icon: '🏆', desc: 'An exceptional 50+ hours contributed across the Tricity!' });
+        newBadges.push({ name: 'Tricity Champion', icon: '', desc: 'An exceptional 50+ hours contributed across the Tricity!' });
       }
       sub.badges = newBadges;
 
@@ -829,19 +850,19 @@ const api = {
       const badges = sub.badges || [];
       const hasBadge = (name) => badges.some(b => b.name === name);
       if (sub.drivesAttended >= 1 && !hasBadge('First Drive')) {
-        badges.push({ name: 'First Drive', icon: '⭐', desc: 'Attended your first community volunteer drive!' });
+        badges.push({ name: 'First Drive', icon: '', desc: 'Attended your first community volunteer drive!' });
       }
       if (sub.drivesAttended >= 5 && !hasBadge('Drive Regular')) {
-        badges.push({ name: 'Drive Regular', icon: '🎯', desc: 'Attended 5 drives — a reliable iVolunteer!' });
+        badges.push({ name: 'Drive Regular', icon: '', desc: 'Attended 5 drives — a reliable iVolunteer!' });
       }
       if (sub.drivesAttended >= 10 && !hasBadge('Drive Pro')) {
-        badges.push({ name: 'Drive Pro', icon: '💪', desc: '10+ drives attended — true dedication!' });
+        badges.push({ name: 'Drive Pro', icon: '', desc: '10+ drives attended — true dedication!' });
       }
       if (sub.hoursContributed >= 25 && !hasBadge('Community Star')) {
-        badges.push({ name: 'Community Star', icon: '🌟', desc: 'Completed over 25 volunteer hours!' });
+        badges.push({ name: 'Community Star', icon: '', desc: 'Completed over 25 volunteer hours!' });
       }
       if (sub.hoursContributed >= 50 && !hasBadge('Tricity Champion')) {
-        badges.push({ name: 'Tricity Champion', icon: '🏆', desc: 'An exceptional 50+ hours contributed across the Tricity!' });
+        badges.push({ name: 'Tricity Champion', icon: '', desc: 'An exceptional 50+ hours contributed across the Tricity!' });
       }
       sub.badges = badges;
 
@@ -890,7 +911,7 @@ const api = {
       const userId = getCurrentUserId();
       if (!userId) throw createError('No token provided.', 401);
 
-      const { name, phone = '', city = '', bio = '', isVolunteer, availability } = body;
+      const { name, phone = '', city = '', bio = '', isVolunteer, availability, interests, skills } = body;
       if (!name || !name.trim()) {
         throw createError('Name is required.', 400);
       }
@@ -910,20 +931,21 @@ const api = {
           joinedDate: todayStr(),
           hoursContributed: 0,
           drivesAttended: 0,
-          availability: availability || 'weekends',
-          interests: ['foodDrive', 'clothingDrive'],
-          skills: ['Community Support'],
+          availability: availability || 'flexible',
+          interests: Array.isArray(interests) ? interests : [],
+          skills: Array.isArray(skills) && skills.length ? skills : ['Community Outreach'],
           badges: [
-            { name: 'New Volunteer', icon: '🌱', desc: 'Joined iVolunteer active volunteer network' }
+            { name: 'New Volunteer', icon: '', desc: 'Joined iVolunteer active volunteer network' }
           ],
           upcomingDrives: [],
           attendedDrives: []
         };
-      } else if (updatedSubProfile && availability) {
-        updatedSubProfile = {
-          ...updatedSubProfile,
-          availability
-        };
+      } else if (!updatedIsVol) {
+        updatedSubProfile = null;
+      } else if (updatedSubProfile) {
+        if (availability) updatedSubProfile.availability = availability;
+        if (Array.isArray(interests)) updatedSubProfile.interests = interests;
+        if (Array.isArray(skills) && skills.length) updatedSubProfile.skills = skills;
       }
 
       users[userIndex] = {
@@ -945,7 +967,7 @@ const api = {
       const userId = getCurrentUserId();
       if (!userId) throw createError('No token provided.', 401);
 
-      const { availability = 'weekends', interests = [], skills = [], priorExperience = '' } = body;
+      const { availability, interests, skills, priorExperience } = body;
 
       const users = getStoredUsers();
       const userIndex = users.findIndex((u) => u.id === userId);
@@ -953,6 +975,7 @@ const api = {
 
       const user = users[userIndex];
       if (!user.volunteerSubProfile) {
+        // Creating fresh subprofile — use provided values or safe defaults
         user.isVolunteer = true;
         user.volunteerSubProfile = {
           volunteerId: generateVolunteerId(),
@@ -960,17 +983,23 @@ const api = {
           joinedDate: todayStr(),
           hoursContributed: 0,
           drivesAttended: 0,
-          availability,
-          interests,
-          skills: Array.isArray(skills) && skills.length ? skills : ['Community Support'],
-          priorExperience: priorExperience.trim(),
-          badges: [{ name: 'New Volunteer', icon: '🌱', desc: 'Joined active volunteer network' }],
+          availability: availability || 'flexible',
+          interests: Array.isArray(interests) ? interests : [],
+          skills: Array.isArray(skills) && skills.length ? skills : ['Community Outreach'],
+          priorExperience: (priorExperience || '').trim(),
+          badges: [{ name: 'New Volunteer', icon: '', desc: 'Joined active volunteer network' }],
           upcomingDrives: [],
           attendedDrives: []
         };
       } else {
-        user.volunteerSubProfile.availability = availability;
-        user.volunteerSubProfile.interests    = interests;
+        // Updating existing subprofile — only update fields that are explicitly provided
+        user.isVolunteer = true;
+        if (availability !== undefined) {
+          user.volunteerSubProfile.availability = availability;
+        }
+        if (Array.isArray(interests)) {
+          user.volunteerSubProfile.interests = interests;
+        }
         if (Array.isArray(skills) && skills.length) {
           user.volunteerSubProfile.skills = skills;
         }
