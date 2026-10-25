@@ -273,8 +273,8 @@ export default function VolunteerPage() {
           <h1>
             Give Your Time, <span className="gradient-text">Spark Real Change</span>
           </h1>
-          <p style={{ maxWidth: 700, margin: '0 auto var(--space-8)' }}>
-            Join hundreds of dedicated Tricity volunteers distributing hot langar meals, teaching children, warming families in winter, and preserving local ecology.
+          <p style={{ maxWidth: 560, margin: '0 auto var(--space-8)' }}>
+            Join volunteers across Chandigarh Tricity distributing meals, teaching children, and serving local communities.
           </p>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-6)', flexWrap: 'wrap' }}>
@@ -302,21 +302,21 @@ export default function VolunteerPage() {
             <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center', borderTop: '4px solid var(--color-primary)' }}>
               <h3 style={{ fontSize: 'var(--font-size-md)', marginBottom: 'var(--space-2)' }}>Direct Grassroots Impact</h3>
               <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                Work directly alongside verified homes like Bal Niketan, Tammana, and Tera Hi Tera mission right here in the Tricity.
+                Work with verified homes like Bal Niketan, Tammana, and Tera Hi Tera in the Tricity.
               </p>
             </div>
 
             <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center', borderTop: '4px solid var(--color-accent)' }}>
               <h3 style={{ fontSize: 'var(--font-size-md)', marginBottom: 'var(--space-2)' }}>Flexible Time Commitments</h3>
               <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                Whether you have 2 hours on Sunday morning or can coordinate weekday drives, there is a role designed for your schedule.
+                Weekday or weekend — choose a schedule that works for you.
               </p>
             </div>
 
             <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center', borderTop: '4px solid var(--color-secondary-indigo)' }}>
               <h3 style={{ fontSize: 'var(--font-size-md)', marginBottom: 'var(--space-2)' }}>Recognition &amp; Badges</h3>
               <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                Track your hours, earn community milestone badges, and build your social impact record for your profile.
+                Earn milestone badges and build your social impact record.
               </p>
             </div>
           </div>
@@ -345,8 +345,8 @@ export default function VolunteerPage() {
                   You are already a volunteer
                 </h2>
 
-                <p style={{ color: 'var(--color-text-secondary)', maxWidth: 540, margin: '0 auto var(--space-6)', fontSize: 'var(--font-size-md)', lineHeight: 1.6 }}>
-                  Your volunteer profile is active. You can browse and RSVP to community drives below, track your contribution hours, or edit your preferred causes and availability anytime.
+                <p style={{ color: 'var(--color-text-secondary)', maxWidth: 480, margin: '0 auto var(--space-6)', fontSize: 'var(--font-size-md)' }}>
+                  Your volunteer profile is active. Browse drives below, track your hours, or update your preferences.
                 </p>
 
                 <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'center', flexWrap: 'wrap' }}>

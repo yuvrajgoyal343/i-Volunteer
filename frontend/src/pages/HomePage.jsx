@@ -13,7 +13,7 @@ export default function HomePage() {
         <div className="container">
           <div className="hero-content">
             <h1>Give What You Can. <span>Change a Life.</span></h1>
-            <p>iVolunteer connects generous donors with verified NGOs, orphanages, and old-age homes across Chandigarh, Mohali, Panchkula & Punjab. Donate essentials, volunteer your time, and see the impact you make.</p>
+            <p>Connecting donors with verified NGOs across Chandigarh Tricity & Punjab.</p>
             <div className="hero-actions">
               <Link to="/donate" className="btn btn-primary btn-lg">
                 <svg viewBox="0 0 24 24" width="20" height="20"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -47,23 +47,23 @@ export default function HomePage() {
         <div className="container">
           <div className="section-header">
             <h2>How It <span className="gradient-text">Works</span></h2>
-            <p>A simple, transparent process from your doorstep to the people who need it most.</p>
+
           </div>
           <div className="steps-flow">
             <div className="step-item">
               <div className="step-number">1</div>
               <h3>Choose What to Donate</h3>
-              <p>Select from food, clothes, books, medicines, or other essentials and fill in the details.</p>
+              <p>Select food, clothes, books, or medicines.</p>
             </div>
             <div className="step-item">
               <div className="step-number">2</div>
               <h3>Select a Verified Organisation</h3>
-              <p>Pick a nearby NGO, orphanage, or old-age home. All organisations are verified for authenticity.</p>
+              <p>Pick a nearby verified NGO or shelter home.</p>
             </div>
             <div className="step-item">
               <div className="step-number">3</div>
               <h3>Track Your Impact</h3>
-              <p>Follow your donation from pickup to delivery. Know exactly where your contribution goes.</p>
+              <p>Track your donation from pickup to delivery.</p>
             </div>
           </div>
         </div>
@@ -74,7 +74,7 @@ export default function HomePage() {
         <div className="container">
           <div className="section-header">
             <h2>What You Can <span className="gradient-text-accent">Donate</span></h2>
-            <p>Every item counts. Choose a category and make a difference today.</p>
+
           </div>
           <div className="categories-grid">
             {[
@@ -99,7 +99,7 @@ export default function HomePage() {
         <div className="container">
           <div className="section-header">
             <h2>The Impact So Far</h2>
-            <p>Platform-wide network impact across verified partner organisations throughout Chandigarh, Mohali, Panchkula, and Punjab.</p>
+
           </div>
           <div className="impact-stats">
             {[
@@ -122,7 +122,7 @@ export default function HomePage() {
         <div className="container">
           <div className="section-header">
             <h2>See Real <span className="gradient-text">Impact</span> in Action</h2>
-            <p>A glimpse into our on-ground food drives, clothing collections, library setups, and volunteer care visits.</p>
+
           </div>
           <div className="homepage-collage-grid">
             {[
@@ -148,7 +148,7 @@ export default function HomePage() {
         <div className="container">
           <div className="section-header">
             <h2>Ready to Make a <span className="gradient-text">Difference</span>?</h2>
-            <p>Whether you have items to donate or time to volunteer, your contribution matters. Start today.</p>
+
           </div>
           <div className="hero-actions">
             <Link to="/donate" className="btn btn-primary btn-lg">

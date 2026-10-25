@@ -181,8 +181,8 @@ export default function DonatePage() {
           <h1>
             Donate Essentials, <span className="gradient-text">Transform Lives</span>
           </h1>
-          <p style={{ maxWidth: 680, margin: '0 auto var(--space-6)' }}>
-            Transparent item donations. Pack your surplus clothes, dry rations, or books, and our verified volunteer partners will collect them from your door.
+          <p style={{ maxWidth: 500, margin: '0 auto var(--space-6)' }}>
+            Free doorstep pickup of your essentials, delivered directly to verified homes across Chandigarh Tricity.
           </p>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-6)', flexWrap: 'wrap' }}>

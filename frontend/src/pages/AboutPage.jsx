@@ -12,9 +12,9 @@ const IMPACT_METRICS = [
 ];
 
 const VERIFICATION_STEPS = [
-  { num: 1, color: '#059669', bg: 'var(--color-primary-bg)', text: 'var(--color-primary)', title: 'Legal & Tax Audit', desc: 'Verification of 12A/80G tax exemption certificates, state society registration under the Societies Act, and CWC (Child Welfare Committee) approvals.' },
-  { num: 2, color: '#F59E0B', bg: 'var(--color-accent-bg)', text: 'var(--color-accent-dark)', title: 'On-Ground Inspection', desc: 'Our field coordinators conduct physical visits to inspect facility hygiene, resident welfare, storage conditions, and direct community utilization.' },
-  { num: 3, color: '#6366F1', bg: 'rgba(99, 102, 241, 0.12)', text: '#4F46E5', title: 'Continuous Delivery Receipts', desc: 'Donation deliveries are documented with date-stamped pickup proofs and annual re-verification to maintain list status.' }
+  { num: 1, color: '#059669', bg: 'var(--color-primary-bg)', text: 'var(--color-primary)', title: 'Legal & Tax Audit', desc: 'Verification of 12A/80G certificates, state society registration, and CWC approvals.' },
+  { num: 2, color: '#F59E0B', bg: 'var(--color-accent-bg)', text: 'var(--color-accent-dark)', title: 'On-Ground Inspection', desc: 'Physical visits to inspect facility hygiene, resident welfare, and community utilization.' },
+  { num: 3, color: '#6366F1', bg: 'rgba(99, 102, 241, 0.12)', text: '#4F46E5', title: 'Continuous Delivery Receipts', desc: 'Deliveries are documented with pickup proofs and annual re-verification.' }
 ];
 
 const CORE_VALUES = [
@@ -59,8 +59,8 @@ export default function AboutPage() {
       <section className="page-header" style={{ position: 'relative', overflow: 'hidden' }}>
         <div className="container" style={{ position: 'relative', zIndex: 2 }}>
           <h1>Connecting Compassion with <span className="gradient-text">Verified Need</span></h1>
-          <p style={{ maxWidth: 720, margin: '0 auto var(--space-6)' }}>
-            iVolunteer was founded to eliminate opacity in charity. We ensure every warm sweater, book, and meal reaches genuine orphanages, elderly shelters, and community langars across Chandigarh, Mohali, Panchkula, and Punjab.
+          <p style={{ maxWidth: 600, margin: '0 auto var(--space-6)' }}>
+            We ensure every item reaches genuine orphanages, elderly shelters, and community langars across Chandigarh Tricity &amp; Punjab.
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-6)', flexWrap: 'wrap' }}>
             {['100% 3-Stage NGO Audit', 'No Cash Handouts • Items Only', 'Hyper-Local Ground Verification'].map(chip => (
@@ -75,13 +75,8 @@ export default function AboutPage() {
           {/* Mission & Key Philosophy Split */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 'var(--space-8)', alignItems: 'center', marginBottom: 'var(--space-16)' }}>
             <div>
-              <span className="badge badge-verified" style={{ marginBottom: 'var(--space-3)' }}>The Philosophy</span>
-              <h2 style={{ fontSize: 'var(--font-size-2xl)', lineHeight: 1.2, marginBottom: 'var(--space-4)' }}>Why Physical Giving Changes Everything</h2>
-              <p style={{ fontSize: 'var(--font-size-md)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
-                Too often, monetary donations get diluted by administrative overhead and uncertainty. iVolunteer completely shifts the paradigm: we deal exclusively in <strong>tangible essentials</strong> — food grains, textbooks, prescription medicines, warm winter clothing, and volunteer care hours.
-              </p>
-              <p style={{ fontSize: 'var(--font-size-sm)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-6)' }}>
-                Every donation submitted through our platform is routed to verified partners such as Tammana, Bal Niketan Panchkula, Tera Hi Tera mission, or Lions Club Old Age Home, where it is put directly into the hands of someone who needs it today.
+              <p style={{ fontSize: 'var(--font-size-md)', lineHeight: 'var(--line-height-relaxed)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-6)' }}>
+                iVolunteer deals exclusively in <strong>tangible essentials</strong> — food grains, textbooks, medicines, and warm clothing — routed directly to verified partners like Tammana, Bal Niketan, and Tera Hi Tera.
               </p>
               <div style={{ display: 'flex', gap: 'var(--space-4)' }}>
                 <Link to="/organisations" className="btn btn-primary btn-sm">View Verified Organisations →</Link>
@@ -109,11 +104,7 @@ export default function AboutPage() {
           {/* 3-Stage Verification Pipeline */}
           <div style={{ marginBottom: 'var(--space-16)' }}>
             <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
-              <span className="badge badge-verified" style={{ marginBottom: 'var(--space-2)' }}>The Trust Standard</span>
-              <h2>How We Verify Every Organisation</h2>
-              <p style={{ color: 'var(--color-text-secondary)', maxWidth: 600, margin: '0 auto' }}>
-                Every listed home undergoes a strict 3-tier audit before appearing in the directory.
-              </p>
+
             </div>
             <div className="steps-flow" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-6)' }}>
               {VERIFICATION_STEPS.map(s => (
@@ -131,7 +122,6 @@ export default function AboutPage() {
           {/* Core Values Section */}
           <div style={{ marginBottom: 'var(--space-16)' }}>
             <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
-              <span className="badge badge-category" style={{ marginBottom: 'var(--space-2)' }}>Guiding Principles</span>
               <h2>Our Core Values</h2>
             </div>
             <div className="grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--space-6)' }}>
@@ -185,8 +175,8 @@ export default function AboutPage() {
             {/* Helpdesk Contacts */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
               {[
-                { title: 'General Inquiries', desc: 'For questions about doorstep pickup coverage or drive volunteer guidelines.', email: 'support@ivolunteer.org' },
-                { title: 'NGO Listing & Verification', desc: 'Run an orphanage, senior home, or charitable dispensary in Chandigarh Tricity or Punjab? Get audited and verified for listings.', email: 'partners@ivolunteer.org' }
+                { title: 'General Inquiries', desc: 'Questions about doorstep pickup or volunteer drives.', email: 'support@ivolunteer.org' },
+                { title: 'NGO Listing & Verification', desc: 'Run a shelter or charitable home in Tricity or Punjab? Get verified and listed.', email: 'partners@ivolunteer.org' }
               ].map(c => (
                 <div key={c.title} className="card" style={{ padding: 'var(--space-6)', borderRadius: 'var(--radius-xl)' }}>
                   <h4 style={{ fontSize: 'var(--font-size-md)', marginBottom: 4 }}>{c.title}</h4>
